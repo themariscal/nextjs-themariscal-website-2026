@@ -1,0 +1,434 @@
+{
+  "metadata": {
+    "title": "TheMariscal.com",
+    "description": "Toegang tot alle functies die een reiziger nodig heeft voor zijn avontuur rond de wereld!",
+    "openGraphDescription": "Toegang tot alle functies die een reiziger nodig heeft voor zijn avontuur rond de wereld!",
+    "twitterDescription": "Toegang tot alle functies die een reiziger nodig heeft voor zijn avontuur rond de wereld!",
+    "siteName": "TheMariscal.com",
+    "author": "Martín Silva Molina",
+    "keywords": [
+      "TheMariscal.com",
+      "Reiziger",
+      "Avontuur",
+      "Wereld",
+      "Functies",
+      "Functionaliteit",
+      "The Mariscal",
+      "Martín Silva Molina",
+      "Silva Molina",
+      "Portfolio"
+    ]
+  },
+  "maintenance": {
+    "title": "Onderhoud",
+    "description": "We zijn momenteel niet beschikbaar vanwege onderhoud. Probeer het later opnieuw."
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "Pagina niet gevonden",
+    "description": "De pagina die u zoekt bestaat niet of is verplaatst.",
+    "backToHome": "Terug naar home"
+  },
+  "languages": {
+    "en": "Engels",
+    "es": "Spaans",
+    "de": "Duits",
+    "nl": "Nederlands",
+    "hr": "Kroatisch",
+    "it": "Italiaans",
+    "pt": "Portugees",
+    "fr": "Frans"
+  },
+  "appSidebar": {
+    "popular": "Populair",
+    "sections": {
+      "reciente": "RECENT",
+      "temas": "ONDERWERPEN",
+      "recursos": "BRONNEN",
+      "comunidades": "GEMEENSCHAPPEN",
+      "legal": "LEGAAL"
+    },
+    "recent": {
+      "discordapp": "r/discordapp"
+    },
+    "categories": {
+      "culturaInternet": "Internet cultuur (viraal)",
+      "juegos": "Spellen",
+      "preguntasRespuestas": "Vragen en antwoorden",
+      "tecnologia": "Technologie",
+      "culturaPop": "Popcultuur",
+      "peliculasTV": "Films & TV",
+      "anime": "Anime",
+      "artes": "Kunsten",
+      "negocios": "Zaken",
+      "carreras": "Carrières",
+      "ciencia": "Wetenschap",
+      "comida": "Eten",
+      "deportes": "Sport",
+      "educacion": "Onderwijs",
+      "entretenimiento": "Entertainment",
+      "estiloVida": "Levensstijl",
+      "historia": "Geschiedenis",
+      "hogarJardin": "Huis en tuin",
+      "mascotas": "Huisdieren",
+      "musica": "Muziek",
+      "noticias": "Nieuws",
+      "politica": "Politiek",
+      "salud": "Gezondheid",
+      "viajes": "Reizen",
+      "vehiculos": "Voertuigen",
+      "bienestar": "Welzijn"
+    },
+    "subcategories": {
+      "increible": "Ongelooflijk",
+      "animales": "Dieren",
+      "cringe": "Cringe",
+      "humor": "Humor",
+      "interesante": "Interessant",
+      "memes": "Memes",
+      "satisfactorio": "Bevredigend",
+      "meta": "Meta",
+      "reconfortante": "Troostend",
+      "juegosAccion": "Actiespellen",
+      "juegosAventura": "Avontuurspellen",
+      "esports": "E-sport",
+      "consolas": "Spelconsoles en e...",
+      "noticiasJuegos": "Nieuws en discussies...",
+      "juegosMoviles": "Mobiele spellen",
+      "otrosJuegos": "Andere spellen",
+      "juegosRol": "Rolspellen",
+      "juegosSimulacion": "Simulatiespellen",
+      "juegosDeportes": "Sport- en racespel...",
+      "juegosEstrategia": "Strategiespellen",
+      "juegosMesa": "Bordspellen",
+      "preguntasRespuestas": "Vragen en antwoorden",
+      "historias": "Verhalen en bekenten...",
+      "impresion3d": "3D printen",
+      "inteligenciaArtificial": "Kunstmatige intelligen...",
+      "hardware": "Computers en hardwar...",
+      "electronica": "Consumentenelektronica",
+      "bricolaje": "DIY elektronica",
+      "programacion": "Programmeren",
+      "software": "Software en apps",
+      "streaming": "Streamingdiensten",
+      "noticiasTecnologia": "Nieuws en discussies...",
+      "realidadVirtual": "Virtual en augmented...",
+      "culturaPop": "Popcultuur",
+      "celebridades": "Beroemdheden",
+      "famosos": "Beroemde mensen",
+      "meme": "Meme",
+      "memeVideos": "Meme video's",
+      "memeVideosGif": "Meme video's/GIF's",
+      "memeVideosGif2": "Meme video's/GIF's",
+      "peliculas": "Films",
+      "peliculas2": "Films",
+      "peliculas3": "Films",
+      "peliculas4": "Films",
+      "peliculas5": "Films",
+      "peliculas6": "Films",
+      "peliculas7": "Films",
+      "peliculas8": "Films",
+      "peliculas9": "Films",
+      "peliculas10": "Films",
+      "peliculas11": "Films",
+      "peliculas12": "Films",
+      "peliculas13": "Films"
+    },
+    "resources": {
+      "acercaReddit": "Over Reddit",
+      "anunciarse": "Adverteren",
+      "redditPro": "Reddit Pro",
+      "ayuda": "Hulp",
+      "blog": "Blog",
+      "empleo": "Banen",
+      "prensa": "Pers"
+    },
+    "communities": {
+      "comunidades": "Gemeenschappen",
+      "mejorReddit": "Het beste van Reddit",
+      "traducidas": "Vertaalde posts...",
+      "temas": "Onderwerpen"
+    },
+    "legal": {
+      "reglas": "TheMariscal regels",
+      "privacidad": "Privacybeleid",
+      "acuerdo": "Gebruikersovereenkomst",
+      "accesibilidad": "Toegankelijkheid"
+    },
+    "actions": {
+      "verMas": "Meer tonen",
+      "verMenos": "Minder tonen"
+    },
+    "footer": "TheMariscal, Inc. © 2025. Alle rechten voorbehouden."
+  },
+  "header": {
+    "search": {
+      "placeholder": "Zoeken",
+      "tooltip": "Zoeken in The Mariscal",
+      "keyboardShortcut": "Druk",
+      "keyboardKey": "⌘K",
+      "noResults": "Geen resultaten gevonden.",
+      "suggestions": "Suggesties",
+      "calendar": "Kalender",
+      "searchEmoji": "Zoek Emoji",
+      "calculator": "Rekenmachine",
+      "settings": "Instellingen",
+      "profile": "Profiel",
+      "billing": "Facturering"
+    },
+    "navigation": {
+      "obtenerApp": "App ophalen",
+      "obtenerAppTooltip": "Haal The Mariscal app op voor mobiele apparaten",
+      "ingresar": "Inloggen",
+      "ingresarTooltip": "Inloggen in The Mariscal universum"
+    },
+    "tooltips": {
+      "logo": "TheMariscal.com"
+    },
+    "userAccount": {
+      "defaultUser": "Gebruiker",
+      "loading": "Laden...",
+      "myAccount": "Mijn account",
+      "myFavorites": "Mijn favorieten",
+      "notifications": "Meldingen",
+      "settings": "Instellingen",
+      "privacy": "Privacy",
+      "subscription": "Abonnement",
+      "admin": "Admin",
+      "tester": "Tester",
+      "logout": "Uitloggen",
+      "logoutTitle": "Uitloggen",
+      "logoutMessage": "Weet je zeker dat je wilt uitloggen?",
+      "logoutButton": "Uitloggen",
+      "logoutSuccess": "Tot ziens!",
+      "logoutError": "Fout bij uitloggen"
+    }
+  },
+  "headerSections": {
+    "navigation": {
+      "sobreNosotros": "Over ons",
+      "precios": "Prijzen",
+      "carreras": "Carrières",
+      "documentacion": "Documentatie"
+    },
+    "aboutUs": {
+      "title": "Over ons",
+      "description": "Mariscal is het toonaangevende platform voor sociale netwerken en digitale content.",
+      "learnMore": "Meer weten",
+      "features": {
+        "title": "Functies",
+        "description": "Ontdek alle functionaliteiten die we bieden om uw ervaring te verbeteren."
+      },
+      "testimonials": {
+        "title": "Testimonials",
+        "description": "Lees wat onze gebruikers zeggen over ons platform."
+      },
+      "press": {
+        "title": "Pers",
+        "description": "Blijf op de hoogte van het laatste nieuws over Mariscal."
+      },
+      "blog": {
+        "title": "Blog",
+        "description": "Artikelen en relevante content over technologie en sociale netwerken."
+      }
+    },
+    "careers": {
+      "title": "Carrières",
+      "description": "Mariscal werd beoordeeld als een van de beste werkplekken.",
+      "careersSite": "Carrière website",
+      "business": {
+        "title": "Business",
+        "marketing": "Marketing",
+        "finance": "Financiën",
+        "legal": "Juridisch",
+        "sales": "Verkoop"
+      },
+      "engineering": {
+        "title": "Engineering",
+        "fullstack": "Full stack",
+        "devops": "DevOps",
+        "qa": "QA",
+        "data": "Data",
+        "machineLearning": "Machine Learning",
+        "management": "Management"
+      },
+      "more": {
+        "title": "Meer",
+        "support": "Support",
+        "office": "Kantoor",
+        "other": "Andere"
+      }
+    },
+    "pricing": {
+      "individual": {
+        "title": "Voor individuen",
+        "basicPlan": "Basisplan",
+        "premiumPlan": "Premium plan"
+      },
+      "business": {
+        "title": "Voor bedrijven",
+        "startups": "Startups",
+        "smb": "MKB",
+        "enterprise": "Enterprise"
+      },
+      "contactSales": "Contact verkoop"
+    }
+  },
+  "dialogs": {
+    "getApp": {
+      "title": "Download The Mariscal app",
+      "description": "Scan deze QR-code om de app te downloaden",
+      "qrAlt": "QR-code om de app te downloaden",
+      "orSearchInStore": "Of zoek het in de Store",
+      "googlePlayAlt": "Beschikbaar op Google Play",
+      "appStoreAlt": "Beschikbaar op App Store"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welkom in het Mariscal universum!",
+      "email": "E-mail",
+      "password": "Wachtwoord",
+      "forgotPassword": "Wachtwoord vergeten?",
+      "submit": "Inloggen",
+      "submitting": "Inloggen...",
+      "welcome": "Welkom!",
+      "newUser": "Nieuw hier?",
+      "createAccount": "Account aanmaken",
+      "terms": "Door verder te gaan accepteer je onze",
+      "userAgreement": "Gebruikersovereenkomst",
+      "privacyPolicy": "Privacybeleid",
+      "and": "en bevestig je dat je de hebt begrepen"
+    },
+    "register": {
+      "title": "Word lid van het Mariscal universum!",
+      "username": "Gebruikersnaam",
+      "email": "E-mail",
+      "password": "Wachtwoord",
+      "confirmPassword": "Bevestig wachtwoord",
+      "submit": "Registreren",
+      "submitting": "Account aanmaken...",
+      "existingUser": "Heb je al een account?",
+      "login": "Inloggen",
+      "terms": "Door verder te gaan accepteer je onze",
+      "userAgreement": "Gebruikersovereenkomst",
+      "privacyPolicy": "Privacybeleid",
+      "and": "en bevestig je dat je de hebt begrepen"
+    },
+    "otp": {
+      "title": "Verifieer je e-mail",
+      "description": "We hebben je een verificatiecode naar je e-mail gestuurd. Voer deze in om door te gaan.",
+      "submit": "Bevestig code",
+      "submitting": "Verificeren...",
+      "resend": "Nieuwe code verzenden",
+      "resending": "Verzenden...",
+      "resendTimer": "Andere code verzenden over:",
+      "success": "Account succesvol aangemaakt!"
+    },
+    "forgotPassword": {
+      "description": "Voer je e-mail in en we sturen je een code om je wachtwoord te resetten",
+      "email": "E-mailadres",
+      "emailPlaceholder": "voorbeeld@email.com",
+      "submit": "Resetcode verzenden",
+      "sending": "Code verzenden...",
+      "backToLogin": "Terug naar inloggen"
+    },
+    "socials": {
+      "continueWithApple": "Doorgaan met Apple",
+      "continueWithGoogle": "Doorgaan met Google",
+      "continueWithTikTok": "Doorgaan met TikTok",
+      "orContinueWith": "Of doorgaan met"
+    },
+    "loading": "Laden...",
+    "resetPassword": {
+      "title": "Wachtwoord resetten",
+      "codeDescription": "Voer de resetcode in die we naar je e-mail hebben gestuurd.",
+      "newPassword": "Nieuw wachtwoord",
+      "confirmPassword": "Bevestig wachtwoord",
+      "submit": "Wachtwoord resetten",
+      "submitting": "Wachtwoord resetten...",
+      "success": "Wachtwoord succesvol gereset!",
+      "changeEmail": "E-mail wijzigen"
+    },
+    "errors": {
+      "authNotAvailable": "Authenticatiesysteem niet beschikbaar",
+      "unknownError": "Er is een onbekende fout opgetreden",
+      "incompleteLogin": "Onvolledige login",
+      "incompleteVerification": "Fout bij het verifiëren van de code",
+      "incompleteReset": "Onverwachte resetprocesstatus",
+      "twoFactorRequired": "Twee-factor authenticatie vereist",
+      "errorTitle": "Oeps! Er was een probleem",
+      "loading": "Laden...",
+      "resendSuccess": "Code succesvol opnieuw verzonden",
+      "sendCodeError": "Fout bij het verzenden van de code"
+    },
+    "validation": {
+      "email": {
+        "required": "E-mail is vereist",
+        "invalid": "Moet een geldige e-mail zijn"
+      },
+      "password": {
+        "required": "Wachtwoord is vereist",
+        "minLength": "Wachtwoord moet minimaal 8 tekens bevatten",
+        "complexity": "Wachtwoord moet minimaal één kleine letter, één hoofdletter, één cijfer en één speciaal teken (@$!%*?&) bevatten"
+      },
+      "username": {
+        "required": "Gebruikersnaam is vereist",
+        "minLength": "Gebruikersnaam moet minimaal 4 tekens bevatten",
+        "format": "Gebruikersnaam mag alleen kleine letters, cijfers, streepjes en underscores bevatten"
+      },
+      "confirmPassword": {
+        "required": "Bevestig je wachtwoord",
+        "mismatch": "Wachtwoorden komen niet overeen"
+      },
+      "code": {
+        "required": "Code is vereist",
+        "minLength": "Code moet minimaal 6 tekens bevatten",
+      "otpLength": "Your one-time password must be 6 characters."
+    }
+  }
+ 
+},
+"settings": {
+  "tooltip": "Instellingen",
+  "title": "Instellingen",
+  "description": "Breng wijzigingen aan in je profiel hier. Klik op opslaan wanneer je klaar bent.",
+  "login": "Inloggen",
+  "logout": {
+    "title": "Uitloggen",
+    "message": "Weet je zeker dat je wilt uitloggen?",
+    "confirm": "Uitloggen",
+    "button": "Uitloggen"
+  },
+  "theme": {
+    "light": "Licht",
+    "dark": "Donker",
+    "system": "Systeem",
+    "selectColor": "Kleur selecteren",
+    "colors": {
+      "blue": "Blauw",
+      "green": "Groen",
+      "violet": "Violet",
+      "rose": "Roze",
+      "orange": "Oranje",
+      "yellow": "Geel",
+      "red": "Rood",
+      "zinc": "Zink",
+      "slate": "Leisteen",
+      "stone": "Steen",
+      "gray": "Grijs",
+      "neutral": "Neutraal",
+      "emerald": "Smaragd",
+      "teal": "Teal",
+      "cyan": "Cyaan",
+      "sky": "Lucht",
+      "indigo": "Indigo",
+      "purple": "Paars",
+      "fuchsia": "Fuchsia",
+      "pink": "Roze",
+      "lime": "Limoen",
+      "amber": "Amber"
+    }
+  }
+}
+}

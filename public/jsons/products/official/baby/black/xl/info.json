@@ -1,0 +1,25 @@
+{
+   "text": {
+        "en": {  
+            "title": "Baby",
+            "description": "A stylish and versatile shirt, perfect for any occasion. Made with high-quality materials for comfort and durability."
+        },
+        "es": {
+            "title": "Bebe",
+            "description": "Un traje de bebé, perfecto para cualquier ocasión. Fabricado con materiales de alta calidad para garantizar comodidad y durabilidad."
+        }
+    },
+    "model": "baby",
+    "design": "official",
+    "color": "black",
+    "size": "small",
+    "price": 62.25,
+    "stock": 14,
+    "url": "/official/baby/black/small",
+    "images": [
+    "https://via.placeholder.com/150",
+    "https://via.placeholder.com/150",
+    "https://via.placeholder.com/150"
+    ]
+
+}

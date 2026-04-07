@@ -1,0 +1,164 @@
+{
+  "model": "shirt",
+  "text": {
+    "en": {  
+      "title": "Official",
+      "description": "A stylish and versatile shirt, perfect for any occasion. Made with high-quality materials for comfort and durability."
+    },
+    "es": {
+      "title": "Oficial",
+      "description": "Una camisa elegante y versátil, perfecta para cualquier ocasión. Fabricada con materiales de alta calidad para garantizar comodidad y durabilidad."
+    }
+  },
+  "textures": {
+    "front": "texture.png",
+    "back": "blank",
+    "lowBack": "loweBackTexture.png"
+  }, 
+  "colors": {
+    "black": {
+      "name": "black",
+      "hex": "000000"
+    },
+    "white": {
+      "name": "white", 
+      "hex": "FFFFFF"
+    },
+    "red": {
+      "name": "red", 
+      "hex": "D32F2F"
+    },
+    "green": {
+      "name": "green",
+      "hex": "4CAF50"
+    },
+    "blue": {
+      "name": "blue",
+      "hex": "1565C0"
+    },
+    "yellow": {
+      "name": "yellow",
+      "hex": "FFA000"
+    },
+    "pink": {
+      "name": "pink",
+      "hex": "F06292"
+    },
+    "brown": {
+      "name": "brown",
+      "hex": "6D4C41"
+    }
+  },
+  "sizes": {
+    "s": {
+      "name": "small",
+      "value": "S"
+    },
+    "m": {
+      "name": "medium",
+      "value": "M"
+    },
+    "l": {
+      "name": "large",
+      "value": "L"
+    },  
+    "xl": {
+      "name": "extra large",
+      "value": "XL"
+    }
+ },
+  "models":{
+      "baby": {
+        "colors": ["black", "white", "red", "blue", "yellow", "pink"],
+        "sizes": ["small", "medium"],
+        "price": 23.99,
+        "stock": 25,
+        "url": "/official/baby/black/s",
+        "images": [
+          "https://via.placeholder.com/150",
+          "https://via.placeholder.com/150",
+          "https://via.placeholder.com/150"
+        ],
+        "variants": {
+          "black": {
+            "price": 27.99,
+            "stock": 16,
+            "url": "/official/baby/black",
+            "images": [
+              "https://via.placeholder.com/150",
+              "https://via.placeholder.com/150",
+              "https://via.placeholder.com/150"
+            ]
+          },
+          "black-medium": {
+            "price": 29.99,
+            "stock": 12,
+            "url": "/official/baby/black/m",
+            "images": [
+              "https://via.placeholder.com/150",
+              "https://via.placeholder.com/150",
+              "https://via.placeholder.com/150"
+            ]
+          }
+        }
+      },
+      "bag": {
+        "colors": ["black", "white", "brown"],
+        "sizes": ["medium", "large"]
+      },
+      "hoodie": {
+        "colors": ["black", "white", "red", "green", "blue", "yellow"],
+        "sizes": ["small", "medium", "large", "extra large"]
+      },
+      "kid-shirt": {
+        "colors": ["black", "white", "red",  "yellow"],
+        "sizes": ["small", "medium", "large"]
+      },
+      "long-sleeves-man": {
+        "colors": ["black", "white", "red", "green", "blue", "yellow", "pink", "brown"],
+        "sizes": ["small", "medium", "large", "extra large"]
+      },
+      "shirt": {
+        "colors": ["black", "white", "red", "green", "blue", "yellow", "pink", "brown"],
+        "sizes": ["small", "medium", "large", "extra large"]
+      },
+      "tank-top": {
+        "colors": ["black", "white"],
+        "sizes": ["small", "medium", "large", "extra large"]
+      },
+      "woman-shirt": {
+        "colors": ["black", "white", "red", "yellow", "pink"],
+        "sizes": ["small", "medium", "large", "extra large"]
+      },
+      "woman-cropped-shirt": {
+        "colors": ["black", "white", "pink"],
+        "sizes": ["small", "medium", "large"]
+      },
+      "woman-shirt-dress": {
+        "colors": ["black", "white", "yellow"],
+        "sizes": ["small", "medium", "large"]
+      },
+      "woman-shirt-long": {
+        "colors": ["black", "white","pink"],
+        "sizes": ["small", "medium", "large"]
+      },
+      "woman-top": {
+        "colors": ["black", "white", "yellow", "pink"],
+        "sizes": ["small", "medium", "large"]
+      }
+  },
+  "variant": {
+    "model": "woman-shirt",
+    "design": "official",
+    "color": "red",
+    "size": "xl",
+    "price": 42.25,
+    "stock": 25,
+    "url": "/official/woman-shirt/red/xl",
+    "images": [
+      "https://via.placeholder.com/150",
+      "https://via.placeholder.com/150",
+      "https://via.placeholder.com/150"
+    ]
+  }
+}

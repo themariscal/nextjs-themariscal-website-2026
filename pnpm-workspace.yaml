@@ -1,3 +1,6 @@
-ignoredBuiltDependencies:
+onlyBuiltDependencies:
+  - '@clerk/shared'
+  - '@tailwindcss/oxide'
+  - core-js
   - sharp
   - unrs-resolver

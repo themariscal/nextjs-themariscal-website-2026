@@ -1,0 +1,96 @@
+{
+  "id": 3,
+  "slug": "blog-page-3",
+  "title": "TypeScript 5.0: Tipos Avanzados y Mejores Prácticas para Desarrolladores",
+  "subtitle": "Explora las características más avanzadas de TypeScript 5.0 y domina las mejores prácticas para escribir código más robusto y mantenible",
+  "excerpt": "TypeScript 5.0 introduce características revolucionarias que transforman cómo escribimos código tipado. Desde tipos condicionales avanzados hasta inferencia mejorada, descubre cómo llevar tu código al siguiente nivel.",
+  "author": {
+    "name": "Ana Martínez",
+    "role": "Senior TypeScript Developer",
+    "avatar": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face"
+  },
+  "publishDate": "2024-03-10",
+  "readTime": "15 min",
+  "tags": ["TypeScript", "JavaScript", "Programming", "Best Practices"],
+  "featuredImage": "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&h=400&fit=crop",
+  "elements": [
+    {
+      "id": 1,
+      "type": "text",
+      "content": "# TypeScript 5.0: Una Revolución en el Tipado\n\nTypeScript 5.0 marca un hito importante en la evolución del lenguaje, **introduciendo características que hacen el tipado más poderoso, expresivo y fácil de usar**. Esta versión no solo mejora la experiencia del desarrollador, sino que también proporciona herramientas más robustas para construir aplicaciones escalables.\n\n## Tipos Condicionales Avanzados\n\nLos tipos condicionales han evolucionado significativamente, permitiendo **crear tipos más dinámicos y flexibles** que se adaptan a diferentes escenarios de uso. Esta característica es fundamental para construir APIs más robustas."
+    },
+    {
+      "id": 2,
+      "type": "image",
+      "src": "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&h=400&fit=crop",
+      "alt": "Código TypeScript en editor",
+      "caption": "TypeScript 5.0 ofrece herramientas más potentes para el desarrollo"
+    },
+    {
+      "id": 3,
+      "type": "text",
+      "content": "### Inferencia de Tipos Mejorada\n\n- **Template literal types**: Creación de tipos basados en strings\n- **Mapped types avanzados**: Transformación más sofisticada de tipos\n- **Recursive types**: Tipos que se referencian a sí mismos\n- **Branded types**: Tipos únicos para mayor seguridad\n\n## Decorators y Metadatos\n\nLos decorators en TypeScript 5.0 **permiten una programación más declarativa y expresiva**, facilitando la implementación de patrones como dependency injection y aspect-oriented programming."
+    },
+    {
+      "id": 4,
+      "type": "video",
+      "youtubeId": "dQw4w9WgXcQ",
+      "title": "TypeScript 5.0 en Profundidad",
+      "caption": "Análisis detallado de las nuevas características de TypeScript 5.0"
+    },
+    {
+      "id": 5,
+      "type": "text",
+      "content": "### Mejores Prácticas de Tipado\n\n1. **Strict mode**: Configuración estricta para mayor seguridad\n2. **Type guards**: Validación de tipos en runtime\n3. **Utility types**: Tipos predefinidos para casos comunes\n4. **Generic constraints**: Restricciones en tipos genéricos\n\n## Performance y Compilación\n\nTypeScript 5.0 introduce **mejoras significativas en la velocidad de compilación** y optimizaciones que hacen el desarrollo más eficiente, especialmente en proyectos grandes."
+    },
+    {
+      "id": 6,
+      "type": "image",
+      "src": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=400&fit=crop",
+      "alt": "Herramientas de desarrollo TypeScript",
+      "caption": "Las nuevas herramientas de desarrollo mejoran la productividad"
+    },
+    {
+      "id": 7,
+      "type": "text",
+      "content": "### Integración con Frameworks\n\n- **React integration**: Mejor soporte para componentes React\n- **Node.js types**: Tipos actualizados para Node.js\n- **Web APIs**: Soporte completo para APIs web modernas\n- **Third-party libraries**: Mejor integración con librerías externas\n\n## Migración y Adopción\n\nLa migración a TypeScript 5.0 está diseñada para ser **suave y gradual**, con herramientas automáticas que facilitan la transición desde versiones anteriores.\n\n## Conclusión\n\nTypeScript 5.0 representa **un salto cualitativo en el desarrollo de aplicaciones tipadas**. Sus nuevas características no solo mejoran la experiencia del desarrollador, sino que también proporcionan las herramientas necesarias para construir software más robusto y mantenible.\n\nLa adopción de estas características permite a los equipos **escribir código más seguro y expresivo**, reduciendo bugs y mejorando la productividad a largo plazo. El futuro del desarrollo con TypeScript es prometedor y lleno de posibilidades.\n\n¿Listo para explorar TypeScript 5.0? ¡Comienza implementando estas características en tus proyectos!"
+    }
+  ],
+  "highlights": [
+    "Tipos condicionales avanzados para mayor flexibilidad",
+    "Inferencia de tipos mejorada y más precisa",
+    "Decorators para programación más declarativa",
+    "Mejoras significativas en performance de compilación"
+  ],
+  "social": {
+    "likes": 1890,
+    "shares": 156,
+    "comments": 67
+  },
+  "relatedPosts": [
+    {
+      "id": 1,
+      "title": "React 19: Las Nuevas Características que Cambiarán tu Forma de Desarrollar",
+      "url": "/api/blog/blog-page-2",
+      "featuredImage": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=200&h=200&fit=crop"
+    },
+    {
+      "id": 2,
+      "title": "Next.js 14: App Router y Server Actions - El Futuro del Desarrollo Web",
+      "url": "/api/blog/blog-page-4",
+      "featuredImage": "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=200&h=200&fit=crop"
+    }
+  ],
+  "nextPost": [
+    {
+      "id": 4,
+      "title": "El Futuro de la Tecnología Web: Tendencias que Revolucionarán el Desarrollo",
+      "url": "/blog/blog-page-4"
+    },
+    {
+      "id": 5,
+      "title": "El Futuro de la Tecnología Web: Tendencias que Revolucionarán el Desarrollo",
+      "url": "/blog/blog-page-5"
+    }
+  ]
+}

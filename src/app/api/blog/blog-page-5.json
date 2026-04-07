@@ -1,0 +1,96 @@
+{
+  "id": 5,
+  "slug": "blog-page-5",
+  "title": "CSS Grid y Flexbox: Dominando el Layout Moderno en 2024",
+  "subtitle": "Aprende las técnicas más avanzadas de CSS Grid y Flexbox para crear layouts responsivos y elegantes que funcionan en cualquier dispositivo",
+  "excerpt": "El layout moderno en CSS ha evolucionado significativamente con Grid y Flexbox. Descubre las mejores prácticas, técnicas avanzadas y patrones que todo desarrollador frontend debe dominar para crear interfaces excepcionales.",
+  "author": {
+    "name": "Sofia García",
+    "role": "CSS Expert & UI/UX Designer",
+    "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&fit=crop&crop=face"
+  },
+  "publishDate": "2024-05-15",
+  "readTime": "20 min",
+  "tags": ["CSS", "Grid", "Flexbox", "Layout", "Responsive"],
+  "featuredImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop",
+  "elements": [
+    {
+      "id": 1,
+      "type": "text",
+      "content": "# CSS Grid y Flexbox: El Arte del Layout Moderno\n\nEn 2024, dominar CSS Grid y Flexbox no es opcional, es esencial. **Estas tecnologías han revolucionado cómo creamos layouts**, proporcionando herramientas poderosas y flexibles que nos permiten construir interfaces complejas con código limpio y mantenible.\n\n## CSS Grid: El Poder de las Dos Dimensiones\n\nCSS Grid **transforma completamente cómo pensamos sobre el layout**, permitiendo crear diseños complejos de manera intuitiva y eficiente. Es la herramienta perfecta para layouts bidimensionales."
+    },
+    {
+      "id": 2,
+      "type": "image",
+      "src": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop",
+      "alt": "Diseño CSS Grid",
+      "caption": "CSS Grid permite crear layouts complejos de manera intuitiva"
+    },
+    {
+      "id": 3,
+      "type": "text",
+      "content": "### Flexbox: El Maestro de la Alineación\n\n- **Flex Direction**: Control total sobre la dirección del layout\n- **Justify Content**: Alineación horizontal perfecta\n- **Align Items**: Alineación vertical precisa\n- **Flex Wrap**: Manejo inteligente del desbordamiento\n\n## Técnicas Avanzadas de Grid\n\nLas técnicas avanzadas de CSS Grid **permiten crear layouts que antes eran imposibles**, desde grids asimétricos hasta layouts adaptativos complejos."
+    },
+    {
+      "id": 4,
+      "type": "video",
+      "youtubeId": "dQw4w9WgXcQ",
+      "title": "CSS Grid vs Flexbox",
+      "caption": "Comparación detallada entre CSS Grid y Flexbox"
+    },
+    {
+      "id": 5,
+      "type": "text",
+      "content": "### Patrones de Layout Modernos\n\n1. **Holy Grail Layout**: Header, sidebar, main content, footer\n2. **Card Grid**: Grid responsivo para tarjetas\n3. **Masonry Layout**: Layout tipo Pinterest\n4. **Sticky Header**: Navegación que se mantiene visible\n\n## Responsive Design Avanzado\n\nEl diseño responsivo moderno **utiliza Grid y Flexbox de manera inteligente** para crear experiencias que se adaptan perfectamente a cualquier dispositivo y tamaño de pantalla."
+    },
+    {
+      "id": 6,
+      "type": "image",
+      "src": "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&h=400&fit=crop",
+      "alt": "Diseño responsivo",
+      "caption": "Los layouts modernos se adaptan perfectamente a cualquier dispositivo"
+    },
+    {
+      "id": 7,
+      "type": "text",
+      "content": "### Mejores Prácticas y Optimización\n\n- **Performance**: Cómo optimizar Grid y Flexbox para mejor rendimiento\n- **Accessibility**: Layouts accesibles que funcionan para todos\n- **Browser Support**: Estrategias para compatibilidad cross-browser\n- **Fallbacks**: Planes de respaldo para navegadores antiguos\n\n## Herramientas y Recursos\n\nLas herramientas modernas de desarrollo **facilitan el trabajo con Grid y Flexbox**, desde DevTools hasta frameworks CSS que abstraen la complejidad.\n\n## Conclusión\n\nCSS Grid y Flexbox representan **el presente y futuro del layout web**. Dominar estas tecnologías no solo mejora la calidad de nuestros diseños, sino que también nos permite crear experiencias de usuario excepcionales.\n\nLa combinación estratégica de Grid y Flexbox **nos da el poder de crear cualquier layout imaginable**, desde simples interfaces hasta diseños complejos que desafían las limitaciones tradicionales del CSS.\n\n¿Listo para dominar el layout moderno? ¡Comienza experimentando con Grid y Flexbox y transforma tus diseños!"
+    }
+  ],
+  "highlights": [
+    "CSS Grid para layouts bidimensionales complejos",
+    "Flexbox para alineación y distribución perfecta",
+    "Técnicas avanzadas para layouts modernos",
+    "Diseño responsivo con Grid y Flexbox"
+  ],
+  "social": {
+    "likes": 2789,
+    "shares": 198,
+    "comments": 123
+  },
+  "relatedPosts": [
+    {
+      "id": 1,
+      "title": "Next.js 14: App Router y Server Actions - El Futuro del Desarrollo Web",
+      "url": "/api/blog/blog-page-4",
+      "featuredImage": "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=200&h=200&fit=crop"
+    },
+    {
+      "id": 2,
+      "title": "Node.js y Deno: El Futuro del Desarrollo Backend con JavaScript",
+      "url": "/api/blog/blog-page-6",
+      "featuredImage": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=200&h=200&fit=crop"
+    }
+  ],
+  "nextPost": [
+    {
+      "id": 6,
+      "title": "El Futuro de la Tecnología Web: Tendencias que Revolucionarán el Desarrollo",
+      "url": "/blog/blog-page-6"
+    },
+    {
+      "id": 1,
+      "title": "El Futuro de la Tecnología Web: Tendencias que Revolucionarán el Desarrollo",
+      "url": "/blog/blog-page-1"
+    }
+  ]
+}

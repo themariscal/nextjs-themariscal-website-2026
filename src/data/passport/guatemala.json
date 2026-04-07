@@ -1,0 +1,563 @@
+{
+  "data": {
+    "Mobility Score": 134,
+    "Visa-free": 79,
+    "Visa on arrival": 49,
+    "eTA": 6,
+    "Visa required": 64,
+    "Passport Power Rank": 27,
+    "World reach": 67,
+    "Population": 17703190,
+    "Imagen": "https://www.passportindex.org/countries/gt.png"
+  },
+  "paises": [
+    { "pais": "Afghanistan", "requisitos": "visa required", "link": null },
+    { "pais": "Albania", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Algeria", "requisitos": "visa required", "link": null },
+    { "pais": "Andorra", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Angola", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Antigua and Barbuda",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=ag&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Argentina", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Armenia",
+      "requisitos": "eVisa/120 days",
+      "link": "https://www.passportindex.org/link/?ccode=am&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Australia",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=au&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Austria", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Azerbaijan",
+      "requisitos": "eVisa/30 days",
+      "link": "https://www.passportindex.org/link/?ccode=az&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Bahamas", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Bahrain",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=bh&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Bangladesh",
+      "requisitos": "visa on arrival/30 days",
+      "link": null
+    },
+    { "pais": "Barbados", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Belarus", "requisitos": "visa required", "link": null },
+    { "pais": "Belgium", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Belize", "requisitos": "visa-free/30 days", "link": null },
+    {
+      "pais": "Benin",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=bj&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Bhutan",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=bt&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Bolivia",
+      "requisitos": "visa on arrival / eVisa/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=bo&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Bosnia and Herzegovina",
+      "requisitos": "visa-free/90 days",
+      "link": null
+    },
+    {
+      "pais": "Botswana",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=bw&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Brazil", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Brunei", "requisitos": "visa required", "link": null },
+    { "pais": "Bulgaria", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Burkina Faso",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=bf&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Burundi",
+      "requisitos": "visa on arrival/30 days",
+      "link": null
+    },
+    {
+      "pais": "Cambodia",
+      "requisitos": "visa on arrival / eVisa/30 days",
+      "link": "https://www.passportindex.org/link/?ccode=kh&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Cameroon",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=cm&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Canada", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Cape Verde",
+      "requisitos": "visa on arrival (EASE)",
+      "link": "https://www.passportindex.org/link/?ccode=cv&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Central African Republic",
+      "requisitos": "visa required",
+      "link": null
+    },
+    {
+      "pais": "Chad",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=td&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Chile", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "China", "requisitos": "visa required", "link": null },
+    { "pais": "Colombia", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Comoros",
+      "requisitos": "visa on arrival/45 days",
+      "link": null
+    },
+    { "pais": "Congo", "requisitos": "visa required", "link": null },
+    { "pais": "Costa Rica", "requisitos": "visa-free/30 days", "link": null },
+    { "pais": "Croatia", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Cuba",
+      "requisitos": "eVisa/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=cu&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Cyprus", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Czech Republic",
+      "requisitos": "visa-free/90 days",
+      "link": null
+    },
+    { "pais": "Denmark", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Djibouti",
+      "requisitos": "visa on arrival / eVisa/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=dj&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Dominica", "requisitos": "visa-free/21 days", "link": null },
+    {
+      "pais": "Dominican Republic",
+      "requisitos": "E-Ticket/30 days",
+      "link": "https://www.passportindex.org/link/?ccode=do&pcode=gt&id=4&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Ecuador", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Egypt", "requisitos": "visa required", "link": null },
+    { "pais": "El Salvador", "requisitos": "visa-free/180 days", "link": null },
+    {
+      "pais": "Equatorial Guinea",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=gq&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Eritrea", "requisitos": "visa required", "link": null },
+    { "pais": "Estonia", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Eswatini", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Ethiopia",
+      "requisitos": "eVisa/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=et&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Fiji", "requisitos": "visa required", "link": null },
+    { "pais": "Finland", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "France", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Gabon",
+      "requisitos": "eVisa/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=ga&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Gambia", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Georgia",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=ge&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Germany", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Ghana", "requisitos": "visa required", "link": null },
+    { "pais": "Greece", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Grenada", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Guinea",
+      "requisitos": "eVisa/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=gn&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Guinea-Bissau",
+      "requisitos": "visa on arrival/90 days",
+      "link": null
+    },
+    { "pais": "Guyana", "requisitos": "visa required", "link": null },
+    { "pais": "Haiti", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Honduras", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Hong Kong", "requisitos": "visa-free/30 days", "link": null },
+    { "pais": "Hungary", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Iceland", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "India",
+      "requisitos": "eVisa/30 days",
+      "link": "https://www.passportindex.org/link/?ccode=in&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Indonesia",
+      "requisitos": "visa on arrival / eVisa/30 days",
+      "link": "https://www.passportindex.org/link/?ccode=id&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Iran",
+      "requisitos": "visa on arrival / eVisa/30 days",
+      "link": "https://www.passportindex.org/link/?ccode=ir&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Iraq",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=iq&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Ireland", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Israel",
+      "requisitos": "eTA/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=il&pcode=gt&id=3&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Italy", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Jamaica", "requisitos": "visa-free/30 days", "link": null },
+    { "pais": "Japan", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Jordan",
+      "requisitos": "visa on arrival / eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=jo&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Kazakhstan",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=kz&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Kenya",
+      "requisitos": "eTA/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=ke&pcode=gt&id=3&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Kiribati", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Kosovo", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Kuwait", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Kyrgyzstan",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=kg&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Laos",
+      "requisitos": "visa on arrival / eVisa/30 days",
+      "link": "https://www.passportindex.org/link/?ccode=la&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Latvia", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Lebanon", "requisitos": "visa required", "link": null },
+    { "pais": "Lesotho", "requisitos": "eVisa/14 days", "link": null },
+    {
+      "pais": "Liberia",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=lr&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Libya",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=ly&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Liechtenstein",
+      "requisitos": "visa-free/90 days",
+      "link": null
+    },
+    { "pais": "Lithuania", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Luxembourg", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Macao", "requisitos": "visa on arrival/30 days", "link": null },
+    {
+      "pais": "Madagascar",
+      "requisitos": "visa on arrival / eVisa/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=mg&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Malawi",
+      "requisitos": "visa on arrival / eVisa/30 days",
+      "link": "https://www.passportindex.org/link/?ccode=mw&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Malaysia", "requisitos": "visa-free/30 days", "link": null },
+    {
+      "pais": "Maldives",
+      "requisitos": "visa on arrival/30 days",
+      "link": null
+    },
+    { "pais": "Mali", "requisitos": "visa required", "link": null },
+    { "pais": "Malta", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Marshall Islands",
+      "requisitos": "visa on arrival/90 days",
+      "link": null
+    },
+    {
+      "pais": "Mauritania",
+      "requisitos": "eVisa/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=mr&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Mauritius",
+      "requisitos": "visa on arrival/60 days",
+      "link": null
+    },
+    { "pais": "Mexico", "requisitos": "visa required", "link": null },
+    { "pais": "Micronesia", "requisitos": "visa-free/30 days", "link": null },
+    { "pais": "Moldova", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Monaco", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Mongolia",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=mn&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Montenegro", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Morocco",
+      "requisitos": "eVisa/30 days",
+      "link": "https://www.passportindex.org/link/?ccode=ma&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Mozambique",
+      "requisitos": "visa on arrival / eVisa/30 days",
+      "link": "https://www.passportindex.org/link/?ccode=mz&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Myanmar",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=mm&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Namibia",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=na&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Nauru", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Nepal",
+      "requisitos": "visa on arrival / eVisa/150 days",
+      "link": "https://www.passportindex.org/link/?ccode=np&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Netherlands", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "New Zealand", "requisitos": "visa required", "link": null },
+    { "pais": "Nicaragua", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Niger", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Nigeria",
+      "requisitos": "eVisa/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=ng&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "North Korea", "requisitos": "visa required", "link": null },
+    {
+      "pais": "North Macedonia",
+      "requisitos": "visa-free/90 days",
+      "link": null
+    },
+    { "pais": "Norway", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Oman",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=om&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Pakistan",
+      "requisitos": "eVisa/30 days",
+      "link": "https://www.passportindex.org/link/?ccode=pk&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Palau", "requisitos": "visa on arrival/30 days", "link": null },
+    {
+      "pais": "Palestinian Territories",
+      "requisitos": "visa-free",
+      "link": null
+    },
+    { "pais": "Panama", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Papua New Guinea",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=pg&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Paraguay", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Peru", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Philippines", "requisitos": "visa-free/30 days", "link": null },
+    { "pais": "Poland", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Portugal", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Qatar",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=qa&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Romania", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Russian Federation",
+      "requisitos": "visa-free/90 days",
+      "link": null
+    },
+    {
+      "pais": "Rwanda",
+      "requisitos": "visa on arrival / eVisa/30 days",
+      "link": "https://www.passportindex.org/link/?ccode=rw&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Saint Kitts and Nevis",
+      "requisitos": "visa-free/90 days",
+      "link": null
+    },
+    {
+      "pais": "Saint Lucia",
+      "requisitos": "visa on arrival/42 days",
+      "link": null
+    },
+    { "pais": "Samoa", "requisitos": "visa on arrival/90 days", "link": null },
+    { "pais": "San Marino", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Sao Tome and Principe",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=st&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Saudi Arabia", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Senegal",
+      "requisitos": "visa on arrival/30 days",
+      "link": null
+    },
+    { "pais": "Serbia", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Seychelles",
+      "requisitos": "tourist registration/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=sc&pcode=gt&id=3&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Sierra Leone",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=sl&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Singapore", "requisitos": "visa-free/30 days", "link": null },
+    { "pais": "Slovakia", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Slovenia", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Solomon Islands", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Somalia",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=so&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "South Africa", "requisitos": "visa required", "link": null },
+    {
+      "pais": "South Korea",
+      "requisitos": "eTA/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=kr&pcode=gt&id=3&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "South Sudan",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=ss&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Spain", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Sri Lanka",
+      "requisitos": "visa on arrival / eVisa/30 days",
+      "link": "https://www.passportindex.org/link/?ccode=lk&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "St. Vincent and the Grenadines",
+      "requisitos": "visa-free/90 days",
+      "link": null
+    },
+    { "pais": "Sudan", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Suriname",
+      "requisitos": "tourist card/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=sr&pcode=gt&id=4&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Sweden", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Switzerland", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Syria",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=sy&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Taiwan", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Tajikistan",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=tj&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Tanzania",
+      "requisitos": "visa on arrival / eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=tz&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Thailand", "requisitos": "visa-free/60 days", "link": null },
+    {
+      "pais": "Timor-Leste",
+      "requisitos": "visa on arrival/30 days",
+      "link": null
+    },
+    {
+      "pais": "Togo",
+      "requisitos": "eVisa/15 days",
+      "link": "https://www.passportindex.org/link/?ccode=tg&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Tonga", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Trinidad and Tobago",
+      "requisitos": "visa-free/90 days",
+      "link": null
+    },
+    { "pais": "Tunisia", "requisitos": "visa required", "link": null },
+    { "pais": "Turkmenistan", "requisitos": "visa required", "link": null },
+    { "pais": "Tuvalu", "requisitos": "visa on arrival/30 days", "link": null },
+    { "pais": "Türkiye", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Uganda",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=ug&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "Ukraine",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=ua&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "United Arab Emirates",
+      "requisitos": "eVisa",
+      "link": "https://www.passportindex.org/link/?ccode=ae&pcode=gt&id=1&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "United Kingdom",
+      "requisitos": "eTA/180 days",
+      "link": "https://www.passportindex.org/link/?ccode=gb&pcode=gt&id=3&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    {
+      "pais": "United States of America",
+      "requisitos": "visa required",
+      "link": null
+    },
+    { "pais": "Uruguay", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Uzbekistan", "requisitos": "visa-free/30 days", "link": null },
+    { "pais": "Vanuatu", "requisitos": "visa required", "link": null },
+    { "pais": "Vatican City", "requisitos": "visa-free/90 days", "link": null },
+    { "pais": "Venezuela", "requisitos": "visa required", "link": null },
+    {
+      "pais": "Viet Nam",
+      "requisitos": "eVisa/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=vn&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    },
+    { "pais": "Yemen", "requisitos": "visa required", "link": null },
+    { "pais": "Zambia", "requisitos": "visa-free/90 days", "link": null },
+    {
+      "pais": "Zimbabwe",
+      "requisitos": "visa on arrival / eVisa/90 days",
+      "link": "https://www.passportindex.org/link/?ccode=zw&pcode=gt&id=2&lang=en&utm_source=evisa_link&utm_medium=p_dashboard"
+    }
+  ]
+}

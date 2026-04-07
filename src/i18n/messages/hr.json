@@ -1,0 +1,433 @@
+{
+  "metadata": {
+    "title": "TheMariscal.com",
+    "description": "Pristupite svim funkcijama koje su putniku potrebne za njegovo avanturističko putovanje oko svijeta!",
+    "openGraphDescription": "Pristupite svim funkcijama koje su putniku potrebne za njegovo avanturističko putovanje oko svijeta!",
+    "twitterDescription": "Pristupite svim funkcijama koje su putniku potrebne za njegovo avanturističko putovanje oko svijeta!",
+    "siteName": "TheMariscal.com",
+    "author": "Martín Silva Molina",
+    "keywords": [
+      "TheMariscal.com",
+      "Putnik",
+      "Avantura",
+      "Svijet",
+      "Funkcije",
+      "Funkcionalnosti",
+      "The Mariscal",
+      "Martín Silva Molina",
+      "Silva Molina",
+      "Portfelj"
+    ]
+  },
+  "maintenance": {
+    "title": "Održavanje",
+    "description": "Trenutno smo nedostupni zbog održavanja. Molimo pokušajte ponovno kasnije."
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "Stranica nije pronađena",
+    "description": "Stranica koju tražite ne postoji ili je premještena.",
+    "backToHome": "Povratak na početnu"
+  },
+  "languages": {
+    "en": "Engleski",
+    "es": "Španjolski",
+    "de": "Njemački",
+    "nl": "Nizozemski",
+    "hr": "Hrvatski",
+    "it": "Talijanski",
+    "pt": "Portugalski",
+    "fr": "Francuski"
+  },
+  "appSidebar": {
+    "popular": "Popularno",
+    "sections": {
+      "reciente": "NAJNOVIJE",
+      "temas": "TEME",
+      "recursos": "RESURSI",
+      "comunidades": "ZAJEDNICE",
+      "legal": "PRAVNO"
+    },
+    "recent": {
+      "discordapp": "r/discordapp"
+    },
+    "categories": {
+      "culturaInternet": "Internet kultura (viralno)",
+      "juegos": "Igre",
+      "preguntasRespuestas": "Pitanja i odgovori",
+      "tecnologia": "Tehnologija",
+      "culturaPop": "Pop kultura",
+      "peliculasTV": "Filmovi i TV",
+      "anime": "Anime",
+      "artes": "Umjetnost",
+      "negocios": "Posao",
+      "carreras": "Karijere",
+      "ciencia": "Znanost",
+      "comida": "Hrana",
+      "deportes": "Sport",
+      "educacion": "Obrazovanje",
+      "entretenimiento": "Zabava",
+      "estiloVida": "Stil života",
+      "historia": "Povijest",
+      "hogarJardin": "Dom i vrt",
+      "mascotas": "Kućni ljubimci",
+      "musica": "Glazba",
+      "noticias": "Vijesti",
+      "politica": "Politika",
+      "salud": "Zdravlje",
+      "viajes": "Putovanja",
+      "vehiculos": "Vozila",
+      "bienestar": "Dobrobit"
+    },
+    "subcategories": {
+      "increible": "Nevjerojatno",
+      "animales": "Životinje",
+      "cringe": "Cringe",
+      "humor": "Humor",
+      "interesante": "Zanimljivo",
+      "memes": "Memovi",
+      "satisfactorio": "Zadovoljavajuće",
+      "meta": "Meta",
+      "reconfortante": "Utješno",
+      "juegosAccion": "Akcijske igre",
+      "juegosAventura": "Avanturističke igre",
+      "esports": "E-sport",
+      "consolas": "Igraće konzole i e...",
+      "noticiasJuegos": "Vijesti i rasprave...",
+      "juegosMoviles": "Mobilne igre",
+      "otrosJuegos": "Ostale igre",
+      "juegosRol": "Igre uloga",
+      "juegosSimulacion": "Simulacijske igre",
+      "juegosDeportes": "Sportske i trkaće...",
+      "juegosEstrategia": "Strateške igre",
+      "juegosMesa": "Društvene igre",
+      "preguntasRespuestas": "Pitanja i odgovori",
+      "historias": "Priče i priznanja...",
+      "impresion3d": "3D ispis",
+      "inteligenciaArtificial": "Umjetna inteligencija...",
+      "hardware": "Računala i hardver...",
+      "electronica": "Potrošačka elektronika",
+      "bricolaje": "DIY elektronika",
+      "programacion": "Programiranje",
+      "software": "Softver i aplikacije",
+      "streaming": "Streaming usluge",
+      "noticiasTecnologia": "Vijesti i rasprave...",
+      "realidadVirtual": "Virtualna i proširena...",
+      "culturaPop": "Pop kultura",
+      "celebridades": "Zvijezde",
+      "famosos": "Poznate osobe",
+      "meme": "Mem",
+      "memeVideos": "Mem videi",
+      "memeVideosGif": "Mem videi/GIF-ovi",
+      "memeVideosGif2": "Mem videi/GIF-ovi",
+      "peliculas": "Filmovi",
+      "peliculas2": "Filmovi",
+      "peliculas3": "Filmovi",
+      "peliculas4": "Filmovi",
+      "peliculas5": "Filmovi",
+      "peliculas6": "Filmovi",
+      "peliculas7": "Filmovi",
+      "peliculas8": "Filmovi",
+      "peliculas9": "Filmovi",
+      "peliculas10": "Filmovi",
+      "peliculas11": "Filmovi",
+      "peliculas12": "Filmovi",
+      "peliculas13": "Filmovi"
+    },
+    "resources": {
+      "acercaReddit": "O Redditu",
+      "anunciarse": "Oglašavanje",
+      "redditPro": "Reddit Pro",
+      "ayuda": "Pomoć",
+      "blog": "Blog",
+      "empleo": "Poslovi",
+      "prensa": "Tisak"
+    },
+    "communities": {
+      "comunidades": "Zajednice",
+      "mejorReddit": "Najbolje od Reddita",
+      "traducidas": "Prevedeni postovi...",
+      "temas": "Teme"
+    },
+    "legal": {
+      "reglas": "TheMariscal pravila",
+      "privacidad": "Politika privatnosti",
+      "acuerdo": "Korisnički ugovor",
+      "accesibilidad": "Pristupačnost"
+    },
+    "actions": {
+      "verMas": "Prikaži više",
+      "verMenos": "Prikaži manje"
+    },
+    "footer": "TheMariscal, Inc. © 2025. Sva prava pridržana."
+  },
+  "header": {
+    "search": {
+      "placeholder": "Pretraži",
+      "tooltip": "Pretraži u The Mariscal",
+      "keyboardShortcut": "Pritisni",
+      "keyboardKey": "⌘K",
+      "noResults": "Nema rezultata.",
+      "suggestions": "Prijedlozi",
+      "calendar": "Kalendar",
+      "searchEmoji": "Pretraži Emoji",
+      "calculator": "Kalkulator",
+      "settings": "Postavke",
+      "profile": "Profil",
+      "billing": "Naplata"
+    },
+    "navigation": {
+      "obtenerApp": "Preuzmi App",
+      "obtenerAppTooltip": "Preuzmi The Mariscal aplikaciju za mobilne uređaje",
+      "ingresar": "Prijavi se",
+      "ingresarTooltip": "Prijavi se u The Mariscal svemir"
+    },
+    "tooltips": {
+      "logo": "TheMariscal.com"
+    },
+    "userAccount": {
+      "defaultUser": "Korisnik",
+      "loading": "Učitavanje...",
+      "myAccount": "Moj račun",
+      "myFavorites": "Moji favoriti",
+      "notifications": "Obavještenja",
+      "settings": "Postavke",
+      "privacy": "Privatnost",
+      "subscription": "Pretplata",
+      "admin": "Admin",
+      "tester": "Tester",
+      "logout": "Odjava",
+      "logoutTitle": "Odjava",
+      "logoutMessage": "Jeste li sigurni da se želite odjaviti?",
+      "logoutButton": "Odjava",
+      "logoutSuccess": "Vidimo se kasnije!",
+      "logoutError": "Greška pri odjavi"
+    }
+  },
+  "headerSections": {
+    "navigation": {
+      "sobreNosotros": "O nama",
+      "precios": "Cijene",
+      "carreras": "Karijere",
+      "documentacion": "Dokumentacija"
+    },
+    "aboutUs": {
+      "title": "O nama",
+      "description": "Mariscal je vodeća platforma za društvene mreže i digitalni sadržaj.",
+      "learnMore": "Saznajte više",
+      "features": {
+        "title": "Funkcije",
+        "description": "Otkrijte sve funkcionalnosti koje nudimo za poboljšanje vašeg iskustva."
+      },
+      "testimonials": {
+        "title": "Svjedočanstva",
+        "description": "Pročitajte što naši korisnici kažu o našoj platformi."
+      },
+      "press": {
+        "title": "Tisak",
+        "description": "Ostanite u tijeku s najnovijim vijestima o Mariscal-u."
+      },
+      "blog": {
+        "title": "Blog",
+        "description": "Članci i relevantni sadržaj o tehnologiji i društvenim mrežama."
+      }
+    },
+    "careers": {
+      "title": "Karijere",
+      "description": "Mariscal je ocijenjen kao jedno od najboljih mjesta za rad.",
+      "careersSite": "Stranica karijera",
+      "business": {
+        "title": "Posao",
+        "marketing": "Marketing",
+        "finance": "Financije",
+        "legal": "Pravno",
+        "sales": "Prodaja"
+      },
+      "engineering": {
+        "title": "Inženjerstvo",
+        "fullstack": "Full stack",
+        "devops": "DevOps",
+        "qa": "QA",
+        "data": "Podaci",
+        "machineLearning": "Strojno učenje",
+        "management": "Upravljanje"
+      },
+      "more": {
+        "title": "Više",
+        "support": "Podrška",
+        "office": "Ured",
+        "other": "Ostalo"
+      }
+    },
+    "pricing": {
+      "individual": {
+        "title": "Za pojedince",
+        "basicPlan": "Osnovni plan",
+        "premiumPlan": "Premium plan"
+      },
+      "business": {
+        "title": "Za tvrtke",
+        "startups": "Startupovi",
+        "smb": "MSP",
+        "enterprise": "Poduzeće"
+      },
+      "contactSales": "Kontaktirajte prodaju"
+    }
+  },
+  "dialogs": {
+    "getApp": {
+      "title": "Preuzmite The Mariscal aplikaciju",
+      "description": "Skenirajte ovaj QR kod za preuzimanje aplikacije",
+      "qrAlt": "QR kod za preuzimanje aplikacije",
+      "orSearchInStore": "Ili je pronađite u Store",
+      "googlePlayAlt": "Dostupno na Google Play",
+      "appStoreAlt": "Dostupno na App Store"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Dobrodošli u Mariscal svemir!",
+      "email": "E-mail",
+      "password": "Lozinka",
+      "forgotPassword": "Zaboravili ste lozinku?",
+      "submit": "Prijavite se",
+      "submitting": "Prijavljivanje...",
+      "welcome": "Dobrodošli!",
+      "newUser": "Novi ste ovdje?",
+      "createAccount": "Stvorite račun",
+      "terms": "Nastavkom prihvaćate naš",
+      "userAgreement": "Korisnički sporazum",
+      "privacyPolicy": "Politika privatnosti",
+      "and": "i potvrđujete da ste razumjeli"
+    },
+    "register": {
+      "title": "Pridružite se Mariscal svemiru!",
+      "username": "Korisničko ime",
+      "email": "E-mail",
+      "password": "Lozinka",
+      "confirmPassword": "Potvrdite lozinku",
+      "submit": "Registrirajte se",
+      "submitting": "Stvaranje računa...",
+      "existingUser": "Već imate račun?",
+      "login": "Prijavite se",
+      "terms": "Nastavkom prihvaćate naš",
+      "userAgreement": "Korisnički sporazum",
+      "privacyPolicy": "Politika privatnosti",
+      "and": "i potvrđujete da ste razumjeli"
+    },
+    "otp": {
+      "title": "Potvrdite svoj e-mail",
+      "description": "Poslali smo vam kod za potvrdu na vaš e-mail. Unesite ga da nastavite.",
+      "submit": "Potvrdite kod",
+      "submitting": "Potvrđivanje...",
+      "resend": "Pošaljite novi kod",
+      "resending": "Slanje...",
+      "resendTimer": "Pošaljite drugi kod za:",
+      "success": "Račun uspješno stvoren!"
+    },
+    "forgotPassword": {
+      "description": "Unesite svoj e-mail i poslat ćemo vam kod za resetiranje lozinke",
+      "email": "E-mail adresa",
+      "emailPlaceholder": "primjer@email.com",
+      "submit": "Pošaljite kod za resetiranje",
+      "sending": "Slanje koda...",
+      "backToLogin": "Povratak na prijavu"
+    },
+    "socials": {
+      "continueWithApple": "Nastavite s Apple",
+      "continueWithGoogle": "Nastavite s Google",
+      "continueWithTikTok": "Nastavite s TikTok",
+      "orContinueWith": "Ili nastavite s"
+    },
+    "loading": "Učitavanje...",
+    "resetPassword": {
+      "title": "Resetirajte lozinku",
+      "codeDescription": "Unesite kod za resetiranje koji smo vam poslali na e-mail.",
+      "newPassword": "Nova lozinka",
+      "confirmPassword": "Potvrdite lozinku",
+      "submit": "Resetirajte lozinku",
+      "submitting": "Resetiranje lozinke...",
+      "success": "Lozinka uspješno resetirana!",
+      "changeEmail": "Promijenite e-mail"
+    },
+    "errors": {
+      "authNotAvailable": "Sustav autentifikacije nije dostupan",
+      "unknownError": "Dogodila se nepoznata greška",
+      "incompleteLogin": "Nepotpuna prijava",
+      "incompleteVerification": "Greška pri potvrđivanju koda",
+      "incompleteReset": "Neočekivano stanje procesa resetiranja",
+      "twoFactorRequired": "Potrebna je dvofaktorska autentifikacija",
+      "errorTitle": "Ups! Dogodio se problem",
+      "loading": "Učitavanje...",
+      "resendSuccess": "Kod uspješno ponovno poslan",
+      "sendCodeError": "Greška pri slanju koda"
+    },
+    "validation": {
+      "email": {
+        "required": "E-mail je obavezan",
+        "invalid": "Mora biti valjan e-mail"
+      },
+      "password": {
+        "required": "Lozinka je obavezna",
+        "minLength": "Lozinka mora imati najmanje 8 znakova",
+        "complexity": "Lozinka mora sadržavati najmanje jedno malo slovo, jedno veliko slovo, jedan broj i jedan poseban znak (@$!%*?&)"
+      },
+      "username": {
+        "required": "Korisničko ime je obavezno",
+        "minLength": "Korisničko ime mora imati najmanje 4 znaka",
+        "format": "Korisničko ime može sadržavati samo mala slova, brojeve, crtice i podvlake"
+      },
+      "confirmPassword": {
+        "required": "Potvrdite svoju lozinku",
+        "mismatch": "Lozinke se ne podudaraju"
+      },
+      "code": {
+        "required": "Kod je obavezan",
+        "minLength": "Kod mora imati najmanje 6 znakova",
+      "otpLength": "Your one-time password must be 6 characters."
+    }
+  } 
+},
+"settings": {
+  "tooltip": "Postavke",
+  "title": "Postavke",
+  "description": "Napravite promjene u svom profilu ovdje. Kliknite spremi kada završite.",
+  "login": "Prijavite se",
+  "logout": {
+    "title": "Odjavite se",
+    "message": "Jeste li sigurni da se želite odjaviti?",
+    "confirm": "Odjavite se",
+    "button": "Odjavite se"
+  },
+  "theme": {
+    "light": "Svijetlo",
+    "dark": "Tamno",
+    "system": "Sustav",
+    "selectColor": "Odaberite boju",
+    "colors": {
+      "blue": "Plava",
+      "green": "Zelena",
+      "violet": "Ljubičasta",
+      "rose": "Ružičasta",
+      "orange": "Narančasta",
+      "yellow": "Žuta",
+      "red": "Crvena",
+      "zinc": "Cink",
+      "slate": "Škriljevac",
+      "stone": "Kamen",
+      "gray": "Siva",
+      "neutral": "Neutralna",
+      "emerald": "Smaragdna",
+      "teal": "Modrozelena",
+      "cyan": "Cijan",
+      "sky": "Nebo",
+      "indigo": "Indigo",
+      "purple": "Ljubičasta",
+      "fuchsia": "Fuksija",
+      "pink": "Ružičasta",
+      "lime": "Limeta",
+      "amber": "Jantar"
+    }
+  }
+}
+}

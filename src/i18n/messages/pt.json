@@ -1,0 +1,434 @@
+{
+  "metadata": {
+    "title": "TheMariscal.com",
+    "description": "Acesse todas as funcionalidades que um viajante precisa em sua aventura pelo mundo!",
+    "openGraphDescription": "Acesse todas as funcionalidades que um viajante precisa em sua aventura pelo mundo!",
+    "twitterDescription": "Acesse todas as funcionalidades que um viajante precisa em sua aventura pelo mundo!",
+    "siteName": "TheMariscal.com",
+    "author": "Martín Silva Molina",
+    "keywords": [
+      "TheMariscal.com",
+      "Viajante",
+      "Aventura",
+      "Mundo",
+      "Funções",
+      "Funcionalidades",
+      "The Mariscal",
+      "Martín Silva Molina",
+      "Silva Molina",
+      "Portfólio"
+    ]
+  },
+  "maintenance": {
+    "title": "Manutenção",
+    "description": "Estamos atualmente em manutenção. Por favor, tente novamente mais tarde."
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "Página não encontrada",
+    "description": "A página que você está procurando não existe ou foi movida.",
+    "backToHome": "Voltar ao início"
+  },
+  "languages": {
+    "en": "Inglês",
+    "es": "Espanhol",
+    "de": "Alemão",
+    "nl": "Holandês",
+    "hr": "Croata",
+    "it": "Italiano",
+    "pt": "Português",
+    "fr": "Francês"
+  },
+  "appSidebar": {
+    "popular": "Popular",
+    "sections": {
+      "reciente": "RECENTE",
+      "temas": "TÓPICOS",
+      "recursos": "RECURSOS",
+      "comunidades": "COMUNIDADES",
+      "legal": "LEGAL"
+    },
+    "recent": {
+      "discordapp": "r/discordapp"
+    },
+    "categories": {
+      "culturaInternet": "Cultura da Internet (viral)",
+      "juegos": "Jogos",
+      "preguntasRespuestas": "Perguntas e respostas",
+      "tecnologia": "Tecnologia",
+      "culturaPop": "Cultura pop",
+      "peliculasTV": "Filmes e TV",
+      "anime": "Anime",
+      "artes": "Artes",
+      "negocios": "Negócios",
+      "carreras": "Carreiras",
+      "ciencia": "Ciência",
+      "comida": "Comida",
+      "deportes": "Esportes",
+      "educacion": "Educação",
+      "entretenimiento": "Entretenimento",
+      "estiloVida": "Estilo de vida",
+      "historia": "História",
+      "hogarJardin": "Casa e jardim",
+      "mascotas": "Animais de estimação",
+      "musica": "Música",
+      "noticias": "Notícias",
+      "politica": "Política",
+      "salud": "Saúde",
+      "viajes": "Viagens",
+      "vehiculos": "Veículos",
+      "bienestar": "Bem-estar"
+    },
+    "subcategories": {
+      "increible": "Incrível",
+      "animales": "Animais",
+      "cringe": "Cringe",
+      "humor": "Humor",
+      "interesante": "Interessante",
+      "memes": "Memes",
+      "satisfactorio": "Satisfatório",
+      "meta": "Meta",
+      "reconfortante": "Confortante",
+      "juegosAccion": "Jogos de ação",
+      "juegosAventura": "Jogos de aventura",
+      "esports": "E-sports",
+      "consolas": "Consoles de jogos e e...",
+      "noticiasJuegos": "Notícias e debates...",
+      "juegosMoviles": "Jogos móveis",
+      "otrosJuegos": "Outros jogos",
+      "juegosRol": "Jogos de RPG",
+      "juegosSimulacion": "Jogos de simulação",
+      "juegosDeportes": "Jogos esportivos e de...",
+      "juegosEstrategia": "Jogos de estratégia",
+      "juegosMesa": "Jogos de tabuleiro",
+      "preguntasRespuestas": "Perguntas e respostas",
+      "historias": "Histórias e confissões...",
+      "impresion3d": "Impressão 3D",
+      "inteligenciaArtificial": "Inteligência artificial...",
+      "hardware": "Computadores e hardwar...",
+      "electronica": "Eletrônicos de consumo",
+      "bricolaje": "Eletrônicos DIY",
+      "programacion": "Programação",
+      "software": "Software e aplicativos",
+      "streaming": "Serviços de streaming",
+      "noticiasTecnologia": "Notícias e debates...",
+      "realidadVirtual": "Realidade virtual e au...",
+      "culturaPop": "Cultura pop",
+      "celebridades": "Celebridades",
+      "famosos": "Pessoas famosas",
+      "meme": "Meme",
+      "memeVideos": "Vídeos de memes",
+      "memeVideosGif": "Vídeos/GIFs de memes",
+      "memeVideosGif2": "Vídeos/GIFs de memes",
+      "peliculas": "Filmes",
+      "peliculas2": "Filmes",
+      "peliculas3": "Filmes",
+      "peliculas4": "Filmes",
+      "peliculas5": "Filmes",
+      "peliculas6": "Filmes",
+      "peliculas7": "Filmes",
+      "peliculas8": "Filmes",
+      "peliculas9": "Filmes",
+      "peliculas10": "Filmes",
+      "peliculas11": "Filmes",
+      "peliculas12": "Filmes",
+      "peliculas13": "Filmes"
+    },
+    "resources": {
+      "acercaReddit": "Sobre o Reddit",
+      "anunciarse": "Anunciar",
+      "redditPro": "Reddit Pro",
+      "ayuda": "Ajuda",
+      "blog": "Blog",
+      "empleo": "Empregos",
+      "prensa": "Imprensa"
+    },
+    "communities": {
+      "comunidades": "Comunidades",
+      "mejorReddit": "O melhor do Reddit",
+      "traducidas": "Posts traduzidos...",
+      "temas": "Tópicos"
+    },
+    "legal": {
+      "reglas": "Regras do TheMariscal",
+      "privacidad": "Política de privacidade",
+      "acuerdo": "Acordo do usuário",
+      "accesibilidad": "Acessibilidade"
+    },
+    "actions": {
+      "verMas": "Ver mais",
+      "verMenos": "Ver menos"
+    },
+    "footer": "TheMariscal, Inc. © 2025. Todos os direitos reservados."
+  },
+  "header": {
+    "search": {
+      "placeholder": "Pesquisar",
+      "tooltip": "Pesquisar no The Mariscal",
+      "keyboardShortcut": "Pressione",
+      "keyboardKey": "⌘K",
+      "noResults": "Nenhum resultado encontrado.",
+      "suggestions": "Sugestões",
+      "calendar": "Calendário",
+      "searchEmoji": "Pesquisar Emoji",
+      "calculator": "Calculadora",
+      "settings": "Configurações",
+      "profile": "Perfil",
+      "billing": "Faturamento"
+    },
+    "navigation": {
+      "obtenerApp": "Obter App",
+      "obtenerAppTooltip": "Obter o app The Mariscal para dispositivos móveis",
+      "ingresar": "Entrar",
+      "ingresarTooltip": "Entrar no universo The Mariscal"
+    },
+    "tooltips": {
+      "logo": "TheMariscal.com"
+    },
+    "userAccount": {
+      "defaultUser": "Usuário",
+      "loading": "Carregando...",
+      "myAccount": "Minha conta",
+      "myFavorites": "Meus favoritos",
+      "notifications": "Notificações",
+      "settings": "Configurações",
+      "privacy": "Privacidade",
+      "subscription": "Assinatura",
+      "admin": "Admin",
+      "tester": "Testador",
+      "logout": "Sair",
+      "logoutTitle": "Sair",
+      "logoutMessage": "Tem certeza de que deseja sair?",
+      "logoutButton": "Sair",
+      "logoutSuccess": "Até logo!",
+      "logoutError": "Erro ao sair"
+    }
+  },
+  "headerSections": {
+    "navigation": {
+      "sobreNosotros": "Sobre nós",
+      "precios": "Preços",
+      "carreras": "Carreiras",
+      "documentacion": "Documentação"
+    },
+    "aboutUs": {
+      "title": "Sobre nós",
+      "description": "Mariscal é a plataforma líder em redes sociais e conteúdo digital.",
+      "learnMore": "Saiba mais",
+      "features": {
+        "title": "Recursos",
+        "description": "Descubra todas as funcionalidades que oferecemos para melhorar sua experiência."
+      },
+      "testimonials": {
+        "title": "Depoimentos",
+        "description": "Leia o que nossos usuários dizem sobre nossa plataforma."
+      },
+      "press": {
+        "title": "Imprensa",
+        "description": "Mantenha-se atualizado com as últimas notícias sobre Mariscal."
+      },
+      "blog": {
+        "title": "Blog",
+        "description": "Artigos e conteúdo relevante sobre tecnologia e redes sociais."
+      }
+    },
+    "careers": {
+      "title": "Carreiras",
+      "description": "Mariscal foi classificado como um dos melhores lugares para trabalhar.",
+      "careersSite": "Site de carreiras",
+      "business": {
+        "title": "Negócios",
+        "marketing": "Marketing",
+        "finance": "Finanças",
+        "legal": "Jurídico",
+        "sales": "Vendas"
+      },
+      "engineering": {
+        "title": "Engenharia",
+        "fullstack": "Full stack",
+        "devops": "DevOps",
+        "qa": "QA",
+        "data": "Dados",
+        "machineLearning": "Machine Learning",
+        "management": "Gestão"
+      },
+      "more": {
+        "title": "Mais",
+        "support": "Suporte",
+        "office": "Escritório",
+        "other": "Outros"
+      }
+    },
+    "pricing": {
+      "individual": {
+        "title": "Para indivíduos",
+        "basicPlan": "Plano básico",
+        "premiumPlan": "Plano premium"
+      },
+      "business": {
+        "title": "Para empresas",
+        "startups": "Startups",
+        "smb": "PME",
+        "enterprise": "Empresa"
+      },
+      "contactSales": "Contatar vendas"
+    }
+  },
+  "dialogs": {
+    "getApp": {
+      "title": "Baixe o app The Mariscal",
+      "description": "Escaneie este código QR para baixar o app",
+      "qrAlt": "Código QR para baixar o app",
+      "orSearchInStore": "Ou procure na Store",
+      "googlePlayAlt": "Disponível no Google Play",
+      "appStoreAlt": "Disponível na App Store"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bem-vindo ao universo Mariscal!",
+      "email": "E-mail",
+      "password": "Senha",
+      "forgotPassword": "Esqueceu sua senha?",
+      "submit": "Entrar",
+      "submitting": "Entrando...",
+      "welcome": "Bem-vindo!",
+      "newUser": "Novo por aqui?",
+      "createAccount": "Criar conta",
+      "terms": "Ao continuar, você aceita nosso",
+      "userAgreement": "Acordo do usuário",
+      "privacyPolicy": "Política de privacidade",
+      "and": "e confirma que entendeu a"
+    },
+    "register": {
+      "title": "Junte-se ao universo Mariscal!",
+      "username": "Nome de usuário",
+      "email": "E-mail",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "submit": "Registrar",
+      "submitting": "Criando conta...",
+      "existingUser": "Já tem uma conta?",
+      "login": "Entrar",
+      "terms": "Ao continuar, você aceita nosso",
+      "userAgreement": "Acordo do usuário",
+      "privacyPolicy": "Política de privacidade",
+      "and": "e confirma que entendeu a"
+    },
+    "otp": {
+      "title": "Verifique seu e-mail",
+      "description": "Enviamos um código de verificação para seu e-mail. Digite-o para continuar.",
+      "submit": "Confirmar código",
+      "submitting": "Verificando...",
+      "resend": "Enviar novo código",
+      "resending": "Enviando...",
+      "resendTimer": "Enviar outro código em:",
+      "success": "Conta criada com sucesso!"
+    },
+    "forgotPassword": {
+      "description": "Digite seu e-mail e enviaremos um código para redefinir sua senha",
+      "email": "Endereço de e-mail",
+      "emailPlaceholder": "exemplo@email.com",
+      "submit": "Enviar código de redefinição",
+      "sending": "Enviando código...",
+      "backToLogin": "Voltar ao login"
+    },
+    "socials": {
+      "continueWithApple": "Continuar com Apple",
+      "continueWithGoogle": "Continuar com Google",
+      "continueWithTikTok": "Continuar com TikTok",
+      "orContinueWith": "Ou continuar com"
+    },
+    "loading": "Carregando...",
+    "resetPassword": {
+      "title": "Redefinir senha",
+      "codeDescription": "Digite o código de redefinição que enviamos para seu e-mail.",
+      "newPassword": "Nova senha",
+      "confirmPassword": "Confirmar senha",
+      "submit": "Redefinir senha",
+      "submitting": "Redefinindo senha...",
+      "success": "Senha redefinida com sucesso!",
+      "changeEmail": "Alterar e-mail"
+    },
+    "errors": {
+      "authNotAvailable": "Sistema de autenticação não disponível",
+      "unknownError": "Ocorreu um erro desconhecido",
+      "incompleteLogin": "Login incompleto",
+      "incompleteVerification": "Erro ao verificar código",
+      "incompleteReset": "Estado inesperado do processo de redefinição",
+      "twoFactorRequired": "Autenticação de dois fatores necessária",
+      "errorTitle": "Ops! Houve um problema",
+      "loading": "Carregando...",
+      "resendSuccess": "Código reenviado com sucesso",
+      "sendCodeError": "Erro ao enviar código"
+    },
+    "validation": {
+      "email": {
+        "required": "E-mail é obrigatório",
+        "invalid": "Deve ser um e-mail válido"
+      },
+      "password": {
+        "required": "Senha é obrigatória",
+        "minLength": "Senha deve ter pelo menos 8 caracteres",
+        "complexity": "Senha deve conter pelo menos uma letra minúscula, uma maiúscula, um número e um caractere especial (@$!%*?&)"
+      },
+      "username": {
+        "required": "Nome de usuário é obrigatório",
+        "minLength": "Nome de usuário deve ter pelo menos 4 caracteres",
+        "format": "Nome de usuário pode conter apenas letras minúsculas, números, hífens e sublinhados"
+      },
+      "confirmPassword": {
+        "required": "Confirme sua senha",
+        "mismatch": "Senhas não coincidem"
+      },
+      "code": {
+        "required": "Código é obrigatório",
+        "minLength": "Código deve ter pelo menos 6 caracteres",
+      "otpLength": "Your one-time password must be 6 characters."
+    }
+  }
+ 
+},
+"settings": {
+  "tooltip": "Configurações",
+  "title": "Configurações",
+  "description": "Faça alterações no seu perfil aqui. Clique em salvar quando terminar.",
+  "login": "Entrar",
+  "logout": {
+    "title": "Sair",
+    "message": "Tem certeza de que deseja sair?",
+    "confirm": "Sair",
+    "button": "Sair"
+  },
+  "theme": {
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema",
+    "selectColor": "Selecionar cor",
+    "colors": {
+      "blue": "Azul",
+      "green": "Verde",
+      "violet": "Violeta",
+      "rose": "Rosa",
+      "orange": "Laranja",
+      "yellow": "Amarelo",
+      "red": "Vermelho",
+      "zinc": "Zinco",
+      "slate": "Ardósia",
+      "stone": "Pedra",
+      "gray": "Cinza",
+      "neutral": "Neutro",
+      "emerald": "Esmeralda",
+      "teal": "Verde-azulado",
+      "cyan": "Ciano",
+      "sky": "Céu",
+      "indigo": "Anil",
+      "purple": "Roxo",
+      "fuchsia": "Fúcsia",
+      "pink": "Rosa",
+      "lime": "Lima",
+      "amber": "Âmbar"
+    }
+  }
+}
+}
