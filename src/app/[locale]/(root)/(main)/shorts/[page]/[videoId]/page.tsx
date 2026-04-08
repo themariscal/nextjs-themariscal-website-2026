@@ -17,8 +17,15 @@ import { toast } from "react-toastify";
 import { ResponsiveDialog } from "@/components/dialogs/layout";
 import { LoginContent } from "@/components/dialogs/auth/login-content";
 import { useMusicStore } from "@/lib/stores/music-store";
+import { motion } from "motion/react";
+import { AnimateNumber, type AnimateNumberProps } from "motion-plus/react";
 
 const PENDING_REACTION_KEY = "pendingShortReaction";
+const REACTION_NUMBER_FORMAT: AnimateNumberProps["format"] = {
+  notation: "compact",
+  compactDisplay: "short",
+  roundingMode: "trunc",
+};
 
 const ShortsPlayerPage = () => {
   const params = useParams();
@@ -33,6 +40,7 @@ const ShortsPlayerPage = () => {
   const allShorts = useQuery(api.youtubeShorts.getByPage, { page });
   const myReaction = useQuery(api.youtubeShorts.getMyReaction, { videoId });
   const reactionCounts = useQuery(api.youtubeShorts.getReactionCounts, { videoId });
+  const comments = useQuery(api.shortComments.getComments, { videoId });
   const toggleReaction = useMutation(api.youtubeShorts.toggleReaction);
 
   const [loginOpen, setLoginOpen] = useState(false);
@@ -150,12 +158,6 @@ const ShortsPlayerPage = () => {
     toggleReaction({ videoId, reaction });
   };
 
-  const formatCount = (n: number) => {
-    if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
-    if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
-    return n > 0 ? String(n) : null;
-  };
-
   return (
     <MainLayout>
       {/* Ambient glow — fixed, covers full viewport behind topbar and music player */}
@@ -223,55 +225,33 @@ const ShortsPlayerPage = () => {
           <div className="col-start-3 ml-3 flex flex-col items-center gap-5 justify-self-start pb-2">
 
             {/* Like */}
-            <button
+            <AnimatedReactionButton
               onClick={() => handleReaction("like")}
-              className="flex flex-col items-center gap-1 group"
+              isSelected={myReaction === "like"}
               title="Me gusta"
-            >
-              <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-                myReaction === "like"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted group-hover:bg-muted/70"
-              )}>
-                <ThumbsUp className={cn(
-                  "w-5 h-5 transition-colors",
-                  myReaction === "like" ? "text-primary-foreground" : "text-foreground"
-                )} />
-              </div>
-              <span className="text-[10px] text-muted-foreground">
-                {formatCount(reactionCounts?.likes ?? 0) ?? "Me gusta"}
-              </span>
-            </button>
+              tone="like"
+              icon={<ThumbsUp className="w-5 h-5" />}
+              count={reactionCounts?.likes ?? 0}
+            />
 
             {/* Dislike */}
-            <button
+            <AnimatedReactionButton
               onClick={() => handleReaction("dislike")}
-              className="flex flex-col items-center gap-1 group"
+              isSelected={myReaction === "dislike"}
               title="No me gusta"
-            >
-              <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-                myReaction === "dislike"
-                  ? "bg-destructive text-destructive-foreground"
-                  : "bg-muted group-hover:bg-muted/70"
-              )}>
-                <ThumbsDown className={cn(
-                  "w-5 h-5 transition-colors",
-                  myReaction === "dislike" ? "text-destructive-foreground" : "text-foreground"
-                )} />
-              </div>
-              <span className="text-[10px] text-muted-foreground">
-                {formatCount(reactionCounts?.dislikes ?? 0) ?? "No me gusta"}
-              </span>
-            </button>
+              tone="dislike"
+              icon={<ThumbsDown className="w-5 h-5" />}
+              count={reactionCounts?.dislikes ?? 0}
+            />
 
             {/* Comments */}
             <CommentsDialog videoId={videoId}>
               <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center group-hover:bg-muted/70 transition-colors">
                 <MessageCircle className="w-5 h-5 text-foreground" />
               </div>
-              <span className="text-[10px] text-muted-foreground">Comentarios</span>
+              <span className="text-[10px] text-muted-foreground">
+                {comments && comments.length > 0 ? `Comentarios (${comments.length})` : "Comentarios"}
+              </span>
             </CommentsDialog>
 
             {/* Share */}
@@ -322,3 +302,47 @@ const ShortsPlayerPage = () => {
 };
 
 export default ShortsPlayerPage;
+
+function AnimatedReactionButton({
+  onClick,
+  isSelected,
+  title,
+  tone,
+  icon,
+  count,
+}: {
+  onClick: () => void;
+  isSelected: boolean;
+  title: string;
+  tone: "like" | "dislike";
+  icon: React.ReactNode;
+  count: number;
+}) {
+  const selectedClass =
+    tone === "like" ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground";
+
+  return (
+    <motion.button
+      onClick={onClick}
+      title={title}
+      className="flex flex-col items-center gap-1"
+      whileTap={{ scale: 0.9 }}
+      animate={{ scale: isSelected ? 1.03 : 1 }}
+      transition={{ type: "spring", stiffness: 500, damping: 24 }}
+    >
+      <motion.div
+        className={cn(
+          "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+          isSelected ? selectedClass : "bg-muted hover:bg-muted/70 text-foreground"
+        )}
+        animate={{ y: isSelected ? -1 : 0 }}
+        transition={{ type: "spring", stiffness: 420, damping: 20 }}
+      >
+        {icon}
+      </motion.div>
+      <span className="text-[10px] text-muted-foreground tabular-nums">
+        <AnimateNumber format={REACTION_NUMBER_FORMAT}>{count}</AnimateNumber>
+      </span>
+    </motion.button>
+  );
+}
