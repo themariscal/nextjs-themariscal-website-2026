@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { ThemeColorProvider } from "@/lib/providers/theme-color-provider";
 import TopLoader from "@/components/layout/top-loader";
 import { ClerkProviderTheme } from "@/lib/providers/clerk-provider";
+import { ConvexClientProvider } from "@/lib/providers/convex-provider";
 import { ToastCustomContainer } from "@/components/layout/toast-custom-container";
 import { getLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
@@ -47,9 +48,11 @@ export default async function RootLayout({
           >
             <ThemeColorProvider>
               <ClerkProviderTheme locale={locale}>
-                <TopLoader />
-                {children}
-                <ToastCustomContainer />
+                <ConvexClientProvider>
+                  <TopLoader />
+                  {children}
+                  <ToastCustomContainer />
+                </ConvexClientProvider>
               </ClerkProviderTheme>
             </ThemeColorProvider>
           </ThemeProvider>
