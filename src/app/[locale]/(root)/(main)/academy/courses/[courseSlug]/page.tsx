@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { useSidebarStore } from "@/lib/stores/sidebar-store";
 import { extractYouTubeVideoId } from "@/lib/youtube-shorts";
 import { useQuery } from "convex/react";
 import {
@@ -1001,8 +1002,7 @@ function CoursePurchaseSidebar({
 
   return (
     <>
-      <div className="sticky top-20">
-        <Card className="overflow-hidden border-border/70 bg-background/95">
+      <Card className="overflow-hidden border-border/70 bg-background/95">
         <button
           type="button"
           className="group relative block aspect-video w-full bg-muted text-left cursor-pointer"
@@ -1111,8 +1111,7 @@ function CoursePurchaseSidebar({
             </p>
           </div>
         </CardContent>
-        </Card>
-      </div>
+      </Card>
 
       <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
         <DialogContent
@@ -1181,6 +1180,130 @@ function CoursePurchaseSidebar({
   );
 }
 
+function CourseMarketplaceFooter() {
+  const { isCollapsed } = useSidebarStore();
+
+  const footerColumnsTop = [
+    {
+      title: "In-demand Careers",
+      links: [
+        "Data Scientist",
+        "Full Stack Web Developer",
+        "Cloud Engineer",
+        "Project Manager",
+        "Game Developer",
+      ],
+    },
+    {
+      title: "Web Development",
+      links: ["Web Development", "JavaScript", "React JS", "Angular", "Java"],
+    },
+    {
+      title: "IT Certifications",
+      links: [
+        "Amazon AWS",
+        "AWS Certified Cloud Practitioner",
+        "AZ-900: Azure Fundamentals",
+        "Kubernetes",
+      ],
+    },
+    {
+      title: "Leadership",
+      links: [
+        "Leadership",
+        "Management Skills",
+        "Project Management",
+        "Personal Productivity",
+      ],
+    },
+  ];
+
+  const footerColumnsBottom = [
+    {
+      title: "About",
+      links: ["About us", "Careers", "Contact us", "Blog", "Investors"],
+    },
+    {
+      title: "Discover Academy",
+      links: ["Get the app", "Teach on Academy", "Plans and Pricing", "Affiliate", "Help and Support"],
+    },
+    {
+      title: "Academy for Business",
+      links: ["Academy Business"],
+    },
+    {
+      title: "Legal & Accessibility",
+      links: ["Accessibility statement", "Privacy policy", "Sitemap", "Terms"],
+    },
+  ];
+
+  return (
+    <footer
+      className={cn(
+        "w-full bg-[#151827] text-slate-200",
+        isCollapsed ? "md:pl-24" : "md:pl-64"
+      )}
+    >
+      <div className="border-t border-slate-700/70">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-5 md:px-6">
+          <p className="text-sm">
+            Top companies choose <span className="font-semibold text-primary">Academy Business</span> to build in-demand career skills.
+          </p>
+          <div className="hidden items-center gap-4 text-xs text-slate-400 md:flex">
+            <span>Nasdaq</span>
+            <span>Volkswagen</span>
+            <span>NetApp</span>
+            <span>Eventbrite</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-slate-700/70">
+        <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-8 md:grid-cols-4 md:px-6">
+          {footerColumnsTop.map((column) => (
+            <div key={column.title} className="space-y-3">
+              <h4 className="text-sm font-semibold text-white">{column.title}</h4>
+              <ul className="space-y-2 text-xs text-slate-400">
+                {column.links.map((link) => (
+                  <li key={link} className="hover:text-white transition-colors cursor-pointer">
+                    {link}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="border-t border-slate-700/70">
+        <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-8 md:grid-cols-4 md:px-6">
+          {footerColumnsBottom.map((column) => (
+            <div key={column.title} className="space-y-3">
+              <h4 className="text-sm font-semibold text-white">{column.title}</h4>
+              <ul className="space-y-2 text-xs text-slate-400">
+                {column.links.map((link) => (
+                  <li key={link} className="hover:text-white transition-colors cursor-pointer">
+                    {link}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="border-t border-slate-700/70">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-slate-400 md:px-6">
+          <div className="font-semibold text-white">academy</div>
+          <span>© 2026 Academy, Inc.</span>
+          <span>Cookie settings</span>
+          <span>English</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 export default function PublicAcademyCoursePage() {
   const params = useParams();
   const courseSlug = (params.courseSlug as string) ?? "";
@@ -1214,11 +1337,14 @@ export default function PublicAcademyCoursePage() {
 
   return (
     <MainLayout>
-      <PrincipalLayout
-        hero={<CourseHero courseData={courseData} stats={stats} />}
-        content={<CourseMainContent courseData={courseData} />}
-        rightSidebar={<CoursePurchaseSidebar courseData={courseData} stats={stats} />}
-      />
+      <>
+        <PrincipalLayout
+          hero={<CourseHero courseData={courseData} stats={stats} />}
+          content={<CourseMainContent courseData={courseData} />}
+          rightSidebar={<CoursePurchaseSidebar courseData={courseData} stats={stats} />}
+        />
+        <CourseMarketplaceFooter />
+      </>
     </MainLayout>
   );
 }
