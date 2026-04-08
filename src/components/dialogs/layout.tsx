@@ -53,14 +53,14 @@ export function ResponsiveDialog({
         <DialogContent className={fullscreen ? `m-0 rounded-none transition-all duration-300 flex flex-col ${isExpanded ? "max-w-[100vw] w-[100vw] max-h-[80vh] h-[80vh]" : "max-w-[65vw] w-[65vw] max-h-[40vh] h-[40vh]"}` : "sm:max-w-[425px]"}>
           <DialogHeader
             className={
-              fullscreen
+              fullscreen || !title
                 ? "sr-only"
                 : centerContent
                   ? "text-center sm:text-center "
                   : "text-left sm:text-left "
             }
           >
-            <DialogTitle>{title || "Chat de Mariscal"}</DialogTitle>
+            <DialogTitle>{title ?? ""}</DialogTitle>
             {description && (
               <DialogDescription>{description}</DialogDescription>
             )}
