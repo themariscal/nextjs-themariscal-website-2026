@@ -641,7 +641,7 @@ function CoursePurchaseSidebar({
             <DialogDescription>{courseData.name}</DialogDescription>
           </DialogHeader>
           <div className="px-6 pb-6 space-y-4 h-[calc(80vh-88px)] overflow-y-auto">
-            <div className="relative aspect-video min-h-[42vh] overflow-hidden rounded-md border border-border/60 bg-black">
+            <div className="relative aspect-video w-full max-h-[45vh] overflow-hidden rounded-md border border-border/60 bg-black">
               <iframe
                 src={`https://www.youtube.com/embed/${activePreviewVideoId}`}
                 title="Course preview video"
