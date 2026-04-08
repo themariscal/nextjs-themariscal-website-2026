@@ -1,0 +1,199 @@
+"use client";
+
+import { api } from "#convex/_generated/api";
+import type { Id } from "#convex/_generated/dataModel";
+import { AlertErrorCard } from "@/components/alerts/alert-error-card";
+import { AdminFormLayout } from "@/components/elements/layouts/admin-form-layout";
+import { Button } from "@/components/ui/button";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useMutation, useQuery } from "convex/react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "react-toastify";
+import { z } from "zod";
+import { createShortsSchemas } from "@/lib/schemas/shorts-schemas";
+import { extractYouTubeVideoId } from "@/lib/youtube-shorts";
+
+export default function AdminEditShortPage() {
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as Id<"youtubeShorts">;
+  const locale = (params.locale as string) ?? "en";
+
+  const short = useQuery(api.youtubeShorts.getById, { id });
+  const updateShort = useMutation(api.youtubeShorts.update);
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const { editShortSchema } = createShortsSchemas();
+  type EditShortType = z.infer<typeof editShortSchema>;
+
+  const defaultValues = useMemo<EditShortType>(
+    () => ({
+      title: "",
+      section: "",
+      shortUrl: "",
+      order: "",
+    }),
+    []
+  );
+
+  const form = useForm<EditShortType>({
+    resolver: zodResolver(editShortSchema),
+    defaultValues,
+  });
+
+  useEffect(() => {
+    if (!short) return;
+
+    form.reset({
+      title: short.title,
+      section: short.section ?? short.page ?? "home",
+      shortUrl: `https://www.youtube.com/shorts/${short.videoId}`,
+      order: short.order !== undefined ? String(short.order) : "",
+    });
+  }, [short, form]);
+
+  const handleSubmit = form.handleSubmit(async (values) => {
+    try {
+      setError(null);
+      setIsSaving(true);
+
+      const videoId = extractYouTubeVideoId(values.shortUrl);
+      if (!videoId) {
+        setError("No pudimos extraer el videoId desde la URL.");
+        return;
+      }
+
+      await updateShort({
+        id,
+        title: values.title,
+        section: values.section,
+        videoId,
+        order: values.order && values.order.length > 0 ? Number(values.order) : undefined,
+      });
+
+      toast.success("Short actualizado.");
+      router.push(`/${locale}/admin/shorts`);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Error desconocido al actualizar el short.");
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  });
+
+  if (short === undefined) {
+    return (
+      <AdminFormLayout
+        title="Editar short"
+        description="Actualizá título, sección y URL del short."
+      >
+        <p className="text-sm text-muted-foreground">Cargando short...</p>
+      </AdminFormLayout>
+    );
+  }
+
+  if (short === null) {
+    return (
+      <AdminFormLayout
+        title="Editar short"
+        description="No encontramos ese short."
+      >
+        <Button variant="outline" onClick={() => router.push(`/${locale}/admin/shorts`)}>
+          Volver
+        </Button>
+      </AdminFormLayout>
+    );
+  }
+
+  return (
+    <AdminFormLayout
+      title="Editar short"
+      description="Actualizá título, sección y URL del short."
+    >
+      <FormProvider {...form}>
+        <form className="grid gap-5" onSubmit={handleSubmit}>
+          {error && <AlertErrorCard title="Error" message={error} />}
+
+          <FormField
+            name="title"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Título</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            name="section"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Sección</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="home" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            name="shortUrl"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>URL del short</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="https://www.youtube.com/shorts/VIDEO_ID" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            name="order"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Orden (opcional)</FormLabel>
+                <FormControl>
+                  <Input {...field} inputMode="numeric" placeholder="26" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex items-center gap-3">
+            <Button type="button" variant="outline" onClick={() => router.push(`/${locale}/admin/shorts`)}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? "Guardando..." : "Guardar cambios"}
+            </Button>
+          </div>
+        </form>
+      </FormProvider>
+    </AdminFormLayout>
+  );
+}

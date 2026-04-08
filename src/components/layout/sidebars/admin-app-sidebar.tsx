@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ChevronDown, User2, Image } from "lucide-react";
+import { ChevronDown, Clapperboard, GraduationCap, Image, User2 } from "lucide-react";
 
 import {
   Sidebar,
@@ -15,31 +15,41 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-
 import {
   Collapsible,
-  CollapsibleTrigger,
   CollapsibleContent,
+  CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
 const items = [
   {
     title: "Users",
     icon: User2,
-    subitems: [{ title: "Users", url: "/admin/users" }],
+    url: "/admin/users",
   },
   {
     title: "Images",
     icon: Image,
-    subitems: [
-      { title: "App Images", url: "/admin/images/app" },
-      { title: "User Images", url: "/admin/images/users" },
-    ],
+    url: "/admin/images/app",
+  },
+  {
+    title: "Shorts",
+    icon: Clapperboard,
+    url: "/admin/shorts",
+  },
+];
+
+const academyItems = [
+  {
+    title: "Courses",
+    url: "/admin/academy/courses",
   },
 ];
 
 export function AdminAppSidebar() {
   const pathname = usePathname();
+  const matchesPath = (targetUrl: string) => pathname.includes(targetUrl);
+  const academyIsActive = academyItems.some((item) => matchesPath(item.url));
 
   return (
     <Sidebar>
@@ -49,46 +59,59 @@ export function AdminAppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
-                const isActive = item.subitems.some((sub) =>
-                  pathname.startsWith(sub.url)
-                );
+                const isActive = matchesPath(item.url);
 
                 return (
-                  <Collapsible
-                    key={item.title}
-                    defaultOpen={isActive}
-                    className="group/collapsible"
-                  >
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton>
-                          <item.icon />
-                          <span>{item.title}</span>
-                          <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {item.subitems.map((subitem) => (
-                            <SidebarMenuSubItem key={subitem.title}>
-                              <a
-                                href={subitem.url}
-                                className={
-                                  pathname === subitem.url
-                                    ? "text-white font-semibold"
-                                    : ""
-                                }
-                              >
-                                {subitem.title}
-                              </a>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </Collapsible>
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <a
+                        href={item.url}
+                        className={
+                          isActive
+                            ? "text-white font-semibold bg-primary/10"
+                            : "text-muted-foreground hover:text-white"
+                        }
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 );
               })}
+
+              <Collapsible
+                defaultOpen={academyIsActive}
+                className="group/collapsible"
+              >
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <GraduationCap className="h-4 w-4" />
+                      <span>Academy</span>
+                      <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {academyItems.map((academyItem) => (
+                        <SidebarMenuSubItem key={academyItem.title}>
+                          <a
+                            href={academyItem.url}
+                            className={
+                              matchesPath(academyItem.url)
+                                ? "text-white font-semibold"
+                                : ""
+                            }
+                          >
+                            {academyItem.title}
+                          </a>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

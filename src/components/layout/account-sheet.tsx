@@ -19,16 +19,15 @@ import { MoreHorizontal, } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
 import { ThemeColorToggle } from "./theme-color-toggle";
 import { LanguageSelector } from "./language-selector";
-import { CustomAlertDialog } from "../alerts/custom-alert-dialog";
 
 import { LoginDialog } from "../dialogs/auth/login-dialog";
-import { SignedIn, SignedOut, useClerk } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { useTranslations } from "next-intl";
 import { LogoutDialog } from "../dialogs/auth/logout-dialog";
 
 export function AccountSheet() {
   const t = useTranslations("settings");
-  const { signOut } = useClerk();
+  const { isLoaded, isSignedIn } = useUser();
   return (
     <Tooltip>
       <Sheet>
@@ -69,20 +68,20 @@ export function AccountSheet() {
 
           </div>
           <SheetFooter>
-            <SignedOut>
+            {isLoaded && !isSignedIn && (
               <LoginDialog>
                 <Button type="button" className="w-full">
                   {t("login")}
                 </Button>
               </LoginDialog>
-            </SignedOut>
-            <SignedIn>
+            )}
+            {isLoaded && isSignedIn && (
               <LogoutDialog>
                 <Button type="submit" className="cursor-pointer">
                   {t("logout.button")}
                 </Button>
               </LogoutDialog>
-            </SignedIn>
+            )}
           </SheetFooter>
         </SheetContent>
       </Sheet>

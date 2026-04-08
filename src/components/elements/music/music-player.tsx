@@ -15,7 +15,10 @@ import {
     List,
     Monitor,
     Maximize,
-    Heart
+    Heart,
+    ChevronDown,
+    ChevronUp,
+    Music2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMusicStore } from '@/lib/stores/music-store';
@@ -32,6 +35,7 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
         volume,
         currentTime,
         duration,
+        isPlayerCollapsed,
         isShuffled,
         isRepeated,
         togglePlayPause,
@@ -40,10 +44,9 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
         nextTrack,
         previousTrack,
         toggleShuffle,
-        toggleRepeat
+        toggleRepeat,
+        togglePlayerCollapsed
     } = useMusicStore();
-
-    const [progress, setProgress] = React.useState([0]);
 
     // Format time helper
     const formatTime = (seconds: number) => {
@@ -54,7 +57,6 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
 
     // Handle progress change
     const handleProgressChange = (value: number[]) => {
-        setProgress(value);
         const newTime = (value[0] / 100) * duration;
         setCurrentTime(newTime);
     };
@@ -66,10 +68,44 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
 
     return (
         <div className={cn(
-            'fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border/50',
-            'h-20 px-4 flex items-center justify-between',
+            'fixed bottom-0 left-0 right-0 z-50 overflow-visible',
             className
         )}>
+            <div
+                className={cn(
+                    'absolute left-1/2 z-10 -translate-x-1/2 transition-all duration-300 ease-out',
+                    isPlayerCollapsed
+                        ? 'bottom-0 translate-y-0'
+                        : 'top-0 -translate-y-[calc(100%-1px)]'
+                )}
+            >
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                        'h-9 min-w-36 rounded-t-xl rounded-b-none border-b-0 bg-background/70 px-5 shadow-md backdrop-blur-xl',
+                        'inline-flex items-center justify-center gap-2'
+                    )}
+                    onClick={togglePlayerCollapsed}
+                    aria-label={isPlayerCollapsed ? 'Mostrar reproductor de musica' : 'Ocultar reproductor de musica'}
+                >
+                    {isPlayerCollapsed && <Music2 className="h-4 w-4" />}
+                    {isPlayerCollapsed ? (
+                        <ChevronUp className="h-4 w-4" />
+                    ) : (
+                        <ChevronDown className="h-4 w-4" />
+                    )}
+                </Button>
+            </div>
+
+            <div
+                className={cn(
+                    'h-20 border-t border-border/40 bg-background/70 px-4 backdrop-blur-xl transition-transform duration-300 ease-out',
+                    'flex items-center justify-between',
+                    isPlayerCollapsed && 'translate-y-full pointer-events-none'
+                )}
+            >
             {/* Left Section - Track Info */}
             <div className="flex items-center gap-4 flex-1 min-w-0">
                 {currentTrack ? (
@@ -171,7 +207,7 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
                         {currentTrack ? formatTime(currentTime) : "0:00"}
                     </span>
                     <Slider
-                        value={currentTrack ? [(currentTime / duration) * 100] : [0]}
+                        value={currentTrack && duration > 0 ? [(currentTime / duration) * 100] : [0]}
                         onValueChange={handleProgressChange}
                         max={100}
                         step={1}
@@ -208,6 +244,7 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
                 <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
                     <Maximize className="w-4 h-4 text-muted-foreground" />
                 </Button>
+            </div>
             </div>
         </div>
     );

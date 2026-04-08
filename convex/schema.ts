@@ -5,11 +5,65 @@ export default defineSchema({
   youtubeShorts: defineTable({
     videoId: v.string(),
     title: v.string(),
-    page: v.string(),
+    // `section` is the new canonical field.
+    // `page` remains optional for backward compatibility with existing routes/data.
+    section: v.optional(v.string()),
+    page: v.optional(v.string()),
     order: v.optional(v.number()),
   })
+    .index("bySection", ["section"])
+    .index("bySectionAndOrder", ["section", "order"])
     .index("byPage", ["page"])
     .index("byPageAndOrder", ["page", "order"]),
+
+  shortSections: defineTable({
+    name: v.string(),
+  }).index("by_name", ["name"]),
+
+  courseLanguages: defineTable({
+    name: v.string(),
+  }).index("by_name", ["name"]),
+
+  courseInstructors: defineTable({
+    name: v.string(),
+  }).index("by_name", ["name"]),
+
+  academyCourses: defineTable({
+    name: v.string(),
+    youtubeUrl: v.string(),
+    youtubeVideoId: v.string(),
+    languageId: v.id("courseLanguages"),
+    instructorId: v.id("courseInstructors"),
+    description: v.string(),
+  })
+    .index("by_language", ["languageId"])
+    .index("by_instructor", ["instructorId"]),
+
+  academyCourseSections: defineTable({
+    courseId: v.id("academyCourses"),
+    name: v.string(),
+    order: v.optional(v.number()),
+  })
+    .index("by_course", ["courseId"])
+    .index("by_course_and_order", ["courseId", "order"]),
+
+  academyCourseSectionElements: defineTable({
+    sectionId: v.id("academyCourseSections"),
+    type: v.union(
+      v.literal("video"),
+      v.literal("quiz"),
+      v.literal("resource"),
+      v.literal("note")
+    ),
+    title: v.string(),
+    order: v.optional(v.number()),
+    durationLabel: v.optional(v.string()),
+    isPreview: v.optional(v.boolean()),
+    contentUrl: v.optional(v.string()),
+    contentText: v.optional(v.string()),
+  })
+    .index("by_section", ["sectionId"])
+    .index("by_section_and_order", ["sectionId", "order"]),
 
   shortReactions: defineTable({
     tokenIdentifier: v.string(),

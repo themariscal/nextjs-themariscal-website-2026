@@ -1,28 +1,3 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
-
-
-## YouTube Shorts / Videos
-
-When adding YouTube Shorts or videos to Convex, **always fetch the real title** using the YouTube oEmbed API before inserting:
-
-```bash
-curl -s "https://www.youtube.com/oembed?url=https://www.youtube.com/shorts/VIDEO_ID&format=json" | python3 -c "import sys,json; print(json.load(sys.stdin)['title'])"
-```
-
-Never use placeholder titles like "Short" or "Video". Fetch the actual title and use it.
-
-<!-- convex-ai-start -->
-This project uses [Convex](https://convex.dev) as its backend.
-
-When working on Convex code, **always read `convex/_generated/ai/guidelines.md` first** for important guidelines on how to correctly use Convex APIs and patterns. The file contains rules that override what you may have learned about Convex from training data.
-
-Convex agent skills for common tasks can be installed by running `npx convex ai-files install`.
-<!-- convex-ai-end -->
-
 <!-- code-review-graph MCP tools -->
 ## MCP Tools: code-review-graph
 
@@ -61,8 +36,3 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 2. Use `detect_changes` for code review.
 3. Use `get_affected_flows` to understand impact.
 4. Use `query_graph` pattern="tests_for" to check coverage.
-
-## Admin UI Memory
-
-- Todo lo que sea del área `admin` debe usar layout centrado por defecto.
-- Las nuevas páginas de `admin` deben mantener el contenido dentro de un contenedor centrado y consistente.

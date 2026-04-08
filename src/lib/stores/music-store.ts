@@ -17,6 +17,7 @@ export interface MusicState {
     currentTrack: Track | null;
     isPlaying: boolean;
     isPaused: boolean;
+    isPlayerCollapsed: boolean;
     volume: number;
     currentTime: number;
     duration: number;
@@ -37,6 +38,8 @@ export interface MusicState {
     setVolume: (volume: number) => void;
     setCurrentTime: (time: number) => void;
     setDuration: (duration: number) => void;
+    setPlayerCollapsed: (collapsed: boolean) => void;
+    togglePlayerCollapsed: () => void;
     
     // Queue management
     setQueue: (tracks: Track[]) => void;
@@ -58,6 +61,7 @@ const initialState = {
     currentTrack: null,
     isPlaying: false,
     isPaused: false,
+    isPlayerCollapsed: false,
     volume: 50,
     currentTime: 0,
     duration: 0,
@@ -104,6 +108,15 @@ export const useMusicStore = create<MusicState>()(
             
             setDuration: (duration: number) => {
                 set({ duration });
+            },
+
+            setPlayerCollapsed: (collapsed: boolean) => {
+                set({ isPlayerCollapsed: collapsed });
+            },
+
+            togglePlayerCollapsed: () => {
+                const { isPlayerCollapsed } = get();
+                set({ isPlayerCollapsed: !isPlayerCollapsed });
             },
             
             setQueue: (tracks: Track[]) => {
@@ -184,6 +197,7 @@ export const useMusicStore = create<MusicState>()(
             partialize: (state) => ({
                 currentTrack: state.currentTrack,
                 isPlaying: state.isPlaying,
+                isPlayerCollapsed: state.isPlayerCollapsed,
                 volume: state.volume,
                 queue: state.queue,
                 currentIndex: state.currentIndex,

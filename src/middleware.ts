@@ -33,7 +33,7 @@ export default clerkMiddleware(async (auth, req) => {
       
     if (isAdminRoute(req) || isTestingRoute(req)) {
         await auth.protect((has) => {
-          return has({ permission: 'org:admin' }) || has({ role: 'admin' })
+          return has({ permission: 'org:admin' }) || has({ role: 'org:admin' })
         })
     }
     
