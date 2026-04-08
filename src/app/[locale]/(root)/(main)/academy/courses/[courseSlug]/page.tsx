@@ -1240,7 +1240,7 @@ function CourseMarketplaceFooter() {
   return (
     <footer
       className={cn(
-        "w-full bg-[#151827] text-slate-200",
+        "relative z-[60] w-full bg-[#151827] text-slate-200",
         isCollapsed ? "md:pl-24" : "md:pl-64"
       )}
     >
