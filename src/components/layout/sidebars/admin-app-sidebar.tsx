@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ChevronDown, User2, Image } from "lucide-react";
+import { ChevronDown, User2, Image, Clapperboard } from "lucide-react";
 
 import {
   Sidebar,
@@ -36,10 +36,22 @@ const items = [
       { title: "User Images", url: "/admin/images/users" },
     ],
   },
+  {
+    title: "Shorts",
+    icon: Clapperboard,
+    subitems: [
+      { title: "Home", url: "/admin/shorts-home" },
+      { title: "Academy", url: "/admin/shorts-academy" },
+    ],
+  },
 ];
 
 export function AdminAppSidebar() {
   const pathname = usePathname();
+  const matchesPath = (targetUrl: string) =>
+    pathname === targetUrl ||
+    pathname.endsWith(targetUrl) ||
+    pathname.includes(`${targetUrl}/`);
 
   return (
     <Sidebar>
@@ -50,7 +62,7 @@ export function AdminAppSidebar() {
             <SidebarMenu>
               {items.map((item) => {
                 const isActive = item.subitems.some((sub) =>
-                  pathname.startsWith(sub.url)
+                  matchesPath(sub.url)
                 );
 
                 return (
@@ -74,7 +86,7 @@ export function AdminAppSidebar() {
                               <a
                                 href={subitem.url}
                                 className={
-                                  pathname === subitem.url
+                                  matchesPath(subitem.url)
                                     ? "text-white font-semibold"
                                     : ""
                                 }
