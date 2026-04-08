@@ -1,5 +1,6 @@
 "use client";
 
+import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "convex/react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -11,7 +12,22 @@ export const YouTubeShorts = ({ page }: { page: string }) => {
   const params = useParams();
   const locale = params?.locale ?? "en";
 
-  if (!shorts || shorts.length === 0) return null;
+  if (shorts === undefined) {
+    return (
+      <div className="w-full">
+        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+          <div className="flex-shrink-0 w-0" />
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex-shrink-0">
+              <Skeleton className="w-[216px] h-96 rounded-xl" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (shorts.length === 0) return null;
 
   return (
     <div className="w-full">
