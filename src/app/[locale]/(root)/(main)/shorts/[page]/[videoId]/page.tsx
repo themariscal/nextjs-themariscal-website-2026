@@ -156,8 +156,19 @@ const ShortsPlayerPage = () => {
 
   return (
     <MainLayout>
-      <div className="flex items-center justify-center h-[calc(100svh-160px)] bg-background overflow-hidden">
-        <div className="flex items-end gap-3 h-full py-2">
+      <div className="relative flex items-center justify-center h-[calc(100svh-160px)] bg-background overflow-hidden">
+
+        {/* Ambient glow — blurred thumbnail behind the video */}
+        <div className="absolute inset-0 z-0" aria-hidden>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+            alt=""
+            className="w-full h-full object-cover scale-150 blur-[72px] opacity-60 saturate-[1.8] brightness-75"
+          />
+        </div>
+
+        <div className="relative z-10 flex items-end gap-3 h-full py-2">
 
           {/* Video */}
           <div
