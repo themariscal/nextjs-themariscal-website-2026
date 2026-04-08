@@ -445,6 +445,59 @@ function CourseMainContent({ courseData }: { courseData: PublicCourseData | null
               })}
             </CardContent>
           </Card>
+
+          <Card className="border-border/60">
+            <CardContent className="space-y-8 pt-6 text-sm text-muted-foreground leading-7">
+              <section className="space-y-3">
+                <h3 className="text-3xl font-bold tracking-tight text-foreground">Requirements</h3>
+                <ul className="list-disc space-y-1 pl-5">
+                  <li>No prior experience is required. We start from the basics.</li>
+                  <li>You only need curiosity, internet access, and time to practice.</li>
+                  <li>A laptop is recommended for coding exercises and demos.</li>
+                </ul>
+              </section>
+
+              <section className="space-y-4">
+                <h3 className="text-3xl font-bold tracking-tight text-foreground">Description</h3>
+                <p className="text-foreground font-semibold">The Problem</p>
+                <p>
+                  AI is transforming every industry, but most people still struggle to find a
+                  clear and practical learning path. Many programs are fragmented, too theoretical,
+                  or disconnected from real-world projects.
+                </p>
+                <p>
+                  This course is designed to solve that. We combine fundamentals, practical tools,
+                  and guided project work so you can build useful AI products, not just consume
+                  tutorials.
+                </p>
+
+                <p className="text-foreground font-semibold">The Solution</p>
+                <p>This program is structured around practical outcomes, including:</p>
+                <ul className="list-disc space-y-1 pl-5">
+                  <li>Core AI concepts with hands-on examples.</li>
+                  <li>Python workflows for machine learning and automation.</li>
+                  <li>Natural language processing and modern LLM tooling.</li>
+                  <li>Real project architecture with APIs and orchestration.</li>
+                  <li>Portfolio-ready exercises focused on employable skills.</li>
+                </ul>
+
+                <p>
+                  By the end, you will have a complete roadmap, practical confidence, and a
+                  repeatable system to keep growing as AI keeps evolving.
+                </p>
+              </section>
+
+              <section className="space-y-3">
+                <h3 className="text-3xl font-bold tracking-tight text-foreground">Who this course is for</h3>
+                <ul className="list-disc space-y-1 pl-5">
+                  <li>Beginners who want a clear, modern path into AI.</li>
+                  <li>Developers who want to integrate AI into products.</li>
+                  <li>Professionals looking to transition into AI-focused roles.</li>
+                  <li>Creators and founders building AI-powered solutions.</li>
+                </ul>
+              </section>
+            </CardContent>
+          </Card>
       </div>
     </div>
   );
