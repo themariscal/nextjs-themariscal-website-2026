@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { User2, Image, Clapperboard } from "lucide-react";
+import { ChevronDown, Clapperboard, GraduationCap, Image, User2 } from "lucide-react";
 
 import {
   Sidebar,
@@ -12,7 +12,14 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const items = [
   {
@@ -32,9 +39,17 @@ const items = [
   },
 ];
 
+const academyItems = [
+  {
+    title: "Courses",
+    url: "/admin/academy/courses",
+  },
+];
+
 export function AdminAppSidebar() {
   const pathname = usePathname();
   const matchesPath = (targetUrl: string) => pathname.includes(targetUrl);
+  const academyIsActive = academyItems.some((item) => matchesPath(item.url));
 
   return (
     <Sidebar>
@@ -64,6 +79,39 @@ export function AdminAppSidebar() {
                   </SidebarMenuItem>
                 );
               })}
+
+              <Collapsible
+                defaultOpen={academyIsActive}
+                className="group/collapsible"
+              >
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <GraduationCap className="h-4 w-4" />
+                      <span>Academy</span>
+                      <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {academyItems.map((academyItem) => (
+                        <SidebarMenuSubItem key={academyItem.title}>
+                          <a
+                            href={academyItem.url}
+                            className={
+                              matchesPath(academyItem.url)
+                                ? "text-white font-semibold"
+                                : ""
+                            }
+                          >
+                            {academyItem.title}
+                          </a>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
