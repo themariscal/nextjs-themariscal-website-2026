@@ -36,7 +36,9 @@ import {
   Infinity as InfinityIcon,
   Languages,
   Link2,
+  MessageSquare,
   PlayCircle,
+  Plus,
   Share2,
   ShieldCheck,
   Star,
@@ -628,6 +630,146 @@ function CourseMainContent({ courseData }: { courseData: PublicCourseData | null
                   </div>
                 </div>
               ))}
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/60">
+            <CardHeader>
+              <CardTitle>From AI Engineering to AI Agents: Full Training Path</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="grid gap-4 rounded-lg border border-border/60 bg-background/60 p-3 md:grid-cols-[180px_1fr]">
+                  <div className="relative h-24 overflow-hidden rounded-md bg-muted">
+                    <Image
+                      src="https://i.ytimg.com/vi/3rGDJDmuZ54/hqdefault.jpg"
+                      alt="Intro to AI Agents and Agentic AI"
+                      fill
+                      className="object-cover"
+                      sizes="180px"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-xl font-semibold text-foreground">
+                      Intro to AI Agents and Agentic AI
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Understand how AI agents work and how to leverage this technology
+                      to transform your business and career.
+                    </p>
+                    <p className="text-xs font-medium text-muted-foreground">365 Careers</p>
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      <Badge className="bg-teal-500/20 text-teal-400">Bestseller</Badge>
+                      <Badge variant="outline" className="gap-1">
+                        <Star className="size-3 fill-current" />
+                        4.5
+                      </Badge>
+                      <Badge variant="outline">50,629 ratings</Badge>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-center">
+                  <div className="flex size-10 items-center justify-center rounded-full border border-border bg-background">
+                    <Plus className="size-5" />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 rounded-lg border border-border/60 bg-background/60 p-3 md:grid-cols-[180px_1fr]">
+                  <div className="relative h-24 overflow-hidden rounded-md bg-muted">
+                    <Image
+                      src="https://i.ytimg.com/vi/3rGDJDmuZ54/hqdefault.jpg"
+                      alt="The AI Engineer Course 2026"
+                      fill
+                      className="object-cover"
+                      sizes="180px"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-xl font-semibold text-foreground">
+                      The AI Engineer Course 2026: Complete AI Engineer Bootcamp
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Complete AI Engineer training: Python, NLP, transformers, LLMs,
+                      LangChain, Hugging Face, APIs.
+                    </p>
+                    <p className="text-xs font-medium text-muted-foreground">365 Careers</p>
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      <Badge className="bg-teal-500/20 text-teal-400">Bestseller</Badge>
+                      <Badge variant="outline" className="gap-1">
+                        <Star className="size-3 fill-current" />
+                        4.6
+                      </Badge>
+                      <Badge variant="outline">18,860 ratings</Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-4 border-t border-border/60 pt-4">
+                <div className="text-right">
+                  <p className="text-sm text-muted-foreground">Total</p>
+                  <p className="text-2xl font-bold text-foreground">
+                    €21.98{" "}
+                    <span className="text-sm font-normal text-muted-foreground line-through">€29.98</span>
+                  </p>
+                </div>
+                <Button className="cursor-pointer">Add all to cart</Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/60">
+            <CardHeader>
+              <CardTitle>Instructor</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="space-y-1">
+                <p className="text-lg font-semibold text-primary underline underline-offset-2">
+                  365 Careers
+                </p>
+                <p className="text-sm text-muted-foreground">365 Careers</p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-[100px_1fr]">
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-primary/20 text-xl font-bold text-primary">
+                  365
+                </div>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Star className="size-4" />
+                    <span>4.5 Instructor Rating</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="size-4" />
+                    <span>1,204,458 Reviews</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <User className="size-4" />
+                    <span>3,857,564 Students</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="size-4" />
+                    <span>132 Courses</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3 text-sm text-muted-foreground leading-7">
+                <p>
+                  365 Careers is one of the world’s best-selling providers of business,
+                  finance, data science, and AI courses on major online learning platforms.
+                  Their courses have helped millions of students across 210+ countries.
+                </p>
+                <p>
+                  Learners working at Apple, PayPal, and Citibank have completed 365 Careers
+                  training programs to level up their practical skills and career opportunities.
+                </p>
+                <p>
+                  The team focuses on structured, beginner-friendly learning paths that combine
+                  conceptual depth with hands-on execution.
+                </p>
+              </div>
             </CardContent>
           </Card>
       </div>
