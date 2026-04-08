@@ -152,6 +152,11 @@ export function OTPForm({
                             </FormControl>
                             <FormDescription className="text-center mt-2">
                                 {t("otp.description")}
+                                {signUp?.emailAddress && (
+                                    <span className="block font-medium text-foreground mt-1">
+                                        {signUp.emailAddress}
+                                    </span>
+                                )}
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
