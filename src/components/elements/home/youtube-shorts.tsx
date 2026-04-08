@@ -10,11 +10,9 @@ export const YouTubeShorts = ({ page }: { page: string }) => {
   if (!shorts || shorts.length === 0) return null;
 
   return (
-    <div className="px-4 pt-4">
-      <h2 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
-        Shorts
-      </h2>
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+    <div className="w-full">
+      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide" style={{ scrollBehavior: "smooth" }}>
+        <div className="flex-shrink-0 w-0" />
         {shorts.map((short) => (
           <a
             key={short._id}
@@ -23,16 +21,16 @@ export const YouTubeShorts = ({ page }: { page: string }) => {
             rel="noopener noreferrer"
             className="flex-shrink-0 group"
           >
-            <div className="relative w-[120px] h-[213px] rounded-xl overflow-hidden bg-muted">
+            <div className="relative w-[108px] h-48 rounded-xl overflow-hidden bg-muted">
               <Image
                 src={`https://i.ytimg.com/vi/${short.videoId}/hqdefault.jpg`}
                 alt={short.title}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-200"
-                sizes="120px"
+                sizes="108px"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <p className="absolute bottom-2 left-2 right-2 text-white text-xs font-medium line-clamp-2 leading-tight">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+              <p className="absolute bottom-2 left-2 right-2 text-white text-[10px] font-medium line-clamp-3 leading-tight">
                 {short.title}
               </p>
             </div>
