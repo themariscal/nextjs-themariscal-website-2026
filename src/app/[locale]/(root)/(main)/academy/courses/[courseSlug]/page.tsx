@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { useMusicStore } from "@/lib/stores/music-store";
 import { useSidebarStore } from "@/lib/stores/sidebar-store";
 import { extractYouTubeVideoId } from "@/lib/youtube-shorts";
 import { useQuery } from "convex/react";
@@ -1307,6 +1308,7 @@ function CourseMarketplaceFooter() {
 export default function PublicAcademyCoursePage() {
   const params = useParams();
   const courseSlug = (params.courseSlug as string) ?? "";
+  const isPlayerCollapsed = useMusicStore((state) => state.isPlayerCollapsed);
 
   const courseData = useQuery(api.academyCourses.getPublicCourseBySlug, {
     slug: courseSlug,
@@ -1337,7 +1339,12 @@ export default function PublicAcademyCoursePage() {
 
   return (
     <MainLayout>
-      <div className="flex min-h-screen flex-col">
+      <div
+        className={cn(
+          "flex min-h-screen flex-col",
+          isPlayerCollapsed ? "-mb-8" : "-mb-20"
+        )}
+      >
         <div className="flex-1">
           <PrincipalLayout
             hero={<CourseHero courseData={courseData} stats={stats} />}
