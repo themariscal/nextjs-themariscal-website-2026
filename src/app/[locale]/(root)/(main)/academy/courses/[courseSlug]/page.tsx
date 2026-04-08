@@ -3,6 +3,7 @@
 import { api } from "#convex/_generated/api";
 import type { Id } from "#convex/_generated/dataModel";
 import MainLayout from "@/components/elements/layouts/main-layout";
+import { PrincipalLayout } from "@/components/elements/layouts/principal-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -114,7 +115,86 @@ function splitDescriptionToBullets(description: string): string[] {
     .slice(0, 8);
 }
 
-function CoursePageContent({ courseData }: { courseData: PublicCourseData | null | undefined }) {
+function CourseHero({
+  courseData,
+  stats,
+}: {
+  courseData: PublicCourseData | null | undefined;
+  stats: {
+    totalSections: number;
+    totalElements: number;
+    totalSeconds: number;
+  };
+}) {
+  if (courseData === undefined) {
+    return (
+      <section className="border-b border-border/50 bg-background">
+        <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-8 md:px-6">
+          <div className="space-y-4">
+            <Skeleton className="h-5 w-48" />
+            <Skeleton className="h-12 w-3/4" />
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-6 w-64" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!courseData) return null;
+
+  return (
+    <section className="border-b border-border/50 bg-gradient-to-b from-background via-muted/20 to-background">
+      <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-8 md:px-6">
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span>Academy</span>
+            <span>•</span>
+            <span>{courseData.languageName ?? "Global"}</span>
+            <span>•</span>
+            <span>AI & Tecnología</span>
+          </div>
+
+          <h1 className="text-3xl font-extrabold leading-tight md:text-4xl">
+            {courseData.name}
+          </h1>
+
+          <p className="max-w-3xl text-sm text-muted-foreground md:text-base">
+            {courseData.description}
+          </p>
+
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <Badge className="bg-primary/90 text-primary-foreground hover:bg-primary/90">
+              Bestseller
+            </Badge>
+            <Badge variant="secondary">Role Play</Badge>
+            <Badge variant="outline" className="gap-1">
+              <Star className="size-3 fill-current" />
+              4.8
+            </Badge>
+            <Badge variant="outline" className="gap-1">
+              <User className="size-3" />
+              {stats.totalElements * 321 + 1270} students
+            </Badge>
+          </div>
+
+          <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+            <div className="flex items-center gap-2">
+              <Languages className="size-4" />
+              Idioma: {courseData.languageName ?? "-"}
+            </div>
+            <div className="flex items-center gap-2">
+              <GraduationCap className="size-4" />
+              Instructor: {courseData.instructorName ?? "-"}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CourseMainContent({ courseData }: { courseData: PublicCourseData | null | undefined }) {
   const stats = useMemo(() => {
     const sections = courseData?.sections ?? [];
 
@@ -163,23 +243,17 @@ function CoursePageContent({ courseData }: { courseData: PublicCourseData | null
 
   if (courseData === undefined) {
     return (
-      <div className="mx-auto w-full max-w-6xl px-4 pb-24 md:px-6">
-        <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-          <div className="space-y-4">
-            <Skeleton className="h-12 w-3/4" />
-            <Skeleton className="h-20 w-full" />
-            <Skeleton className="h-44 w-full" />
-            <Skeleton className="h-96 w-full" />
-          </div>
-          <Skeleton className="h-[560px] w-full" />
-        </div>
+      <div className="w-full space-y-6 px-4 pb-24 pt-8">
+        <Skeleton className="h-44 w-full" />
+        <Skeleton className="h-36 w-full" />
+        <Skeleton className="h-96 w-full" />
       </div>
     );
   }
 
   if (!courseData) {
     return (
-      <div className="mx-auto w-full max-w-6xl px-4 pb-24 md:px-6">
+      <div className="w-full px-4 pb-24 pt-8">
         <Card>
           <CardHeader>
             <CardTitle>Curso no encontrado</CardTitle>
@@ -193,59 +267,8 @@ function CoursePageContent({ courseData }: { courseData: PublicCourseData | null
   }
 
   return (
-    <div className="w-full">
-      <section className="border-b border-border/50 bg-gradient-to-b from-black via-black to-background">
-        <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 pb-10 pt-8 md:px-6 lg:grid-cols-[1fr_340px]">
-          <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-              <span>Academy</span>
-              <span>•</span>
-              <span>{courseData.languageName ?? "Global"}</span>
-              <span>•</span>
-              <span>AI & Tecnología</span>
-            </div>
-
-            <h1 className="text-3xl font-extrabold leading-tight md:text-4xl">
-              {courseData.name}
-            </h1>
-
-            <p className="max-w-3xl text-sm text-muted-foreground md:text-base">
-              {courseData.description}
-            </p>
-
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <Badge className="bg-primary/90 text-primary-foreground hover:bg-primary/90">
-                Bestseller
-              </Badge>
-              <Badge variant="secondary">Role Play</Badge>
-              <Badge variant="outline" className="gap-1">
-                <Star className="size-3 fill-current" />
-                4.8
-              </Badge>
-              <Badge variant="outline" className="gap-1">
-                <User className="size-3" />
-                {stats.totalElements * 321 + 1270} students
-              </Badge>
-            </div>
-
-            <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-              <div className="flex items-center gap-2">
-                <Languages className="size-4" />
-                Idioma: {courseData.languageName ?? "-"}
-              </div>
-              <div className="flex items-center gap-2">
-                <GraduationCap className="size-4" />
-                Instructor: {courseData.instructorName ?? "-"}
-              </div>
-            </div>
-          </div>
-
-          <CoursePurchaseSidebar courseData={courseData} stats={stats} />
-        </div>
-      </section>
-
-      <section className="mx-auto grid w-full max-w-6xl gap-6 px-4 pb-24 pt-8 md:px-6 lg:grid-cols-[1fr_340px]">
-        <div className="space-y-6">
+    <div className="w-full px-4 pb-24 pt-8">
+      <div className="space-y-6">
           <Card className="border-border/60">
             <CardHeader>
               <CardTitle>What you&apos;ll learn</CardTitle>
@@ -364,10 +387,7 @@ function CoursePageContent({ courseData }: { courseData: PublicCourseData | null
               })}
             </CardContent>
           </Card>
-        </div>
-
-        <div className="hidden lg:block" />
-      </section>
+      </div>
     </div>
   );
 }
@@ -383,6 +403,12 @@ function CoursePurchaseSidebar({
     totalSeconds: number;
   };
 }) {
+  if (courseData === undefined) {
+    return <Skeleton className="h-[560px] w-full" />;
+  }
+
+  if (!courseData) return null;
+
   const price = 10.99;
   const previousPrice = 49.99;
 
@@ -448,9 +474,36 @@ export default function PublicAcademyCoursePage() {
     slug: courseSlug,
   }) as PublicCourseData | null | undefined;
 
+  const stats = useMemo(() => {
+    const sections = courseData?.sections ?? [];
+
+    const totalElements = sections.reduce(
+      (acc, section) => acc + section.elements.length,
+      0
+    );
+    const totalSeconds = sections.reduce((acc, section) => {
+      return (
+        acc +
+        section.elements.reduce((elementAcc, element) => {
+          return elementAcc + parseDurationToSeconds(element.durationLabel);
+        }, 0)
+      );
+    }, 0);
+
+    return {
+      totalSections: sections.length,
+      totalElements,
+      totalSeconds,
+    };
+  }, [courseData]);
+
   return (
     <MainLayout>
-      <CoursePageContent courseData={courseData} />
+      <PrincipalLayout
+        hero={<CourseHero courseData={courseData} stats={stats} />}
+        content={<CourseMainContent courseData={courseData} />}
+        rightSidebar={<CoursePurchaseSidebar courseData={courseData} stats={stats} />}
+      />
     </MainLayout>
   );
 }
