@@ -8,6 +8,7 @@ import Topbar from "@/components/layout/topbar";
 import { useSidebarStore } from "@/lib/stores/sidebar-store";
 import { MusicPlayer } from "@/components/elements/music/music-player";
 import { FloatingActionButton } from "@/components/layout/floating-action-button";
+import { useMusicStore } from "@/lib/stores/music-store";
 
 export default function MainLayout({
     children,
@@ -17,6 +18,7 @@ export default function MainLayout({
     children: React.ReactNode;
 }>) {
     const { isCollapsed, toggleSidebar, setCollapsed } = useSidebarStore();
+    const isPlayerCollapsed = useMusicStore((state) => state.isPlayerCollapsed);
     const [screenSize, setScreenSize] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
 
     useEffect(() => {
@@ -63,7 +65,7 @@ export default function MainLayout({
             )}
 
             {/* Main content - adjusted for fixed music player */}
-            <main className="w-full pb-20">
+            <main className={isPlayerCollapsed ? "w-full pb-8" : "w-full pb-20"}>
                 <div className="w-full mt-20">
                     {children}
                 </div>
