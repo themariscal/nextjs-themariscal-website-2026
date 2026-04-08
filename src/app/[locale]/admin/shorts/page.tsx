@@ -3,21 +3,32 @@
 import { api } from "#convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { usePaginatedQuery } from "convex/react";
+import { usePaginatedQuery, useQuery } from "convex/react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const PAGE = "home";
 const PAGE_SIZE = 24;
 
-export default function AdminHomeShortsPage() {
+export default function AdminShortsPage() {
+  const [selectedPage, setSelectedPage] = useState<string>("all");
+  const pageFilter = selectedPage === "all" ? undefined : selectedPage;
+
+  const pages = useQuery(api.youtubeShorts.getPages, {});
   const { results, status, loadMore } = usePaginatedQuery(
-    api.youtubeShorts.getByPagePaginated,
-    { page: PAGE },
+    api.youtubeShorts.getAllPaginated,
+    { page: pageFilter },
     { initialNumItems: PAGE_SIZE }
   );
+
   const router = useRouter();
   const params = useParams();
   const locale = (params?.locale as string) ?? "en";
@@ -42,12 +53,29 @@ export default function AdminHomeShortsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold">Shorts Home</h1>
-        <p className="text-sm text-muted-foreground">
-          Listado de shorts publicados para la Home.
-        </p>
-        <Badge variant="secondary">{results.length} cargados</Badge>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold">Shorts</h1>
+          <p className="text-sm text-muted-foreground">
+            Gestión y visualización de todos los shorts de Convex.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Select value={selectedPage} onValueChange={setSelectedPage}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Todos" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {(pages ?? []).map((page) => (
+                <SelectItem key={page} value={page}>
+                  {page}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Badge variant="secondary">{results.length} cargados</Badge>
+        </div>
       </div>
 
       {status === "LoadingFirstPage" ? (
@@ -68,7 +96,7 @@ export default function AdminHomeShortsPage() {
             <Card
               key={short._id}
               className="group cursor-pointer overflow-hidden"
-              onClick={() => router.push(`/${locale}/shorts/${PAGE}/${short.videoId}`)}
+              onClick={() => router.push(`/${locale}/shorts/${short.page}/${short.videoId}`)}
             >
               <CardHeader className="px-3 pt-3 pb-2">
                 <CardTitle className="text-sm line-clamp-2">{short.title}</CardTitle>
@@ -83,7 +111,10 @@ export default function AdminHomeShortsPage() {
                     sizes="(max-width: 1024px) 50vw, 25vw"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">videoId: {short.videoId}</p>
+                <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                  <span>page: {short.page}</span>
+                  <span>videoId: {short.videoId}</span>
+                </div>
               </CardContent>
             </Card>
           ))}

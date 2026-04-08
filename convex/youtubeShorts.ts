@@ -29,6 +29,37 @@ export const getByPagePaginated = query({
   },
 });
 
+export const getAllPaginated = query({
+  args: {
+    page: v.optional(v.string()),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    if (args.page) {
+      return await ctx.db
+        .query("youtubeShorts")
+        .withIndex("byPage", (q) => q.eq("page", args.page!))
+        .order("desc")
+        .paginate(args.paginationOpts);
+    }
+
+    return await ctx.db
+      .query("youtubeShorts")
+      .order("desc")
+      .paginate(args.paginationOpts);
+  },
+});
+
+export const getPages = query({
+  args: {},
+  handler: async (ctx) => {
+    const rows = await ctx.db.query("youtubeShorts").order("desc").take(500);
+    return Array.from(new Set(rows.map((row) => row.page))).sort((a, b) =>
+      a.localeCompare(b)
+    );
+  },
+});
+
 export const getByVideoId = query({
   args: {
     videoId: v.string(),

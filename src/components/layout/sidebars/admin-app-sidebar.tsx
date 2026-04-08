@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ChevronDown, User2, Image, Clapperboard } from "lucide-react";
+import { User2, Image, Clapperboard } from "lucide-react";
 
 import {
   Sidebar,
@@ -12,46 +12,29 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-
-import {
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
 
 const items = [
   {
     title: "Users",
     icon: User2,
-    subitems: [{ title: "Users", url: "/admin/users" }],
+    url: "/admin/users",
   },
   {
     title: "Images",
     icon: Image,
-    subitems: [
-      { title: "App Images", url: "/admin/images/app" },
-      { title: "User Images", url: "/admin/images/users" },
-    ],
+    url: "/admin/images/app",
   },
   {
     title: "Shorts",
     icon: Clapperboard,
-    subitems: [
-      { title: "Home", url: "/admin/shorts-home" },
-      { title: "Academy", url: "/admin/shorts-academy" },
-    ],
+    url: "/admin/shorts",
   },
 ];
 
 export function AdminAppSidebar() {
   const pathname = usePathname();
-  const matchesPath = (targetUrl: string) =>
-    pathname === targetUrl ||
-    pathname.endsWith(targetUrl) ||
-    pathname.includes(`${targetUrl}/`);
+  const matchesPath = (targetUrl: string) => pathname.includes(targetUrl);
 
   return (
     <Sidebar>
@@ -61,44 +44,24 @@ export function AdminAppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
-                const isActive = item.subitems.some((sub) =>
-                  matchesPath(sub.url)
-                );
+                const isActive = matchesPath(item.url);
 
                 return (
-                  <Collapsible
-                    key={item.title}
-                    defaultOpen={isActive}
-                    className="group/collapsible"
-                  >
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton>
-                          <item.icon />
-                          <span>{item.title}</span>
-                          <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {item.subitems.map((subitem) => (
-                            <SidebarMenuSubItem key={subitem.title}>
-                              <a
-                                href={subitem.url}
-                                className={
-                                  matchesPath(subitem.url)
-                                    ? "text-white font-semibold"
-                                    : ""
-                                }
-                              >
-                                {subitem.title}
-                              </a>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </Collapsible>
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <a
+                        href={item.url}
+                        className={
+                          isActive
+                            ? "text-white font-semibold bg-primary/10"
+                            : "text-muted-foreground hover:text-white"
+                        }
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 );
               })}
             </SidebarMenu>
