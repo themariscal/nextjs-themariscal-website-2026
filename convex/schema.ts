@@ -2,6 +2,15 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  youtubeShorts: defineTable({
+    videoId: v.string(),
+    title: v.string(),
+    page: v.string(),
+    order: v.optional(v.number()),
+  })
+    .index("byPage", ["page"])
+    .index("byPageAndOrder", ["page", "order"]),
+
   users: defineTable({
     externalId: v.string(),
     email: v.string(),
