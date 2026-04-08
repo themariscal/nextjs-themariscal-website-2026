@@ -24,6 +24,7 @@ export default defineSchema({
     tokenIdentifier: v.string(),
     text: v.string(),
     authorName: v.optional(v.string()),
+    authorImage: v.optional(v.string()),
   })
     .index("by_video", ["videoId"])
     .index("by_token", ["tokenIdentifier"]),

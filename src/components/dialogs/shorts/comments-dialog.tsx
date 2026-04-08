@@ -6,15 +6,16 @@ import { useUser } from "@clerk/nextjs";
 import { api } from "#convex/_generated/api";
 import { ResponsiveDialog } from "@/components/dialogs/layout";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface CommentsDialogProps {
   videoId: string;
   children: React.ReactNode;
 }
 
-function CommentsContent({ videoId, onClose }: { videoId: string; onClose: () => void }) {
+function CommentsContent({ videoId }: { videoId: string }) {
   const { isSignedIn } = useUser();
   const comments = useQuery(api.shortComments.getComments, { videoId });
   const addComment = useMutation(api.shortComments.addComment);
@@ -44,11 +45,11 @@ function CommentsContent({ videoId, onClose }: { videoId: string; onClose: () =>
   };
 
   return (
-    <div className="flex flex-col gap-4 px-4 pb-4 pt-2 w-full max-h-[70vh]">
+    <div className="flex flex-col gap-4 px-5 pb-5 pt-2 w-full max-h-[70vh]">
       <h2 className="text-base font-semibold">Comentarios</h2>
 
       {/* Comment list */}
-      <div className="flex-1 overflow-y-auto flex flex-col gap-3 min-h-0 max-h-[45vh]">
+      <div className="flex-1 overflow-y-auto flex flex-col gap-4 min-h-0 max-h-[45vh]">
         {comments === undefined && (
           <div className="flex justify-center py-6">
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
@@ -60,29 +61,47 @@ function CommentsContent({ videoId, onClose }: { videoId: string; onClose: () =>
           </p>
         )}
         {comments?.map((comment) => (
-          <div key={comment._id} className="flex flex-col gap-0.5">
-            <span className="text-xs font-medium text-foreground">
-              {comment.authorName ?? "Usuario"}
-            </span>
-            <p className="text-sm text-muted-foreground leading-snug">{comment.text}</p>
+          <div key={comment._id} className="flex gap-3">
+            {/* Avatar */}
+            <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden bg-muted flex items-center justify-center">
+              {comment.authorImage ? (
+                <Image
+                  src={comment.authorImage}
+                  alt={comment.authorName ?? "Usuario"}
+                  width={32}
+                  height={32}
+                  className="object-cover w-full h-full"
+                />
+              ) : (
+                <span className="text-xs font-medium text-muted-foreground uppercase">
+                  {(comment.authorName ?? "U")[0]}
+                </span>
+              )}
+            </div>
+            {/* Content */}
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs font-semibold text-foreground">
+                {comment.authorName ?? "Usuario"}
+              </span>
+              <p className="text-sm text-muted-foreground leading-snug">{comment.text}</p>
+            </div>
           </div>
         ))}
       </div>
 
       {/* Input area */}
       {isSignedIn ? (
-        <div className="flex flex-col gap-2 border-t pt-3">
+        <div className="flex flex-col gap-3 border-t pt-4">
           <textarea
             value={text}
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Escribe un comentario... (⌘+Enter para enviar)"
             className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-            rows={2}
+            rows={4}
             maxLength={500}
             disabled={loading}
           />
-          {error && <p className="text-xs text-destructive">{error}</p>}
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground">{text.length}/500</span>
             <Button
@@ -93,6 +112,7 @@ function CommentsContent({ videoId, onClose }: { videoId: string; onClose: () =>
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Comentar"}
             </Button>
           </div>
+          {error && <p className="text-xs text-destructive">{error}</p>}
         </div>
       ) : (
         <p className="text-sm text-muted-foreground text-center border-t pt-3">
@@ -105,19 +125,16 @@ function CommentsContent({ videoId, onClose }: { videoId: string; onClose: () =>
 
 export function CommentsDialog({ videoId, children }: CommentsDialogProps) {
   const [open, setOpen] = useState(false);
-  const comments = useQuery(api.shortComments.getComments, { videoId });
 
   return (
     <ResponsiveDialog
       isOpen={open}
       setIsOpen={setOpen}
-      content={<CommentsContent videoId={videoId} onClose={() => setOpen(false)} />}
+      contentClassName="sm:max-w-[600px]"
+      content={<CommentsContent videoId={videoId} />}
     >
       <span onClick={() => setOpen(true)} className={cn("flex flex-col items-center gap-1 group cursor-pointer")}>
         {children}
-        {comments !== undefined && comments.length > 0 && (
-          <span className="sr-only">{comments.length} comentarios</span>
-        )}
       </span>
     </ResponsiveDialog>
   );

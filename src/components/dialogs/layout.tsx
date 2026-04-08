@@ -31,6 +31,7 @@ interface ResponsiveDialogProps {
   centerContent?: boolean;
   fullscreen?: boolean;
   isExpanded?: boolean;
+  contentClassName?: string;
 }
 
 export function ResponsiveDialog({
@@ -43,6 +44,7 @@ export function ResponsiveDialog({
   centerContent = false,
   fullscreen = false,
   isExpanded = false,
+  contentClassName,
 }: ResponsiveDialogProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -50,7 +52,7 @@ export function ResponsiveDialog({
     return (
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>{children}</DialogTrigger>
-        <DialogContent className={fullscreen ? `m-0 rounded-none transition-all duration-300 flex flex-col ${isExpanded ? "max-w-[100vw] w-[100vw] max-h-[80vh] h-[80vh]" : "max-w-[65vw] w-[65vw] max-h-[40vh] h-[40vh]"}` : "sm:max-w-[425px]"}>
+        <DialogContent className={fullscreen ? `m-0 rounded-none transition-all duration-300 flex flex-col ${isExpanded ? "max-w-[100vw] w-[100vw] max-h-[80vh] h-[80vh]" : "max-w-[65vw] w-[65vw] max-h-[40vh] h-[40vh]"}` : contentClassName ?? "sm:max-w-[425px]"}>
           <DialogHeader
             className={
               fullscreen || !title

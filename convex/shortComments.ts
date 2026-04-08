@@ -18,7 +18,8 @@ export const addComment = mutation({
       videoId: args.videoId,
       tokenIdentifier: identity.tokenIdentifier,
       text,
-      authorName: identity.name ?? identity.email ?? "Usuario",
+      authorName: identity.nickname ?? identity.name ?? "Usuario",
+      authorImage: identity.pictureUrl,
     });
   },
 });
