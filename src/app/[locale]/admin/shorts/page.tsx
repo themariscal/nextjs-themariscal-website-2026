@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePaginatedQuery, useQuery } from "convex/react";
+import { Plus } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -28,15 +29,15 @@ import { useEffect, useRef, useState } from "react";
 const PAGE_SIZE = 24;
 
 export default function AdminShortsPage() {
-  const [selectedPage, setSelectedPage] = useState<string>("all");
+  const [selectedSection, setSelectedSection] = useState<string>("all");
   const [selectedShortId, setSelectedShortId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const pageFilter = selectedPage === "all" ? undefined : selectedPage;
+  const sectionFilter = selectedSection === "all" ? undefined : selectedSection;
 
-  const pages = useQuery(api.youtubeShorts.getPages, {});
+  const sections = useQuery(api.youtubeShorts.getSections, {});
   const { results, status, loadMore } = usePaginatedQuery(
     api.youtubeShorts.getAllPaginated,
-    { page: pageFilter },
+    { section: sectionFilter },
     { initialNumItems: PAGE_SIZE }
   );
 
@@ -45,6 +46,8 @@ export default function AdminShortsPage() {
   const locale = (params?.locale as string) ?? "en";
   const sentinelRef = useRef<HTMLDivElement>(null);
   const selectedShort = results.find((item) => item._id === selectedShortId) ?? null;
+  const getShortSection = (short: { section?: string; page?: string }) =>
+    short.section ?? short.page ?? "home";
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -73,15 +76,22 @@ export default function AdminShortsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Select value={selectedPage} onValueChange={setSelectedPage}>
+          <Button
+            className="cursor-pointer"
+            onClick={() => router.push(`/${locale}/admin/shorts/new`)}
+          >
+            <Plus className="size-4" />
+            Agregar short
+          </Button>
+          <Select value={selectedSection} onValueChange={setSelectedSection}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Todos" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos</SelectItem>
-              {(pages ?? []).map((page) => (
-                <SelectItem key={page} value={page}>
-                  {page}
+              {(sections ?? []).map((section) => (
+                <SelectItem key={section} value={section}>
+                  {section}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -127,7 +137,7 @@ export default function AdminShortsPage() {
                   />
                 </div>
                 <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                  <span>page: {short.page}</span>
+                  <span>sección: {getShortSection(short)}</span>
                   <span>videoId: {short.videoId}</span>
                 </div>
               </CardContent>
@@ -164,8 +174,8 @@ export default function AdminShortsPage() {
 
                 <div className="mt-6 space-y-3 text-sm">
                   <div className="flex justify-between gap-3 border-b border-border/50 pb-2">
-                    <span className="text-muted-foreground">Página</span>
-                    <span className="font-medium">{selectedShort.page}</span>
+                    <span className="text-muted-foreground">Sección</span>
+                    <span className="font-medium">{getShortSection(selectedShort)}</span>
                   </div>
                   <div className="flex justify-between gap-3 border-b border-border/50 pb-2">
                     <span className="text-muted-foreground">Video ID</span>
@@ -196,7 +206,9 @@ export default function AdminShortsPage() {
                   <Button
                     onClick={() => {
                       setDialogOpen(false);
-                      router.push(`/${locale}/shorts/${selectedShort.page}/${selectedShort.videoId}`);
+                      router.push(
+                        `/${locale}/shorts/${getShortSection(selectedShort)}/${selectedShort.videoId}`
+                      );
                     }}
                   >
                     Ver video

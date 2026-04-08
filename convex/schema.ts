@@ -5,11 +5,20 @@ export default defineSchema({
   youtubeShorts: defineTable({
     videoId: v.string(),
     title: v.string(),
-    page: v.string(),
+    // `section` is the new canonical field.
+    // `page` remains optional for backward compatibility with existing routes/data.
+    section: v.optional(v.string()),
+    page: v.optional(v.string()),
     order: v.optional(v.number()),
   })
+    .index("bySection", ["section"])
+    .index("bySectionAndOrder", ["section", "order"])
     .index("byPage", ["page"])
     .index("byPageAndOrder", ["page", "order"]),
+
+  shortSections: defineTable({
+    name: v.string(),
+  }).index("by_name", ["name"]),
 
   shortReactions: defineTable({
     tokenIdentifier: v.string(),

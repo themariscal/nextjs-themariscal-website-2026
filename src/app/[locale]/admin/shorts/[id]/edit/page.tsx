@@ -21,32 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { createShortsSchemas } from "@/lib/schemas/shorts-schemas";
-
-function extractYouTubeVideoId(urlOrId: string): string | null {
-  const value = urlOrId.trim();
-  if (!value) return null;
-
-  if (/^[A-Za-z0-9_-]{6,}$/.test(value)) return value;
-
-  try {
-    const url = new URL(value);
-    if (url.hostname.includes("youtu.be")) {
-      return url.pathname.split("/").filter(Boolean)[0] ?? null;
-    }
-
-    if (url.hostname.includes("youtube.com")) {
-      const shortsMatch = url.pathname.match(/\/shorts\/([A-Za-z0-9_-]{6,})/);
-      if (shortsMatch?.[1]) return shortsMatch[1];
-
-      const watchId = url.searchParams.get("v");
-      if (watchId) return watchId;
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
-}
+import { extractYouTubeVideoId } from "@/lib/youtube-shorts";
 
 export default function AdminEditShortPage() {
   const params = useParams();
@@ -65,7 +40,7 @@ export default function AdminEditShortPage() {
   const defaultValues = useMemo<EditShortType>(
     () => ({
       title: "",
-      page: "",
+      section: "",
       shortUrl: "",
       order: "",
     }),
@@ -82,7 +57,7 @@ export default function AdminEditShortPage() {
 
     form.reset({
       title: short.title,
-      page: short.page,
+      section: short.section ?? short.page ?? "home",
       shortUrl: `https://www.youtube.com/shorts/${short.videoId}`,
       order: short.order !== undefined ? String(short.order) : "",
     });
@@ -102,7 +77,7 @@ export default function AdminEditShortPage() {
       await updateShort({
         id,
         title: values.title,
-        page: values.page,
+        section: values.section,
         videoId,
         order: values.order && values.order.length > 0 ? Number(values.order) : undefined,
       });
@@ -124,7 +99,7 @@ export default function AdminEditShortPage() {
     return (
       <AdminFormLayout
         title="Editar short"
-        description="Actualizá título, página y URL del short."
+        description="Actualizá título, sección y URL del short."
       >
         <p className="text-sm text-muted-foreground">Cargando short...</p>
       </AdminFormLayout>
@@ -147,7 +122,7 @@ export default function AdminEditShortPage() {
   return (
     <AdminFormLayout
       title="Editar short"
-      description="Actualizá título, página y URL del short."
+      description="Actualizá título, sección y URL del short."
     >
       <FormProvider {...form}>
         <form className="grid gap-5" onSubmit={handleSubmit}>
@@ -168,11 +143,11 @@ export default function AdminEditShortPage() {
           />
 
           <FormField
-            name="page"
+            name="section"
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Página</FormLabel>
+                <FormLabel>Sección</FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="home" />
                 </FormControl>

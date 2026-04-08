@@ -2,11 +2,22 @@ import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
 
+const getShortSection = (short: { section?: string; page?: string }) =>
+  short.section ?? short.page ?? "home";
+
 export const getByPage = query({
   args: {
     page: v.string(),
   },
   handler: async (ctx, args) => {
+    const bySection = await ctx.db
+      .query("youtubeShorts")
+      .withIndex("bySection", (q) => q.eq("section", args.page))
+      .order("desc")
+      .collect();
+
+    if (bySection.length > 0) return bySection;
+
     return await ctx.db
       .query("youtubeShorts")
       .withIndex("byPage", (q) => q.eq("page", args.page))
@@ -21,6 +32,20 @@ export const getByPagePaginated = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
+    const hasSectionRows = await ctx.db
+      .query("youtubeShorts")
+      .withIndex("bySection", (q) => q.eq("section", args.page))
+      .order("desc")
+      .take(1);
+
+    if (hasSectionRows.length > 0) {
+      return await ctx.db
+        .query("youtubeShorts")
+        .withIndex("bySection", (q) => q.eq("section", args.page))
+        .order("desc")
+        .paginate(args.paginationOpts);
+    }
+
     return await ctx.db
       .query("youtubeShorts")
       .withIndex("byPage", (q) => q.eq("page", args.page))
@@ -31,14 +56,28 @@ export const getByPagePaginated = query({
 
 export const getAllPaginated = query({
   args: {
-    page: v.optional(v.string()),
+    section: v.optional(v.string()),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    if (args.page) {
+    if (args.section) {
+      const hasSectionRows = await ctx.db
+        .query("youtubeShorts")
+        .withIndex("bySection", (q) => q.eq("section", args.section!))
+        .order("desc")
+        .take(1);
+
+      if (hasSectionRows.length > 0) {
+        return await ctx.db
+          .query("youtubeShorts")
+          .withIndex("bySection", (q) => q.eq("section", args.section!))
+          .order("desc")
+          .paginate(args.paginationOpts);
+      }
+
       return await ctx.db
         .query("youtubeShorts")
-        .withIndex("byPage", (q) => q.eq("page", args.page!))
+        .withIndex("byPage", (q) => q.eq("page", args.section!))
         .order("desc")
         .paginate(args.paginationOpts);
     }
@@ -54,9 +93,46 @@ export const getPages = query({
   args: {},
   handler: async (ctx) => {
     const rows = await ctx.db.query("youtubeShorts").order("desc").take(500);
-    return Array.from(new Set(rows.map((row) => row.page))).sort((a, b) =>
+    return Array.from(new Set(rows.map((row) => getShortSection(row)))).sort((a, b) =>
       a.localeCompare(b)
     );
+  },
+});
+
+export const getSections = query({
+  args: {},
+  handler: async (ctx) => {
+    const [sectionsRows, shortsRows] = await Promise.all([
+      ctx.db.query("shortSections").order("desc").take(500),
+      ctx.db.query("youtubeShorts").order("desc").take(500),
+    ]);
+
+    return Array.from(
+      new Set([
+        ...sectionsRows.map((row) => row.name),
+        ...shortsRows.map((row) => getShortSection(row)),
+      ])
+    )
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b));
+  },
+});
+
+export const addSection = mutation({
+  args: {
+    name: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const normalizedName = args.name.trim().toLowerCase();
+    if (!normalizedName) return null;
+
+    const existing = await ctx.db
+      .query("shortSections")
+      .withIndex("by_name", (q) => q.eq("name", normalizedName))
+      .unique();
+
+    if (existing) return existing._id;
+    return await ctx.db.insert("shortSections", { name: normalizedName });
   },
 });
 
@@ -86,14 +162,17 @@ export const create = mutation({
   args: {
     videoId: v.string(),
     title: v.string(),
-    page: v.string(),
+    section: v.string(),
     order: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    const normalizedSection = args.section.trim().toLowerCase();
     return await ctx.db.insert("youtubeShorts", {
       videoId: args.videoId,
       title: args.title,
-      page: args.page,
+      section: normalizedSection,
+      // Backward compatibility with existing routes/data usage.
+      page: normalizedSection,
       order: args.order,
     });
   },
@@ -103,7 +182,7 @@ export const update = mutation({
   args: {
     id: v.id("youtubeShorts"),
     title: v.optional(v.string()),
-    page: v.optional(v.string()),
+    section: v.optional(v.string()),
     videoId: v.optional(v.string()),
     order: v.optional(v.number()),
   },
@@ -111,12 +190,17 @@ export const update = mutation({
     const { id, ...fields } = args;
     const patch: Partial<{
       title: string;
+      section: string;
       page: string;
       videoId: string;
       order: number;
     }> = {};
     if (fields.title !== undefined) patch.title = fields.title;
-    if (fields.page !== undefined) patch.page = fields.page;
+    if (fields.section !== undefined) {
+      const normalizedSection = fields.section.trim().toLowerCase();
+      patch.section = normalizedSection;
+      patch.page = normalizedSection;
+    }
     if (fields.videoId !== undefined) patch.videoId = fields.videoId;
     if (fields.order !== undefined) patch.order = fields.order;
     await ctx.db.patch(id, patch);
