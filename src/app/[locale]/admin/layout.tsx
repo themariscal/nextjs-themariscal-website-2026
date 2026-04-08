@@ -16,7 +16,7 @@ export default function RootLayout({
             </div>
 
             <main className="w-full">
-                <div className="mx-auto w-full max-w-3xl px-4 mt-20">{children}</div>
+                <div className="w-full px-4 md:px-6 lg:px-8 mt-20">{children}</div>
             </main>
         </SidebarProvider>
     );

@@ -2,7 +2,16 @@
 
 import { api } from "#convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -20,6 +29,8 @@ const PAGE_SIZE = 24;
 
 export default function AdminShortsPage() {
   const [selectedPage, setSelectedPage] = useState<string>("all");
+  const [selectedShortId, setSelectedShortId] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const pageFilter = selectedPage === "all" ? undefined : selectedPage;
 
   const pages = useQuery(api.youtubeShorts.getPages, {});
@@ -33,6 +44,7 @@ export default function AdminShortsPage() {
   const params = useParams();
   const locale = (params?.locale as string) ?? "en";
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const selectedShort = results.find((item) => item._id === selectedShortId) ?? null;
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -91,12 +103,15 @@ export default function AdminShortsPage() {
           ))}
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
           {results.map((short) => (
             <Card
               key={short._id}
               className="group cursor-pointer overflow-hidden"
-              onClick={() => router.push(`/${locale}/shorts/${short.page}/${short.videoId}`)}
+              onClick={() => {
+                setSelectedShortId(short._id);
+                setDialogOpen(true);
+              }}
             >
               <CardHeader className="px-3 pt-3 pb-2">
                 <CardTitle className="text-sm line-clamp-2">{short.title}</CardTitle>
@@ -125,6 +140,65 @@ export default function AdminShortsPage() {
         <p className="text-sm text-muted-foreground">Cargando más shorts...</p>
       )}
       <div ref={sentinelRef} className="h-1" />
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="w-[36vw] max-w-[36vw] sm:max-w-[36vw] h-[44vh] p-0 overflow-hidden">
+          {selectedShort && (
+            <div className="grid h-full md:grid-cols-[240px_1fr]">
+              <div className="relative bg-muted min-h-[180px] md:min-h-full">
+                <Image
+                  src={`https://i.ytimg.com/vi/${selectedShort.videoId}/hqdefault.jpg`}
+                  alt={selectedShort.title}
+                  fill
+                  className="object-cover"
+                  sizes="240px"
+                />
+              </div>
+              <div className="p-6 overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="text-xl">{selectedShort.title}</DialogTitle>
+                  <DialogDescription>
+                    Detalle del short seleccionado.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="mt-6 space-y-3 text-sm">
+                  <div className="flex justify-between gap-3 border-b border-border/50 pb-2">
+                    <span className="text-muted-foreground">Página</span>
+                    <span className="font-medium">{selectedShort.page}</span>
+                  </div>
+                  <div className="flex justify-between gap-3 border-b border-border/50 pb-2">
+                    <span className="text-muted-foreground">Video ID</span>
+                    <span className="font-medium">{selectedShort.videoId}</span>
+                  </div>
+                  <div className="flex justify-between gap-3 border-b border-border/50 pb-2">
+                    <span className="text-muted-foreground">Orden</span>
+                    <span className="font-medium">{selectedShort.order ?? "-"}</span>
+                  </div>
+                  <div className="flex justify-between gap-3 border-b border-border/50 pb-2">
+                    <span className="text-muted-foreground">Creado</span>
+                    <span className="font-medium">
+                      {new Date(selectedShort._creationTime).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+
+                <DialogFooter className="mt-8">
+                  <Button variant="outline">Editar</Button>
+                  <Button
+                    onClick={() => {
+                      setDialogOpen(false);
+                      router.push(`/${locale}/shorts/${selectedShort.page}/${selectedShort.videoId}`);
+                    }}
+                  >
+                    Ver video
+                  </Button>
+                </DialogFooter>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
