@@ -8,7 +8,7 @@ import MainLayout from "@/components/elements/layouts/main-layout";
 import { useQuery, useMutation } from "convex/react";
 import { ChevronDown, ChevronUp, MessageCircle, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "#convex/_generated/api";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +28,31 @@ const ShortsPlayerPage = () => {
   const currentIndex = allShorts?.findIndex((s) => s.videoId === videoId) ?? -1;
   const prevShort = allShorts && currentIndex > 0 ? allShorts[currentIndex - 1] : null;
   const nextShort = allShorts && currentIndex < allShorts.length - 1 ? allShorts[currentIndex + 1] : null;
+
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [showIcon, setShowIcon] = useState<"play" | "pause" | null>(null);
+  const iconTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const togglePlayPause = () => {
+    const iframe = iframeRef.current;
+    if (!iframe?.contentWindow) return;
+    if (isPlaying) {
+      iframe.contentWindow.postMessage(JSON.stringify({ event: "command", func: "pauseVideo", args: "" }), "*");
+      setIsPlaying(false);
+      flashIcon("pause");
+    } else {
+      iframe.contentWindow.postMessage(JSON.stringify({ event: "command", func: "playVideo", args: "" }), "*");
+      setIsPlaying(true);
+      flashIcon("play");
+    }
+  };
+
+  const flashIcon = (icon: "play" | "pause") => {
+    setShowIcon(icon);
+    if (iconTimer.current) clearTimeout(iconTimer.current);
+    iconTimer.current = setTimeout(() => setShowIcon(null), 700);
+  };
 
   const nextShortRef = useRef(nextShort);
   const prevShortRef = useRef(prevShort);
@@ -92,21 +117,32 @@ const ShortsPlayerPage = () => {
             style={{ aspectRatio: "9/16" }}
           >
             <iframe
-              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+              ref={iframeRef}
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`}
               title={short?.title ?? "Short"}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
               allowFullScreen
               className="absolute inset-0 w-full h-full"
             />
 
-            {/* Transparent overlay to capture wheel events from iframe */}
+            {/* Overlay: captures wheel (navigation) and click (play/pause) */}
             <div
-              className="absolute inset-0 z-10"
-              onWheel={(e) => {
-                e.preventDefault();
-                handleWheel(e.deltaY);
-              }}
+              className="absolute inset-0 z-10 cursor-pointer"
+              onWheel={(e) => { e.preventDefault(); handleWheel(e.deltaY); }}
+              onClick={togglePlayPause}
             />
+
+            {/* Play/Pause flash icon */}
+            {showIcon && (
+              <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+                <div className="bg-black/50 rounded-full p-5 transition-opacity duration-300">
+                  {showIcon === "pause"
+                    ? <div className="flex gap-1.5"><div className="w-3 h-8 bg-white rounded-sm" /><div className="w-3 h-8 bg-white rounded-sm" /></div>
+                    : <div className="w-0 h-0 border-t-[14px] border-b-[14px] border-l-[24px] border-t-transparent border-b-transparent border-l-white ml-1" />
+                  }
+                </div>
+              </div>
+            )}
 
             {/* Title overlay at bottom */}
             {short && (

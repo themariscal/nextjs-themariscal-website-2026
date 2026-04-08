@@ -62,7 +62,7 @@ export const YouTubeShorts = ({ page }: { page: string }) => {
           <button
             key={short._id}
             onClick={() => router.push(`/${locale}/shorts/${page}/${short.videoId}`)}
-            className="flex-shrink-0 group text-left"
+            className="flex-shrink-0 group text-left cursor-pointer"
           >
             <div className="relative w-[216px] h-96 rounded-xl overflow-hidden bg-muted">
               <Image
