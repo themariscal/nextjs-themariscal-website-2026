@@ -6,7 +6,17 @@ import React, { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { useSidebarStore } from "@/lib/stores/sidebar-store";
 
-export const PrincipalLayout = ({ hero, content, rightSidebar }: { hero?: ReactNode, content: ReactNode, rightSidebar?: ReactNode }) => {
+export const PrincipalLayout = ({
+    hero,
+    content,
+    rightSidebar,
+    containerWidthClassName = "max-w-6xl",
+}: {
+    hero?: ReactNode,
+    content: ReactNode,
+    rightSidebar?: ReactNode,
+    containerWidthClassName?: string,
+}) => {
     const { isCollapsed } = useSidebarStore();
 
     return <div className="w-full">
@@ -17,7 +27,7 @@ export const PrincipalLayout = ({ hero, content, rightSidebar }: { hero?: ReactN
         }
         <div className={cn("w-full transition-normal duration-300", isCollapsed ? 'md:pl-24' : 'md:pl-64')}>
             <section className="w-full">
-                <div className="w-full flex max-w-6xl mx-auto">
+                <div className={cn("mx-auto flex w-full", containerWidthClassName)}>
                     <div className="flex-1">
                         {content}
                     </div>

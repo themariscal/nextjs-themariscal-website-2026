@@ -193,7 +193,7 @@ function CourseHero({
   if (courseData === undefined) {
     return (
       <section className="border-b border-border/50 bg-background">
-        <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-8 md:px-6">
+        <div className="mx-auto w-full max-w-[86rem] px-4 pb-10 pt-8 md:px-6">
           <div className="space-y-4">
             <Skeleton className="h-5 w-48" />
             <Skeleton className="h-12 w-3/4" />
@@ -209,7 +209,7 @@ function CourseHero({
 
   return (
     <section className="border-b border-border/50 bg-gradient-to-b from-background via-muted/20 to-background">
-      <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-8 md:px-6">
+      <div className="mx-auto w-full max-w-[86rem] px-4 pb-10 pt-8 md:px-6">
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             <span>Academy</span>
@@ -1246,7 +1246,7 @@ function CourseMarketplaceFooter() {
       )}
     >
       <div className="border-t border-primary-foreground/20">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-5 md:px-6">
+        <div className="mx-auto flex w-full max-w-[86rem] items-center justify-between gap-4 px-4 py-5 md:px-6">
           <p className="text-sm">
             Top companies choose <span className="font-semibold text-primary-foreground">Academy Business</span> to build in-demand career skills.
           </p>
@@ -1260,7 +1260,7 @@ function CourseMarketplaceFooter() {
       </div>
 
       <div className="border-t border-primary-foreground/20">
-        <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-8 md:grid-cols-4 md:px-6">
+        <div className="mx-auto grid w-full max-w-[86rem] gap-8 px-4 py-8 md:grid-cols-4 md:px-6">
           {footerColumnsTop.map((column) => (
             <div key={column.title} className="space-y-3">
               <h4 className="text-sm font-semibold text-primary-foreground">{column.title}</h4>
@@ -1277,7 +1277,7 @@ function CourseMarketplaceFooter() {
       </div>
 
       <div className="border-t border-primary-foreground/20">
-        <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-8 md:grid-cols-4 md:px-6">
+        <div className="mx-auto grid w-full max-w-[86rem] gap-8 px-4 py-8 md:grid-cols-4 md:px-6">
           {footerColumnsBottom.map((column) => (
             <div key={column.title} className="space-y-3">
               <h4 className="text-sm font-semibold text-primary-foreground">{column.title}</h4>
@@ -1294,7 +1294,7 @@ function CourseMarketplaceFooter() {
       </div>
 
       <div className="border-t border-primary-foreground/20">
-        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-primary-foreground/75 md:px-6">
+        <div className="mx-auto flex w-full max-w-[86rem] flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-primary-foreground/75 md:px-6">
           <div className="font-semibold text-primary-foreground">academy</div>
           <span>© 2026 Academy, Inc.</span>
           <span>Cookie settings</span>
@@ -1350,6 +1350,7 @@ export default function PublicAcademyCoursePage() {
             hero={<CourseHero courseData={courseData} stats={stats} />}
             content={<CourseMainContent courseData={courseData} />}
             rightSidebar={<CoursePurchaseSidebar courseData={courseData} stats={stats} />}
+            containerWidthClassName="max-w-[86rem]"
           />
         </div>
         <CourseMarketplaceFooter />
