@@ -17,7 +17,7 @@ export const YouTubeShorts = ({ page }: { page: string }) => {
       <div className="w-full">
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
           <div className="flex-shrink-0 w-0" />
-          {Array.from({ length: 5 }).map((_, i) => (
+          {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="flex-shrink-0">
               <Skeleton className="w-[216px] h-96 rounded-xl" />
             </div>
