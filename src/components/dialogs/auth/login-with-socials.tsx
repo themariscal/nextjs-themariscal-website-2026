@@ -200,7 +200,6 @@ export function LoginWithSocials({
           </div>
         </div>
 
-        <div id="clerk-captcha" data-cl-theme="dark" data-cl-size="flexible" data-cl-language="es-ES" />
       </div>
     </TooltipProvider>
   );

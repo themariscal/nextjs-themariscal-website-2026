@@ -22,14 +22,13 @@ import { LanguageSelector } from "./language-selector";
 import { CustomAlertDialog } from "../alerts/custom-alert-dialog";
 
 import { LoginDialog } from "../dialogs/auth/login-dialog";
-import { useAuth, useClerk } from "@clerk/nextjs";
+import { SignedIn, SignedOut, useClerk } from "@clerk/nextjs";
 import { useTranslations } from "next-intl";
 import { LogoutDialog } from "../dialogs/auth/logout-dialog";
 
 export function AccountSheet() {
   const t = useTranslations("settings");
   const { signOut } = useClerk();
-  const { isSignedIn, isLoaded } = useAuth();
   return (
     <Tooltip>
       <Sheet>
@@ -70,20 +69,20 @@ export function AccountSheet() {
 
           </div>
           <SheetFooter>
-            {isLoaded && !isSignedIn && (
+            <SignedOut>
               <LoginDialog>
                 <Button type="button" className="w-full">
                   {t("login")}
                 </Button>
               </LoginDialog>
-            )}
-            {isLoaded && isSignedIn && (
+            </SignedOut>
+            <SignedIn>
               <LogoutDialog>
                 <Button type="submit" className="cursor-pointer">
                   {t("logout.button")}
                 </Button>
               </LogoutDialog>
-            )}
+            </SignedIn>
           </SheetFooter>
         </SheetContent>
       </Sheet>

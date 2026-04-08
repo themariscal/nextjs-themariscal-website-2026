@@ -170,7 +170,6 @@ export function RegisterForm({
         <Button className="mt-1" type="submit" disabled={isLoading || !isLoaded}>
           {isLoading ? t("register.submitting") : t("register.submit")}
         </Button>
-        <div id="clerk-captcha" data-cl-theme="dark" data-cl-size="flexible" data-cl-language="es-ES" />
       </form>
 
     </FormProvider>

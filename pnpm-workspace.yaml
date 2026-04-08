@@ -1,7 +1,5 @@
 onlyBuiltDependencies:
   - '@clerk/shared'
-  - '@parcel/watcher'
-  - '@swc/core'
   - '@tailwindcss/oxide'
   - core-js
   - sharp

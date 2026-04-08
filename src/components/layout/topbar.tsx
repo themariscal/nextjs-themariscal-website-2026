@@ -23,7 +23,7 @@ import { appSidebarData } from "@/data/sidebar-data";
 
 import { QrCode, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@clerk/nextjs";
+import { SignedIn, SignedOut } from '@clerk/nextjs'
 
 import Image from "next/image";
 import { getNavigationLinks } from "@/data/topbar-data";
@@ -83,7 +83,6 @@ const NavLink = ({
 
 const Topbar = ({ hideSidebar = false }: { hideSidebar?: boolean }) => {
   const router = useRouter();
-  const { isSignedIn, isLoaded } = useAuth();
   const t = useTranslations("header");
   const tSections = useTranslations("headerSections");
 
@@ -191,7 +190,7 @@ const Topbar = ({ hideSidebar = false }: { hideSidebar?: boolean }) => {
               </Tooltip>
             </GetAppDialog>
           </div>
-          {isLoaded && !isSignedIn && (
+          <SignedOut>
             <LoginDialog>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -204,9 +203,11 @@ const Topbar = ({ hideSidebar = false }: { hideSidebar?: boolean }) => {
                 </TooltipContent>
               </Tooltip>
             </LoginDialog>
-          )}
+          </SignedOut>
 
-          {isLoaded && isSignedIn && <UserAccountPopover />}
+          <SignedIn>
+            <UserAccountPopover />
+          </SignedIn>
 
           <AccountSheet />
         </div>

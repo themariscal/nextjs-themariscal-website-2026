@@ -11,6 +11,7 @@ const isPublicApiRoute = createRouteMatcher([
 ]);
 
 const isApiRoute = createRouteMatcher(['/api/(.*)']);
+const isSSOCallback = createRouteMatcher([`/${languagesList}/auth/sso-callback(.*)`]);
 const isAppRoute = createRouteMatcher([`/${languagesList}/app(.*)`]);
 const isAccountRoute = createRouteMatcher([`/${languagesList}/account(.*)`]);
 const isAdminRoute = createRouteMatcher([`/${languagesList}/admin(.*)`]);
@@ -22,6 +23,10 @@ export default clerkMiddleware(async (auth, req) => {
       auth.protect();
     }
   } else {
+    if (isSSOCallback(req)) {
+      return i18nMiddleware(req);
+    }
+
     if (isAccountRoute(req) || isAppRoute(req)) {
         await auth.protect()
       }
