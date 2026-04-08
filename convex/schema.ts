@@ -39,6 +39,14 @@ export default defineSchema({
     .index("by_language", ["languageId"])
     .index("by_instructor", ["instructorId"]),
 
+  academyCourseSections: defineTable({
+    courseId: v.id("academyCourses"),
+    name: v.string(),
+    order: v.optional(v.number()),
+  })
+    .index("by_course", ["courseId"])
+    .index("by_course_and_order", ["courseId", "order"]),
+
   shortReactions: defineTable({
     tokenIdentifier: v.string(),
     videoId: v.string(),

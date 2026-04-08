@@ -35,5 +35,14 @@ export const createAcademySchemas = () => ({
         message: "El nombre del instructor contiene caracteres inválidos.",
       }),
   }),
-});
 
+  addCourseSectionSchema: z.object({
+    name: z
+      .string()
+      .trim()
+      .min(2, { message: "La sección debe tener al menos 2 caracteres." })
+      .regex(/^[a-zA-ZÀ-ÿ0-9 .,_-]+$/, {
+        message: "El nombre de la sección contiene caracteres inválidos.",
+      }),
+  }),
+});
