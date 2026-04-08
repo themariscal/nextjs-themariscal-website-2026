@@ -170,15 +170,15 @@ const ShortsPlayerPage = () => {
 
       <div
         className={cn(
-          "relative z-[10] flex items-center justify-center overflow-hidden",
+          "relative z-[10] overflow-hidden",
           isPlayerCollapsed ? "h-[calc(100svh-80px)]" : "h-[calc(100svh-160px)]"
         )}
       >
-        <div className="flex items-end gap-3 h-full pt-2 pb-4">
+        <div className="grid h-full w-full grid-cols-[1fr_auto_1fr] items-end pt-2 pb-4">
 
           {/* Video */}
           <div
-            className="relative rounded-2xl overflow-hidden bg-black flex-shrink-0 shadow-xl h-full"
+            className="relative col-start-2 rounded-2xl overflow-hidden bg-black flex-shrink-0 shadow-xl h-full"
             style={{ aspectRatio: "9/16" }}
           >
             <iframe
@@ -220,7 +220,7 @@ const ShortsPlayerPage = () => {
           </div>
 
           {/* Right action column */}
-          <div className="flex flex-col items-center gap-5 pb-2">
+          <div className="col-start-3 ml-3 flex flex-col items-center gap-5 justify-self-start pb-2">
 
             {/* Like */}
             <button
