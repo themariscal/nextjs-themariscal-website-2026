@@ -2,5 +2,6 @@ onlyBuiltDependencies:
   - '@clerk/shared'
   - '@tailwindcss/oxide'
   - core-js
+  - inotify
   - sharp
   - unrs-resolver
