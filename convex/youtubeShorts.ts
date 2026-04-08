@@ -52,3 +52,82 @@ export const remove = mutation({
     await ctx.db.delete(args.id);
   },
 });
+
+export const toggleReaction = mutation({
+  args: {
+    videoId: v.string(),
+    reaction: v.union(v.literal("like"), v.literal("dislike")),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    const tokenIdentifier = identity.tokenIdentifier;
+
+    const existing = await ctx.db
+      .query("shortReactions")
+      .withIndex("by_token_and_video", (q) =>
+        q.eq("tokenIdentifier", tokenIdentifier).eq("videoId", args.videoId)
+      )
+      .unique();
+
+    if (existing !== null) {
+      if (existing.reaction === args.reaction) {
+        // Toggle off: same reaction clicked again
+        await ctx.db.delete(existing._id);
+        return null;
+      } else {
+        // Switch reaction
+        await ctx.db.patch(existing._id, { reaction: args.reaction });
+        return args.reaction;
+      }
+    }
+
+    await ctx.db.insert("shortReactions", {
+      tokenIdentifier,
+      videoId: args.videoId,
+      reaction: args.reaction,
+    });
+    return args.reaction;
+  },
+});
+
+export const getMyReaction = query({
+  args: {
+    videoId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    const reaction = await ctx.db
+      .query("shortReactions")
+      .withIndex("by_token_and_video", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier).eq("videoId", args.videoId)
+      )
+      .unique();
+
+    return reaction?.reaction ?? null;
+  },
+});
+
+export const getReactionCounts = query({
+  args: {
+    videoId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const reactions = await ctx.db
+      .query("shortReactions")
+      .withIndex("by_video", (q) => q.eq("videoId", args.videoId))
+      .take(1000);
+
+    let likes = 0;
+    let dislikes = 0;
+    for (const r of reactions) {
+      if (r.reaction === "like") likes++;
+      else dislikes++;
+    }
+
+    return { likes, dislikes };
+  },
+});

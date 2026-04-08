@@ -11,6 +11,14 @@ export default defineSchema({
     .index("byPage", ["page"])
     .index("byPageAndOrder", ["page", "order"]),
 
+  shortReactions: defineTable({
+    tokenIdentifier: v.string(),
+    videoId: v.string(),
+    reaction: v.union(v.literal("like"), v.literal("dislike")),
+  })
+    .index("by_token_and_video", ["tokenIdentifier", "videoId"])
+    .index("by_video", ["videoId"]),
+
   users: defineTable({
     externalId: v.string(),
     email: v.string(),
