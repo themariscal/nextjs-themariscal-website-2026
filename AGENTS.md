@@ -13,7 +13,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 1. **Always branch from `develop`** — never from main, never from the current branch.
 2. **Create the worktree BEFORE doing any work** — not after.
 3. **Branch naming**: use `feature/<short-description>`, `fix/<short-description>`, or `chore/<short-description>`.
-4. **Worktree location**: `../worktrees/<branch-name>` (sibling to the project root).
+4. **Worktree location**: `.worktrees/<branch-name>` (inside the project root, gitignored).
 
 ## Required Steps (in order)
 
@@ -22,10 +22,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 git fetch origin develop
 
 # 2. Create branch from develop + worktree in one command
-git worktree add ../worktrees/<branch-name> -b <branch-name> origin/develop
+git worktree add .worktrees/<branch-name> -b <branch-name> origin/develop
 
 # 3. Work exclusively inside the worktree directory
-cd ../worktrees/<branch-name>
+cd .worktrees/<branch-name>
 ```
 
 ## What NOT to do
