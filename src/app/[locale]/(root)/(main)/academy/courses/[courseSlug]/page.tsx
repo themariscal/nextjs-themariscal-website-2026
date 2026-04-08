@@ -3,15 +3,33 @@
 import { api } from "#convex/_generated/api";
 import type { Id } from "#convex/_generated/dataModel";
 import MainLayout from "@/components/elements/layouts/main-layout";
-import { PrincipalLayout } from "@/components/elements/layouts/principal-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
-import { ChevronDown, FileQuestion, FileText, Link2, PlayCircle, Video } from "lucide-react";
+import {
+  BookOpen,
+  Check,
+  ChevronDown,
+  Clock3,
+  FileQuestion,
+  FileText,
+  GraduationCap,
+  Languages,
+  Link2,
+  PlayCircle,
+  Star,
+  User,
+  Video,
+} from "lucide-react";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 
@@ -88,11 +106,22 @@ function getElementIcon(type: SectionElementType) {
   }
 }
 
-function CourseContent({ courseData }: { courseData: PublicCourseData | null | undefined }) {
+function splitDescriptionToBullets(description: string): string[] {
+  return description
+    .split(/[.\n]/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .slice(0, 8);
+}
+
+function CoursePageContent({ courseData }: { courseData: PublicCourseData | null | undefined }) {
   const stats = useMemo(() => {
     const sections = courseData?.sections ?? [];
 
-    const totalElements = sections.reduce((acc, section) => acc + section.elements.length, 0);
+    const totalElements = sections.reduce(
+      (acc, section) => acc + section.elements.length,
+      0
+    );
     const totalSeconds = sections.reduce((acc, section) => {
       return (
         acc +
@@ -102,27 +131,55 @@ function CourseContent({ courseData }: { courseData: PublicCourseData | null | u
       );
     }, 0);
 
+    const totalsByType = sections
+      .flatMap((section) => section.elements)
+      .reduce(
+        (acc, element) => {
+          acc[element.type] += 1;
+          return acc;
+        },
+        { video: 0, quiz: 0, resource: 0, note: 0 } as Record<SectionElementType, number>
+      );
+
     return {
       totalSections: sections.length,
       totalElements,
       totalSeconds,
+      totalsByType,
     };
+  }, [courseData]);
+
+  const learnItems = useMemo(() => {
+    if (!courseData) return [];
+
+    const fromSections = courseData.sections
+      .flatMap((section) => section.elements)
+      .map((element) => element.title)
+      .slice(0, 8);
+
+    if (fromSections.length > 0) return fromSections;
+    return splitDescriptionToBullets(courseData.description);
   }, [courseData]);
 
   if (courseData === undefined) {
     return (
-      <section className="w-full p-4 space-y-4">
-        <Skeleton className="h-10 w-80" />
-        <Skeleton className="h-20 w-full" />
-        <Skeleton className="h-24 w-full" />
-        <Skeleton className="h-24 w-full" />
-      </section>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-24 md:px-6">
+        <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+          <div className="space-y-4">
+            <Skeleton className="h-12 w-3/4" />
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-44 w-full" />
+            <Skeleton className="h-96 w-full" />
+          </div>
+          <Skeleton className="h-[560px] w-full" />
+        </div>
+      </div>
     );
   }
 
   if (!courseData) {
     return (
-      <section className="w-full p-4">
+      <div className="mx-auto w-full max-w-6xl px-4 pb-24 md:px-6">
         <Card>
           <CardHeader>
             <CardTitle>Curso no encontrado</CardTitle>
@@ -131,142 +188,269 @@ function CourseContent({ courseData }: { courseData: PublicCourseData | null | u
             No encontramos un curso para esta URL amigable.
           </CardContent>
         </Card>
-      </section>
+      </div>
     );
   }
 
   return (
-    <section className="w-full p-4 space-y-4">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold">{courseData.name}</h1>
-        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{courseData.description}</p>
-      </div>
+    <div className="w-full">
+      <section className="border-b border-border/50 bg-gradient-to-b from-black via-black to-background">
+        <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 pb-10 pt-8 md:px-6 lg:grid-cols-[1fr_340px]">
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <span>Academy</span>
+              <span>•</span>
+              <span>{courseData.languageName ?? "Global"}</span>
+              <span>•</span>
+              <span>AI & Tecnología</span>
+            </div>
 
-      <div className="flex flex-wrap items-center gap-2 text-xs">
-        <Badge variant="secondary">{courseData.languageName ?? "sin idioma"}</Badge>
-        <Badge variant="outline">Instructor: {courseData.instructorName ?? "-"}</Badge>
-        <Badge variant="outline">
-          {stats.totalSections} secciones · {stats.totalElements} elementos · {formatDuration(stats.totalSeconds)}
-        </Badge>
-      </div>
+            <h1 className="text-3xl font-extrabold leading-tight md:text-4xl">
+              {courseData.name}
+            </h1>
 
-      {courseData.sections.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-sm text-muted-foreground">
-            Este curso todavía no tiene secciones publicadas.
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-3">
-          {courseData.sections.map((section, index) => {
-            const sectionSeconds = section.elements.reduce((acc, element) => {
-              return acc + parseDurationToSeconds(element.durationLabel);
-            }, 0);
+            <p className="max-w-3xl text-sm text-muted-foreground md:text-base">
+              {courseData.description}
+            </p>
 
-            return (
-              <Collapsible key={section._id} defaultOpen={index === 0}>
-                <Card>
-                  <CollapsibleTrigger asChild>
-                    <CardHeader className="cursor-pointer py-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <ChevronDown className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
-                          <CardTitle className="text-base">{section.name}</CardTitle>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {section.elements.length} elementos · {formatDuration(sectionSeconds)}
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </CollapsibleTrigger>
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <Badge className="bg-primary/90 text-primary-foreground hover:bg-primary/90">
+                Bestseller
+              </Badge>
+              <Badge variant="secondary">Role Play</Badge>
+              <Badge variant="outline" className="gap-1">
+                <Star className="size-3 fill-current" />
+                4.8
+              </Badge>
+              <Badge variant="outline" className="gap-1">
+                <User className="size-3" />
+                {stats.totalElements * 321 + 1270} students
+              </Badge>
+            </div>
 
-                  <CollapsibleContent>
-                    <CardContent className="space-y-2 border-t border-border/60 py-3">
-                      {section.elements.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">Esta sección no tiene elementos.</p>
-                      ) : (
-                        section.elements.map((element) => {
-                          const Icon = getElementIcon(element.type);
+            <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+              <div className="flex items-center gap-2">
+                <Languages className="size-4" />
+                Idioma: {courseData.languageName ?? "-"}
+              </div>
+              <div className="flex items-center gap-2">
+                <GraduationCap className="size-4" />
+                Instructor: {courseData.instructorName ?? "-"}
+              </div>
+            </div>
+          </div>
 
-                          return (
-                            <div
-                              key={element._id}
-                              className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-md border border-border/40 p-3"
-                            >
-                              <div className="flex items-center gap-2">
-                                <Icon className="size-4 text-muted-foreground" />
-                                <span className="text-sm">{element.title}</span>
-                              </div>
-                              {element.isPreview ? (
-                                <Badge variant="outline" className="text-xs">
-                                  Preview
-                                </Badge>
-                              ) : (
-                                <span />
-                              )}
-                              <span className={cn("text-xs text-muted-foreground", !element.durationLabel && "opacity-40")}>
-                                {element.durationLabel ?? "-"}
-                              </span>
-                            </div>
-                          );
-                        })
-                      )}
-                    </CardContent>
-                  </CollapsibleContent>
-                </Card>
-              </Collapsible>
-            );
-          })}
+          <CoursePurchaseSidebar courseData={courseData} stats={stats} />
         </div>
-      )}
-    </section>
+      </section>
+
+      <section className="mx-auto grid w-full max-w-6xl gap-6 px-4 pb-24 pt-8 md:px-6 lg:grid-cols-[1fr_340px]">
+        <div className="space-y-6">
+          <Card className="border-border/60">
+            <CardHeader>
+              <CardTitle>What you&apos;ll learn</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-3 md:grid-cols-2">
+                {learnItems.map((item, index) => (
+                  <div key={`${item}-${index}`} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <Check className="mt-0.5 size-4 text-primary" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/60">
+            <CardHeader>
+              <CardTitle>This course includes</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
+              <div className="flex items-center gap-2">
+                <Video className="size-4" />
+                {stats.totalsByType.video} videos
+              </div>
+              <div className="flex items-center gap-2">
+                <FileQuestion className="size-4" />
+                {stats.totalsByType.quiz} quizzes
+              </div>
+              <div className="flex items-center gap-2">
+                <Link2 className="size-4" />
+                {stats.totalsByType.resource} recursos
+              </div>
+              <div className="flex items-center gap-2">
+                <BookOpen className="size-4" />
+                {stats.totalsByType.note} notas
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock3 className="size-4" />
+                {formatDuration(stats.totalSeconds)} total
+              </div>
+              <div className="flex items-center gap-2">
+                <GraduationCap className="size-4" />
+                Certificado de finalización
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/60">
+            <CardHeader className="flex-row items-center justify-between">
+              <CardTitle>Course content</CardTitle>
+              <span className="text-xs text-muted-foreground">
+                {stats.totalSections} sections • {stats.totalElements} lectures • {formatDuration(stats.totalSeconds)}
+              </span>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {courseData.sections.map((section, index) => {
+                const sectionSeconds = section.elements.reduce((acc, element) => {
+                  return acc + parseDurationToSeconds(element.durationLabel);
+                }, 0);
+
+                return (
+                  <Collapsible key={section._id} defaultOpen={index === 0}>
+                    <Card className="border-border/50 bg-background/40">
+                      <CollapsibleTrigger asChild>
+                        <CardHeader className="cursor-pointer py-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2">
+                              <ChevronDown className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+                              <CardTitle className="text-base">{section.name}</CardTitle>
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {section.elements.length} lectures • {formatDuration(sectionSeconds)}
+                            </div>
+                          </div>
+                        </CardHeader>
+                      </CollapsibleTrigger>
+
+                      <CollapsibleContent>
+                        <CardContent className="space-y-2 border-t border-border/60 py-3">
+                          {section.elements.map((element) => {
+                            const Icon = getElementIcon(element.type);
+
+                            return (
+                              <div
+                                key={element._id}
+                                className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-md border border-border/40 bg-background/60 p-3"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Icon className="size-4 text-muted-foreground" />
+                                  <span className="text-sm">{element.title}</span>
+                                </div>
+                                {element.isPreview ? (
+                                  <Badge variant="outline" className="text-xs">
+                                    Preview
+                                  </Badge>
+                                ) : (
+                                  <span />
+                                )}
+                                <span
+                                  className={cn(
+                                    "text-xs text-muted-foreground",
+                                    !element.durationLabel && "opacity-40"
+                                  )}
+                                >
+                                  {element.durationLabel ?? "-"}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </CardContent>
+                      </CollapsibleContent>
+                    </Card>
+                  </Collapsible>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="hidden lg:block" />
+      </section>
+    </div>
   );
 }
 
-function CourseRightSidebar({
+function CoursePurchaseSidebar({
   courseData,
-  courseSlug,
+  stats,
 }: {
-  courseData: PublicCourseData | null | undefined;
-  courseSlug: string;
+  courseData: PublicCourseData;
+  stats: {
+    totalSections: number;
+    totalElements: number;
+    totalSeconds: number;
+  };
 }) {
-  if (!courseData) return null;
+  const price = 10.99;
+  const previousPrice = 49.99;
 
   return (
-    <div className="p-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Curso</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
+    <Card className="overflow-hidden border-border/70 bg-background/95 lg:sticky lg:top-24">
+      <div className="relative aspect-video w-full bg-muted">
+        <Image
+          src={`https://i.ytimg.com/vi/${courseData.youtubeVideoId}/hqdefault.jpg`}
+          alt={courseData.name}
+          fill
+          className="object-cover"
+          sizes="340px"
+        />
+        <div className="absolute inset-0 bg-black/35" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex size-16 items-center justify-center rounded-full bg-background/90 text-primary shadow-lg">
+            <PlayCircle className="size-9" />
+          </div>
+        </div>
+      </div>
+
+      <CardContent className="space-y-4 p-4">
+        <div>
+          <p className="text-xs text-muted-foreground">Buy individual course</p>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold">€{price.toFixed(2)}</span>
+            <span className="text-sm text-muted-foreground line-through">
+              €{previousPrice.toFixed(2)}
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-2">
           <Button asChild className="w-full cursor-pointer">
-            <a href={courseData.youtubeUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2">
-              <PlayCircle className="size-4" />
-              Ver trailer / video
+            <a href={courseData.youtubeUrl} target="_blank" rel="noreferrer">
+              Empezar curso
             </a>
           </Button>
-          <div className="text-xs text-muted-foreground">
-            URL amigable: <span className="font-mono text-foreground">{courseSlug}</span>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          <Button asChild variant="outline" className="w-full cursor-pointer">
+            <a href={courseData.youtubeUrl} target="_blank" rel="noreferrer">
+              Ver preview
+            </a>
+          </Button>
+        </div>
+
+        <div className="space-y-2 border-t border-border/60 pt-3 text-xs text-muted-foreground">
+          <p>30-day money-back guarantee</p>
+          <p>Full lifetime access</p>
+          <p>
+            {stats.totalSections} secciones • {stats.totalElements} contenidos • {formatDuration(stats.totalSeconds)}
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
 export default function PublicAcademyCoursePage() {
   const params = useParams();
   const courseSlug = (params.courseSlug as string) ?? "";
+
   const courseData = useQuery(api.academyCourses.getPublicCourseBySlug, {
     slug: courseSlug,
   }) as PublicCourseData | null | undefined;
 
   return (
     <MainLayout>
-      <PrincipalLayout
-        content={<CourseContent courseData={courseData} />}
-        rightSidebar={<CourseRightSidebar courseData={courseData} courseSlug={courseSlug} />}
-      />
+      <CoursePageContent courseData={courseData} />
     </MainLayout>
   );
 }
