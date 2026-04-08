@@ -10,7 +10,7 @@ export const getByPage = query({
     return await ctx.db
       .query("youtubeShorts")
       .withIndex("byPage", (q) => q.eq("page", args.page))
-      .order("asc")
+      .order("desc")
       .collect();
   },
 });
