@@ -4,10 +4,13 @@ import { ChevronDown } from 'lucide-react'
 import React from 'react'
 import { CommunitiesSheet } from './communities/communities-sheet'
 import { PostCard } from './posts/post-card'
+import { YouTubeShorts } from './youtube-shorts'
 
 export const HomeContent = () => {
     return (
-        <div className="flex-1 h-full p-4">
+        <div className="flex-1 h-full">
+            <YouTubeShorts page="home" />
+            <div className="p-4">
             {/* Feed Navigation */}
             <div className="flex items-center gap-4 mb-6">
 
@@ -46,6 +49,7 @@ export const HomeContent = () => {
                         isJoined={post.isJoined}
                     />
                 ))}
+            </div>
             </div>
         </div>
     )
