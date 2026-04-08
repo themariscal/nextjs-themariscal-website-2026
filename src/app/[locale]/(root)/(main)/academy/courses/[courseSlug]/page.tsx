@@ -632,13 +632,16 @@ function CoursePurchaseSidebar({
       </div>
 
       <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
-        <DialogContent className="max-w-6xl p-0 overflow-hidden">
+        <DialogContent
+          className="!top-0 !left-0 !translate-x-0 !translate-y-0 !h-screen !w-screen !max-w-none sm:!max-w-none md:!max-w-none lg:!max-w-none rounded-none border-0 p-0 overflow-hidden"
+          style={{ width: "100vw", maxWidth: "100vw", height: "100vh" }}
+        >
           <DialogHeader className="px-6 pt-6 pb-2">
             <DialogTitle>Course Preview</DialogTitle>
             <DialogDescription>{courseData.name}</DialogDescription>
           </DialogHeader>
-          <div className="px-6 pb-6 space-y-4">
-            <div className="relative aspect-video min-h-[520px] overflow-hidden rounded-md border border-border/60 bg-black">
+          <div className="px-6 pb-6 space-y-4 h-[calc(100vh-88px)] overflow-y-auto">
+            <div className="relative aspect-video min-h-[70vh] overflow-hidden rounded-md border border-border/60 bg-black">
               <iframe
                 src={`https://www.youtube.com/embed/${activePreviewVideoId}`}
                 title="Course preview video"
