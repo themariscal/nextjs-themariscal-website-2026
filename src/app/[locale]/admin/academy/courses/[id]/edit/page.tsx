@@ -91,19 +91,34 @@ export default function AdminAcademyEditCoursePage() {
   useEffect(() => {
     if (!course) return;
 
+    const languageId = String(course.languageId ?? "");
+    const instructorId = String(course.instructorId ?? "");
+
     form.reset({
       name: course.name,
       youtubeUrl: course.youtubeUrl,
-      languageId: course.languageId,
-      instructorId: course.instructorId,
+      languageId,
+      instructorId,
       description: course.description,
     });
+
+    // Force-select values after reset so shadcn Select reflects persisted ids.
+    form.setValue("languageId", languageId, { shouldValidate: false });
+    form.setValue("instructorId", instructorId, { shouldValidate: false });
   }, [course, form]);
+
+  const languageOptions = languages ?? [];
+  const instructorOptions = instructors ?? [];
+  const hasCurrentLanguage = !!course && languageOptions.some((item) => item._id === course.languageId);
+  const hasCurrentInstructor = !!course && instructorOptions.some((item) => item._id === course.instructorId);
 
   const handleUpdateCourse = form.handleSubmit(async (values) => {
     try {
       setError(null);
       setIsSaving(true);
+
+      const languageIdValue = values.languageId || String(course.languageId);
+      const instructorIdValue = values.instructorId || String(course.instructorId);
 
       const videoId = extractYouTubeVideoId(values.youtubeUrl);
       if (!videoId) {
@@ -116,8 +131,8 @@ export default function AdminAcademyEditCoursePage() {
         name: values.name,
         youtubeUrl: values.youtubeUrl,
         youtubeVideoId: videoId,
-        languageId: values.languageId as Id<"courseLanguages">,
-        instructorId: values.instructorId as Id<"courseInstructors">,
+        languageId: languageIdValue as Id<"courseLanguages">,
+        instructorId: instructorIdValue as Id<"courseInstructors">,
         description: values.description,
       });
 
@@ -250,20 +265,37 @@ export default function AdminAcademyEditCoursePage() {
               <FormItem>
                 <FormLabel>Idioma</FormLabel>
                 <div className="flex gap-2">
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  {(() => {
+                    const fallbackValue = course ? String(course.languageId) : "";
+                    const currentValue = field.value || fallbackValue;
+
+                    return (
+                  <Select
+                    value={currentValue || undefined}
+                    onValueChange={(value) => field.onChange(value)}
+                  >
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Seleccioná un idioma" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {(languages ?? []).map((language) => (
+                      {!hasCurrentLanguage && course ? (
+                        <SelectItem value={String(course.languageId)}>
+                          {course.languageName
+                            ? `${course.languageName} (guardado)`
+                            : "Idioma guardado"}
+                        </SelectItem>
+                      ) : null}
+                      {languageOptions.map((language) => (
                         <SelectItem key={language._id} value={language._id}>
                           {language.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                    );
+                  })()}
                   <Button
                     type="button"
                     variant="outline"
@@ -285,20 +317,37 @@ export default function AdminAcademyEditCoursePage() {
               <FormItem>
                 <FormLabel>Instructor</FormLabel>
                 <div className="flex gap-2">
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  {(() => {
+                    const fallbackValue = course ? String(course.instructorId) : "";
+                    const currentValue = field.value || fallbackValue;
+
+                    return (
+                  <Select
+                    value={currentValue || undefined}
+                    onValueChange={(value) => field.onChange(value)}
+                  >
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Seleccioná un instructor" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {(instructors ?? []).map((instructor) => (
+                      {!hasCurrentInstructor && course ? (
+                        <SelectItem value={String(course.instructorId)}>
+                          {course.instructorName
+                            ? `${course.instructorName} (guardado)`
+                            : "Instructor guardado"}
+                        </SelectItem>
+                      ) : null}
+                      {instructorOptions.map((instructor) => (
                         <SelectItem key={instructor._id} value={instructor._id}>
                           {instructor.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                    );
+                  })()}
                   <Button
                     type="button"
                     variant="outline"
