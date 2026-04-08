@@ -14,6 +14,19 @@ export const getByPage = query({
   },
 });
 
+export const getByVideoId = query({
+  args: {
+    videoId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const results = await ctx.db
+      .query("youtubeShorts")
+      .filter((q) => q.eq(q.field("videoId"), args.videoId))
+      .first();
+    return results ?? null;
+  },
+});
+
 export const create = mutation({
   args: {
     videoId: v.string(),
