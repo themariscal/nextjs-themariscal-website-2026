@@ -1,9 +1,14 @@
 "use client";
 
+// Module-level guard — survives component remounts during navigation
+let navigatingGlobal = false;
+let navigatingTimer: ReturnType<typeof setTimeout> | null = null;
+
 import MainLayout from "@/components/elements/layouts/main-layout";
 import { useQuery, useMutation } from "convex/react";
 import { ChevronDown, ChevronUp, MessageCircle, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { api } from "#convex/_generated/api";
 import { cn } from "@/lib/utils";
 
@@ -24,9 +29,47 @@ const ShortsPlayerPage = () => {
   const prevShort = allShorts && currentIndex > 0 ? allShorts[currentIndex - 1] : null;
   const nextShort = allShorts && currentIndex < allShorts.length - 1 ? allShorts[currentIndex + 1] : null;
 
+  const nextShortRef = useRef(nextShort);
+  const prevShortRef = useRef(prevShort);
+
+  useEffect(() => {
+    nextShortRef.current = nextShort;
+    prevShortRef.current = prevShort;
+  }, [nextShort, prevShort]);
+
   const navigate = (targetVideoId: string) => {
     router.push(`/${locale}/shorts/${page}/${targetVideoId}`);
   };
+
+  const navigateOnce = (targetVideoId: string | null | undefined) => {
+    if (!targetVideoId || navigatingGlobal) return;
+    navigatingGlobal = true;
+    if (navigatingTimer) clearTimeout(navigatingTimer);
+    navigate(targetVideoId);
+    navigatingTimer = setTimeout(() => { navigatingGlobal = false; }, 1200);
+  };
+
+  const handleWheel = (deltaY: number) => {
+    if (deltaY > 0) navigateOnce(nextShortRef.current?.videoId);
+    else if (deltaY < 0) navigateOnce(prevShortRef.current?.videoId);
+  };
+
+  useEffect(() => {
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      handleWheel(e.deltaY);
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowDown") navigateOnce(nextShortRef.current?.videoId);
+      if (e.key === "ArrowUp") navigateOnce(prevShortRef.current?.videoId);
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, []);
 
   const handleReaction = (reaction: "like" | "dislike") => {
     toggleReaction({ videoId, reaction });
@@ -54,6 +97,15 @@ const ShortsPlayerPage = () => {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
               allowFullScreen
               className="absolute inset-0 w-full h-full"
+            />
+
+            {/* Transparent overlay to capture wheel events from iframe */}
+            <div
+              className="absolute inset-0 z-10"
+              onWheel={(e) => {
+                e.preventDefault();
+                handleWheel(e.deltaY);
+              }}
             />
 
             {/* Title overlay at bottom */}
@@ -138,7 +190,7 @@ const ShortsPlayerPage = () => {
             {/* Up / Down navigation */}
             <div className="flex flex-col items-center gap-2 mt-2">
               <button
-                onClick={() => prevShort && navigate(prevShort.videoId)}
+                onClick={() => navigateOnce(prevShort?.videoId)}
                 disabled={!prevShort}
                 className="w-10 h-10 rounded-full bg-muted flex items-center justify-center disabled:opacity-30 hover:bg-muted/70 transition-colors"
                 title="Anterior"
@@ -146,7 +198,7 @@ const ShortsPlayerPage = () => {
                 <ChevronUp className="w-5 h-5" />
               </button>
               <button
-                onClick={() => nextShort && navigate(nextShort.videoId)}
+                onClick={() => navigateOnce(nextShort?.videoId)}
                 disabled={!nextShort}
                 className="w-10 h-10 rounded-full bg-muted flex items-center justify-center disabled:opacity-30 hover:bg-muted/70 transition-colors"
                 title="Siguiente"
