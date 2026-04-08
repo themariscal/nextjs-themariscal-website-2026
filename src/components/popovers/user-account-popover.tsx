@@ -20,14 +20,16 @@ import {
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useUser } from '@clerk/nextjs';
+import { useRouter } from "@/i18n/routing";
+import { useClerk, useAuth, useUser } from "@clerk/nextjs";
 import { IsAdminComponent } from "@/components/auth/is-admin-component";
 import { LogoutDialog } from "../dialogs/auth/logout-dialog";
 import { useTranslations } from "next-intl";
 
 export function UserAccountPopover() {
   const { user, isLoaded } = useUser();
+  const { orgId } = useAuth();
+  const { setActive } = useClerk();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const t = useTranslations("header.userAccount");
@@ -37,8 +39,8 @@ export function UserAccountPopover() {
   const userPhotoURL = user?.imageUrl || 'https://github.com/shadcn.png';
 
 
-  const handleMenuItemClick = (action: () => void) => {
-    action();
+  const handleMenuItemClick = async (action: () => void | Promise<void>) => {
+    await action();
     setOpen(false);
   };
 
@@ -78,13 +80,37 @@ export function UserAccountPopover() {
   const adminMenuItem = {
     icon: ShieldCheck,
     label: t("admin"),
-    action: () => router.push("/admin"),
+    action: async () => {
+      const adminMembership = user?.organizationMemberships.find(
+        (membership) =>
+          membership.role === "org:admin" ||
+          membership.permissions.includes("org:admin")
+      );
+
+      if (adminMembership && orgId !== adminMembership.organization.id) {
+        await setActive({ organization: adminMembership.organization.id });
+      }
+
+      router.push("/admin");
+    },
   };
 
   const testerMenuItem = {
     icon: FlaskConical,
     label: t("tester"),
-    action: () => router.push("/testing"),
+    action: async () => {
+      const adminMembership = user?.organizationMemberships.find(
+        (membership) =>
+          membership.role === "org:admin" ||
+          membership.permissions.includes("org:admin")
+      );
+
+      if (adminMembership && orgId !== adminMembership.organization.id) {
+        await setActive({ organization: adminMembership.organization.id });
+      }
+
+      router.push("/testing");
+    },
   };
 
   // Show loading state while Clerk is loading
@@ -147,7 +173,7 @@ export function UserAccountPopover() {
               <Button
                 variant="ghost"
                 className="cursor-pointer w-full justify-start h-10 px-3 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                onClick={() => handleMenuItemClick(adminMenuItem.action)}
+                onClick={() => void handleMenuItemClick(adminMenuItem.action)}
               >
                 <ShieldCheck className="size-4 mr-3" />
                 {adminMenuItem.label}
@@ -156,7 +182,7 @@ export function UserAccountPopover() {
               <Button
                 variant="ghost"
                 className="cursor-pointer w-full justify-start h-10 px-3 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                onClick={() => handleMenuItemClick(testerMenuItem.action)}
+                onClick={() => void handleMenuItemClick(testerMenuItem.action)}
               >
                 <FlaskConical className="size-4 mr-3" />
                 {testerMenuItem.label}
@@ -171,7 +197,7 @@ export function UserAccountPopover() {
                   key={index}
                   variant="ghost"
                   className="cursor-pointer w-full justify-start h-10 px-3"
-                  onClick={() => handleMenuItemClick(item.action)}
+                  onClick={() => void handleMenuItemClick(item.action)}
                 >
                   <Icon className="size-4 mr-3" />
                   {item.label}
