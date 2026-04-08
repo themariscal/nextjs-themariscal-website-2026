@@ -33,13 +33,13 @@ const ShortsPlayerPage = () => {
 
   return (
     <MainLayout>
-      <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-background overflow-hidden">
-        <div className="flex items-end gap-3">
+      <div className="flex items-center justify-center h-[calc(100svh-160px)] bg-background overflow-hidden">
+        <div className="flex items-end gap-3 h-full py-2">
 
           {/* Video */}
           <div
-            className="relative rounded-2xl overflow-hidden bg-black flex-shrink-0 shadow-xl"
-            style={{ height: "calc(100vh - 100px)", aspectRatio: "9/16" }}
+            className="relative rounded-2xl overflow-hidden bg-black flex-shrink-0 shadow-xl h-full"
+            style={{ aspectRatio: "9/16" }}
           >
             <iframe
               src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
