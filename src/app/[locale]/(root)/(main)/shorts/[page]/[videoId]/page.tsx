@@ -16,6 +16,7 @@ import { useUser } from "@clerk/nextjs";
 import { toast } from "react-toastify";
 import { ResponsiveDialog } from "@/components/dialogs/layout";
 import { LoginContent } from "@/components/dialogs/auth/login-content";
+import { useMusicStore } from "@/lib/stores/music-store";
 
 const PENDING_REACTION_KEY = "pendingShortReaction";
 
@@ -35,6 +36,7 @@ const ShortsPlayerPage = () => {
   const toggleReaction = useMutation(api.youtubeShorts.toggleReaction);
 
   const [loginOpen, setLoginOpen] = useState(false);
+  const isPlayerCollapsed = useMusicStore((state) => state.isPlayerCollapsed);
 
   // After OAuth redirect back: execute pending reaction + show toast
   useEffect(() => {
@@ -166,8 +168,13 @@ const ShortsPlayerPage = () => {
         />
       </div>
 
-      <div className="relative z-[10] flex items-center justify-center h-[calc(100svh-80px)] overflow-hidden">
-        <div className="flex items-end gap-3 h-full pt-2 pb-0">
+      <div
+        className={cn(
+          "relative z-[10] flex items-center justify-center overflow-hidden",
+          isPlayerCollapsed ? "h-[calc(100svh-80px)]" : "h-[calc(100svh-160px)]"
+        )}
+      >
+        <div className="flex items-end gap-3 h-full pt-2 pb-4">
 
           {/* Video */}
           <div
