@@ -254,6 +254,52 @@ function CourseHero({
 
 function CourseMainContent({ courseData }: { courseData: PublicCourseData | null | undefined }) {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const recommendedCourses = [
+    {
+      title: "The Complete AI Guide: Learn ChatGPT, Generative AI & More",
+      label: "Bestseller",
+      rating: 4.5,
+      students: "341,912",
+      hours: "41.5 hours",
+      updated: "Updated: 3/2026",
+      price: "€10.99",
+      oldPrice: "€14.99",
+      initials: "AG",
+    },
+    {
+      title: "AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents",
+      label: "Bestseller",
+      rating: 4.7,
+      students: "227,261",
+      hours: "33.5 hours",
+      updated: "Updated: 2/2026",
+      price: "€10.99",
+      oldPrice: "€14.99",
+      initials: "AE",
+    },
+    {
+      title: "AI Engineer Agentic Track: The Complete Agent & MCP Course",
+      label: "Premium",
+      rating: 4.7,
+      students: "241,471",
+      hours: "17 hours",
+      updated: "Updated: 2/2026",
+      price: "€10.99",
+      oldPrice: "€14.99",
+      initials: "MC",
+    },
+    {
+      title: "Artificial Intelligence A-Z 2026: Agentic AI, Gen AI, and RL",
+      label: "Premium",
+      rating: 4.4,
+      students: "344,936",
+      hours: "15.5 hours",
+      updated: "Updated: 1/2026",
+      price: "€15.99",
+      oldPrice: "€17.99",
+      initials: "AZ",
+    },
+  ];
 
   const stats = useMemo(() => {
     const sections = courseData?.sections ?? [];
@@ -534,6 +580,54 @@ function CourseMainContent({ courseData }: { courseData: PublicCourseData | null
                   )}
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/60">
+            <CardHeader>
+              <CardTitle>Students also bought</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {recommendedCourses.map((item) => (
+                <div
+                  key={item.title}
+                  className="grid grid-cols-[1fr_auto] items-center gap-4 rounded-lg border border-border/60 bg-background/60 p-4"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/15 text-xs font-bold text-primary">
+                      {item.initials}
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-base font-semibold text-foreground leading-tight">
+                        {item.title}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2 text-xs">
+                        <Badge
+                          variant={item.label === "Premium" ? "default" : "secondary"}
+                          className={item.label === "Premium" ? "" : "bg-teal-500/20 text-teal-400"}
+                        >
+                          {item.label}
+                        </Badge>
+                        <Badge variant="outline" className="gap-1">
+                          <Star className="size-3 fill-current" />
+                          {item.rating}
+                        </Badge>
+                        <Badge variant="outline" className="gap-1">
+                          <User className="size-3" />
+                          {item.students}
+                        </Badge>
+                        <Badge variant="outline">{item.hours}</Badge>
+                        <Badge variant="outline">{item.updated}</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="min-w-[90px] border-l border-border/60 pl-4 text-right">
+                    <p className="text-lg font-bold text-foreground">{item.price}</p>
+                    <p className="text-sm text-muted-foreground line-through">{item.oldPrice}</p>
+                  </div>
+                </div>
+              ))}
             </CardContent>
           </Card>
       </div>
