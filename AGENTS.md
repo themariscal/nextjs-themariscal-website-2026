@@ -5,6 +5,16 @@ This version has breaking changes — APIs, conventions, and file structure may 
 <!-- END:nextjs-agent-rules -->
 
 
+## YouTube Shorts / Videos
+
+When adding YouTube Shorts or videos to Convex, **always fetch the real title** using the YouTube oEmbed API before inserting:
+
+```bash
+curl -s "https://www.youtube.com/oembed?url=https://www.youtube.com/shorts/VIDEO_ID&format=json" | python3 -c "import sys,json; print(json.load(sys.stdin)['title'])"
+```
+
+Never use placeholder titles like "Short" or "Video". Fetch the actual title and use it.
+
 <!-- convex-ai-start -->
 This project uses [Convex](https://convex.dev) as its backend.
 

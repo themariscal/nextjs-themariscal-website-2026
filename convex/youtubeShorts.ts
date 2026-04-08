@@ -44,6 +44,21 @@ export const create = mutation({
   },
 });
 
+export const update = mutation({
+  args: {
+    id: v.id("youtubeShorts"),
+    title: v.optional(v.string()),
+    order: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...fields } = args;
+    const patch: Partial<{ title: string; order: number }> = {};
+    if (fields.title !== undefined) patch.title = fields.title;
+    if (fields.order !== undefined) patch.order = fields.order;
+    await ctx.db.patch(id, patch);
+  },
+});
+
 export const remove = mutation({
   args: {
     id: v.id("youtubeShorts"),
