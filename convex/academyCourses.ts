@@ -1,6 +1,16 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
+function toFriendlySlug(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export const getLanguages = query({
   args: {},
   handler: async (ctx) => {
@@ -315,5 +325,53 @@ export const getCourseSectionsWithElements = query({
         };
       })
     );
+  },
+});
+
+export const getPublicCourseBySlug = query({
+  args: {
+    slug: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const requestedSlug = toFriendlySlug(args.slug);
+    if (!requestedSlug) return null;
+
+    const courses = await ctx.db.query("academyCourses").order("desc").take(500);
+    const course = courses.find((item) => toFriendlySlug(item.name) === requestedSlug) ?? null;
+    if (!course) return null;
+
+    const [language, instructor] = await Promise.all([
+      ctx.db.get(course.languageId),
+      ctx.db.get(course.instructorId),
+    ]);
+
+    const sections = await ctx.db
+      .query("academyCourseSections")
+      .withIndex("by_course_and_order", (q) => q.eq("courseId", course._id))
+      .order("asc")
+      .take(500);
+
+    const sectionsWithElements = await Promise.all(
+      sections.map(async (section) => {
+        const elements = await ctx.db
+          .query("academyCourseSectionElements")
+          .withIndex("by_section_and_order", (q) => q.eq("sectionId", section._id))
+          .order("asc")
+          .take(500);
+
+        return {
+          ...section,
+          elements,
+        };
+      })
+    );
+
+    return {
+      ...course,
+      languageName: language?.name ?? null,
+      instructorName: instructor?.name ?? null,
+      slug: requestedSlug,
+      sections: sectionsWithElements,
+    };
   },
 });

@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "convex/react";
-import { BookOpen, Plus, Rows } from "lucide-react";
+import { BookOpen, ExternalLink, Plus, Rows } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -32,6 +32,16 @@ type CourseItem = {
   languageName: string | null;
   instructorName: string | null;
 };
+
+function toFriendlySlug(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 export default function AdminAcademyCoursesPage() {
   const router = useRouter();
@@ -156,6 +166,16 @@ export default function AdminAcademyCoursesPage() {
                 >
                   <Rows className="size-4" />
                   Ver secciones
+                </Button>
+                <Button asChild variant="outline" className="cursor-pointer">
+                  <a
+                    href={`/${locale}/academy/courses/${toFriendlySlug(selectedCourse.name)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <ExternalLink className="size-4" />
+                    Ver en la web
+                  </a>
                 </Button>
               </DialogFooter>
             </>
