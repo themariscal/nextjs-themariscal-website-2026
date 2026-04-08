@@ -12,10 +12,20 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { extractYouTubeVideoId } from "@/lib/youtube-shorts";
 import { useQuery } from "convex/react";
 import {
+  BadgePercent,
   BookOpen,
   Check,
   ChevronDown,
@@ -23,16 +33,20 @@ import {
   FileQuestion,
   FileText,
   GraduationCap,
+  Infinity as InfinityIcon,
   Languages,
   Link2,
   PlayCircle,
+  Share2,
+  ShieldCheck,
   Star,
+  Tag,
   User,
   Video,
 } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type SectionElementType = "video" | "quiz" | "resource" | "note";
 
@@ -58,6 +72,13 @@ type PublicCourseData = {
     name: string;
     elements: SectionElement[];
   }>;
+};
+
+type PreviewVideoItem = {
+  id: string;
+  title: string;
+  durationLabel?: string;
+  sectionName?: string;
 };
 
 function parseDurationToSeconds(value?: string): number {
@@ -113,6 +134,43 @@ function splitDescriptionToBullets(description: string): string[] {
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
     .slice(0, 8);
+}
+
+function getPreviewVideos(courseData: PublicCourseData): PreviewVideoItem[] {
+  const previews = courseData.sections.flatMap((section) =>
+    section.elements
+      .filter((element) => element.isPreview)
+      .map((element) => {
+        const fromUrl = element.contentUrl
+          ? extractYouTubeVideoId(element.contentUrl)
+          : null;
+
+        return {
+          id: fromUrl ?? courseData.youtubeVideoId,
+          title: element.title,
+          durationLabel: element.durationLabel,
+          sectionName: section.name,
+        };
+      })
+  );
+
+  if (previews.length === 0) {
+    return [
+      {
+        id: courseData.youtubeVideoId,
+        title: courseData.name,
+      },
+    ];
+  }
+
+  const uniqueById = new Map<string, PreviewVideoItem>();
+  for (const preview of previews) {
+    if (!uniqueById.has(preview.id)) {
+      uniqueById.set(preview.id, preview);
+    }
+  }
+
+  return Array.from(uniqueById.values());
 }
 
 function CourseHero({
@@ -396,73 +454,242 @@ function CoursePurchaseSidebar({
   courseData,
   stats,
 }: {
-  courseData: PublicCourseData;
+  courseData: PublicCourseData | null | undefined;
   stats: {
     totalSections: number;
     totalElements: number;
     totalSeconds: number;
   };
 }) {
+  const basePrice = 10.99;
+  const previousPrice = 49.99;
+  const [couponCode, setCouponCode] = useState("");
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discount: number;
+  } | null>(null);
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const previewVideos = useMemo(
+    () => (courseData ? getPreviewVideos(courseData) : []),
+    [courseData]
+  );
+  const [activePreviewVideoId, setActivePreviewVideoId] = useState(
+    courseData?.youtubeVideoId ?? ""
+  );
+
+  useEffect(() => {
+    setActivePreviewVideoId(courseData?.youtubeVideoId ?? "");
+  }, [courseData?.youtubeVideoId]);
+
+  const discountsByCoupon: Record<string, number> = {
+    MT260406G3NEW: 0.27,
+    MARISCAL10: 0.1,
+    ACADEMY15: 0.15,
+  };
+
+  const finalPrice = appliedCoupon
+    ? basePrice * (1 - appliedCoupon.discount)
+    : basePrice;
+
   if (courseData === undefined) {
     return <Skeleton className="h-[560px] w-full" />;
   }
 
   if (!courseData) return null;
 
-  const price = 10.99;
-  const previousPrice = 49.99;
+  const handleApplyCoupon = () => {
+    const normalized = couponCode.trim().toUpperCase();
+    if (!normalized) {
+      setCouponError("Ingresá un cupón.");
+      return;
+    }
+
+    const discount = discountsByCoupon[normalized];
+    if (!discount) {
+      setCouponError("Cupón inválido.");
+      setAppliedCoupon(null);
+      return;
+    }
+
+    setAppliedCoupon({ code: normalized, discount });
+    setCouponError(null);
+  };
 
   return (
-    <Card className="overflow-hidden border-border/70 bg-background/95 lg:sticky lg:top-24">
-      <div className="relative aspect-video w-full bg-muted">
-        <Image
-          src={`https://i.ytimg.com/vi/${courseData.youtubeVideoId}/hqdefault.jpg`}
-          alt={courseData.name}
-          fill
-          className="object-cover"
-          sizes="340px"
-        />
-        <div className="absolute inset-0 bg-black/35" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex size-16 items-center justify-center rounded-full bg-background/90 text-primary shadow-lg">
-            <PlayCircle className="size-9" />
+    <>
+      <Card className="overflow-hidden border-border/70 bg-background/95">
+        <button
+          type="button"
+          className="group relative block aspect-video w-full bg-muted text-left cursor-pointer"
+          onClick={() => setPreviewDialogOpen(true)}
+        >
+          <Image
+            src={`https://i.ytimg.com/vi/${courseData.youtubeVideoId}/hqdefault.jpg`}
+            alt={courseData.name}
+            fill
+            className="object-cover transition-transform duration-200 group-hover:scale-105"
+            sizes="340px"
+          />
+          <div className="absolute inset-0 bg-black/35" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex size-16 items-center justify-center rounded-full bg-background/90 text-primary shadow-lg">
+              <PlayCircle className="size-9" />
+            </div>
           </div>
-        </div>
-      </div>
-
-      <CardContent className="space-y-4 p-4">
-        <div>
-          <p className="text-xs text-muted-foreground">Buy individual course</p>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold">€{price.toFixed(2)}</span>
-            <span className="text-sm text-muted-foreground line-through">
-              €{previousPrice.toFixed(2)}
-            </span>
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-3 text-center text-sm font-medium text-white">
+            Preview this course
           </div>
-        </div>
+        </button>
 
-        <div className="space-y-2">
-          <Button asChild className="w-full cursor-pointer">
-            <a href={courseData.youtubeUrl} target="_blank" rel="noreferrer">
-              Empezar curso
-            </a>
-          </Button>
-          <Button asChild variant="outline" className="w-full cursor-pointer">
-            <a href={courseData.youtubeUrl} target="_blank" rel="noreferrer">
-              Ver preview
-            </a>
-          </Button>
-        </div>
+        <CardContent className="space-y-4 p-4">
+          <div>
+            <p className="text-xs text-muted-foreground">Buy individual course</p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-extrabold">€{finalPrice.toFixed(2)}</span>
+              <span className="text-sm text-muted-foreground line-through">
+                €{previousPrice.toFixed(2)}
+              </span>
+              {appliedCoupon ? (
+                <span className="text-sm text-primary font-medium">
+                  {Math.round(appliedCoupon.discount * 100)}% off
+                </span>
+              ) : null}
+            </div>
+            {appliedCoupon ? (
+              <p className="mt-1 text-xs text-primary">
+                Cupón <strong>{appliedCoupon.code}</strong> aplicado.
+              </p>
+            ) : (
+              <p className="mt-1 text-xs text-primary">12 hours left at this price!</p>
+            )}
+          </div>
 
-        <div className="space-y-2 border-t border-border/60 pt-3 text-xs text-muted-foreground">
-          <p>30-day money-back guarantee</p>
-          <p>Full lifetime access</p>
-          <p>
-            {stats.totalSections} secciones • {stats.totalElements} contenidos • {formatDuration(stats.totalSeconds)}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+          <div className="space-y-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="size-4" />
+              30-day money-back guarantee
+            </div>
+            <div className="flex items-center gap-2">
+              <InfinityIcon className="size-4" />
+              Full lifetime access
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Button className="w-full cursor-pointer">Add to cart</Button>
+            <Button variant="outline" className="w-full cursor-pointer">
+              Buy now
+            </Button>
+          </div>
+
+          <div className="space-y-2 border-t border-border/60 pt-3">
+            <p className="text-sm text-muted-foreground">Subscribe and save</p>
+            <div className="text-2xl font-bold">From €10.00 <span className="text-sm font-normal text-muted-foreground">/month</span></div>
+          </div>
+
+          <div className="space-y-3 border-t border-border/60 pt-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium underline underline-offset-2">Apply Coupon</p>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Tag className="size-4" />
+                <Share2 className="size-4" />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Input
+                value={couponCode}
+                onChange={(event) => setCouponCode(event.target.value)}
+                placeholder="Enter Coupon"
+                className="h-9"
+              />
+              <Button type="button" variant="outline" className="h-9" onClick={handleApplyCoupon}>
+                <BadgePercent className="size-4" />
+                Apply
+              </Button>
+            </div>
+            {couponError ? (
+              <p className="text-xs text-destructive">{couponError}</p>
+            ) : null}
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between rounded-md border border-border/60 bg-muted/40 px-3 py-2 text-sm">
+                <span>{appliedCoupon.code}</span>
+                <span className="font-medium text-primary">Applied!</span>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="space-y-2 border-t border-border/60 pt-3 text-xs text-muted-foreground">
+            <p>
+              {stats.totalSections} secciones • {stats.totalElements} contenidos •{" "}
+              {formatDuration(stats.totalSeconds)}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
+        <DialogContent className="max-w-3xl p-0 overflow-hidden">
+          <DialogHeader className="px-6 pt-6 pb-2">
+            <DialogTitle>Course Preview</DialogTitle>
+            <DialogDescription>{courseData.name}</DialogDescription>
+          </DialogHeader>
+          <div className="px-6 pb-6 space-y-4">
+            <div className="relative aspect-video overflow-hidden rounded-md border border-border/60 bg-black">
+              <iframe
+                src={`https://www.youtube.com/embed/${activePreviewVideoId}`}
+                title="Course preview video"
+                className="h-full w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Free sample videos</p>
+              <div className="max-h-[260px] space-y-2 overflow-y-auto pr-1">
+                {previewVideos.map((preview) => (
+                  <button
+                    key={preview.id}
+                    type="button"
+                    onClick={() => setActivePreviewVideoId(preview.id)}
+                    className={cn(
+                      "w-full rounded-md border p-2 text-left transition-colors",
+                      activePreviewVideoId === preview.id
+                        ? "border-primary bg-primary/10"
+                        : "border-border/60 hover:bg-muted/40"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="relative h-14 w-24 overflow-hidden rounded-sm bg-muted">
+                        <Image
+                          src={`https://i.ytimg.com/vi/${preview.id}/mqdefault.jpg`}
+                          alt={preview.title}
+                          fill
+                          className="object-cover"
+                          sizes="96px"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="line-clamp-1 text-sm font-medium">{preview.title}</p>
+                        <p className="line-clamp-1 text-xs text-muted-foreground">
+                          {preview.sectionName ?? "Preview"}
+                        </p>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {preview.durationLabel ?? "-"}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
