@@ -87,6 +87,9 @@ type PreviewVideoItem = {
   sectionName?: string;
 };
 
+const COURSE_BASE_PRICE = 10.99;
+const COURSE_PREVIOUS_PRICE = 49.99;
+
 function parseDurationToSeconds(value?: string): number {
   if (!value) return 0;
 
@@ -946,8 +949,6 @@ function CoursePurchaseSidebar({
     totalSeconds: number;
   };
 }) {
-  const basePrice = 10.99;
-  const previousPrice = 49.99;
   const [couponCode, setCouponCode] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<{
@@ -974,8 +975,8 @@ function CoursePurchaseSidebar({
   };
 
   const finalPrice = appliedCoupon
-    ? basePrice * (1 - appliedCoupon.discount)
-    : basePrice;
+    ? COURSE_BASE_PRICE * (1 - appliedCoupon.discount)
+    : COURSE_BASE_PRICE;
 
   if (courseData === undefined) {
     return <Skeleton className="h-[560px] w-full" />;
@@ -1033,7 +1034,7 @@ function CoursePurchaseSidebar({
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-extrabold">€{finalPrice.toFixed(2)}</span>
               <span className="text-sm text-muted-foreground line-through">
-                €{previousPrice.toFixed(2)}
+                €{COURSE_PREVIOUS_PRICE.toFixed(2)}
               </span>
               {appliedCoupon ? (
                 <span className="text-sm text-primary font-medium">
@@ -1178,6 +1179,44 @@ function CoursePurchaseSidebar({
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+function CourseMobilePurchaseBar({
+  courseData,
+}: {
+  courseData: PublicCourseData | null | undefined;
+}) {
+  const isPlayerCollapsed = useMusicStore((state) => state.isPlayerCollapsed);
+  const { isCollapsed } = useSidebarStore();
+
+  if (!courseData) return null;
+
+  return (
+    <div
+      className={cn(
+        "fixed inset-x-0 z-[70] px-2 lg:hidden md:px-4",
+        isPlayerCollapsed ? "bottom-8" : "bottom-20",
+        isCollapsed ? "md:pl-28" : "md:pl-68"
+      )}
+    >
+      <div className="rounded-xl border border-border/70 bg-background/95 p-3 shadow-2xl backdrop-blur">
+        <div className="flex items-center gap-3">
+          <div className="shrink-0">
+            <p className="text-3xl font-extrabold leading-none">
+              €{COURSE_BASE_PRICE.toFixed(2)}
+            </p>
+            <p className="text-sm font-medium text-muted-foreground line-through">
+              €{COURSE_PREVIOUS_PRICE.toFixed(2)}
+            </p>
+          </div>
+
+          <Button className="h-12 flex-1 text-base font-semibold cursor-pointer">
+            Add to cart
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -1353,6 +1392,7 @@ export default function PublicAcademyCoursePage() {
             containerWidthClassName="max-w-[86rem]"
           />
         </div>
+        <CourseMobilePurchaseBar courseData={courseData} />
         <CourseMarketplaceFooter />
       </div>
     </MainLayout>
