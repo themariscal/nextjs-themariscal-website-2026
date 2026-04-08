@@ -19,6 +19,15 @@ export default defineSchema({
     .index("by_token_and_video", ["tokenIdentifier", "videoId"])
     .index("by_video", ["videoId"]),
 
+  shortComments: defineTable({
+    videoId: v.string(),
+    tokenIdentifier: v.string(),
+    text: v.string(),
+    authorName: v.optional(v.string()),
+  })
+    .index("by_video", ["videoId"])
+    .index("by_token", ["tokenIdentifier"]),
+
   users: defineTable({
     externalId: v.string(),
     email: v.string(),

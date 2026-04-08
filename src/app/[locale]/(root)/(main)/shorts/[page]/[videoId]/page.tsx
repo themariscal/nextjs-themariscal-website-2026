@@ -11,6 +11,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { api } from "#convex/_generated/api";
 import { cn } from "@/lib/utils";
+import { CommentsDialog } from "@/components/dialogs/shorts/comments-dialog";
 
 const ShortsPlayerPage = () => {
   const params = useParams();
@@ -202,15 +203,12 @@ const ShortsPlayerPage = () => {
             </button>
 
             {/* Comments */}
-            <button
-              className="flex flex-col items-center gap-1 group"
-              title="Comentarios"
-            >
+            <CommentsDialog videoId={videoId}>
               <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center group-hover:bg-muted/70 transition-colors">
                 <MessageCircle className="w-5 h-5 text-foreground" />
               </div>
               <span className="text-[10px] text-muted-foreground">Comentarios</span>
-            </button>
+            </CommentsDialog>
 
             {/* Share */}
             <button
