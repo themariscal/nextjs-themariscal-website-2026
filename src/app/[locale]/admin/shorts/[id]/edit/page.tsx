@@ -3,6 +3,7 @@
 import { api } from "#convex/_generated/api";
 import type { Id } from "#convex/_generated/dataModel";
 import { AlertErrorCard } from "@/components/alerts/alert-error-card";
+import { AdminFormLayout } from "@/components/elements/layouts/admin-form-layout";
 import { Button } from "@/components/ui/button";
 import {
   FormControl,
@@ -120,30 +121,34 @@ export default function AdminEditShortPage() {
   });
 
   if (short === undefined) {
-    return <p className="text-sm text-muted-foreground">Cargando short...</p>;
+    return (
+      <AdminFormLayout
+        title="Editar short"
+        description="Actualizá título, página y URL del short."
+      >
+        <p className="text-sm text-muted-foreground">Cargando short...</p>
+      </AdminFormLayout>
+    );
   }
 
   if (short === null) {
     return (
-      <div className="space-y-3">
-        <h1 className="text-2xl font-bold">Editar short</h1>
-        <p className="text-sm text-muted-foreground">No encontramos ese short.</p>
+      <AdminFormLayout
+        title="Editar short"
+        description="No encontramos ese short."
+      >
         <Button variant="outline" onClick={() => router.push(`/${locale}/admin/shorts`)}>
           Volver
         </Button>
-      </div>
+      </AdminFormLayout>
     );
   }
 
   return (
-    <div className="max-w-2xl space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold">Editar short</h1>
-        <p className="text-sm text-muted-foreground">
-          Actualizá título, página y URL del short.
-        </p>
-      </div>
-
+    <AdminFormLayout
+      title="Editar short"
+      description="Actualizá título, página y URL del short."
+    >
       <FormProvider {...form}>
         <form className="grid gap-5" onSubmit={handleSubmit}>
           {error && <AlertErrorCard title="Error" message={error} />}
@@ -214,7 +219,6 @@ export default function AdminEditShortPage() {
           </div>
         </form>
       </FormProvider>
-    </div>
+    </AdminFormLayout>
   );
 }
-
