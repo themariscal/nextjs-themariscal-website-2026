@@ -1,23 +1,48 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "convex/react";
+import { usePaginatedQuery } from "convex/react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { api } from "#convex/_generated/api";
 
+const PAGE_SIZE = 10;
+
 export const YouTubeShorts = ({ page }: { page: string }) => {
-  const shorts = useQuery(api.youtubeShorts.getByPage, { page });
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.youtubeShorts.getByPagePaginated,
+    { page },
+    { initialNumItems: PAGE_SIZE }
+  );
   const router = useRouter();
   const params = useParams();
   const locale = params?.locale ?? "en";
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
-  if (shorts === undefined) {
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && status === "CanLoadMore") {
+          loadMore(PAGE_SIZE);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [status, loadMore]);
+
+  if (status === "LoadingFirstPage") {
     return (
       <div className="w-full">
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
           <div className="flex-shrink-0 w-0" />
-          {Array.from({ length: 10 }).map((_, i) => (
+          {Array.from({ length: PAGE_SIZE }).map((_, i) => (
             <div key={i} className="flex-shrink-0">
               <Skeleton className="w-[216px] h-96 rounded-xl" />
             </div>
@@ -27,17 +52,17 @@ export const YouTubeShorts = ({ page }: { page: string }) => {
     );
   }
 
-  if (shorts.length === 0) return null;
+  if (results.length === 0) return null;
 
   return (
     <div className="w-full">
       <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide" style={{ scrollBehavior: "smooth" }}>
         <div className="flex-shrink-0 w-0" />
-        {shorts.map((short) => (
+        {results.map((short) => (
           <button
             key={short._id}
             onClick={() => router.push(`/${locale}/shorts/${page}/${short.videoId}`)}
-            className="flex-shrink-0 group text-left"
+            className="flex-shrink-0 group text-left cursor-pointer"
           >
             <div className="relative w-[216px] h-96 rounded-xl overflow-hidden bg-muted">
               <Image
@@ -54,6 +79,14 @@ export const YouTubeShorts = ({ page }: { page: string }) => {
             </div>
           </button>
         ))}
+        {status === "LoadingMore" && (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={`loading-${i}`} className="flex-shrink-0">
+              <Skeleton className="w-[216px] h-96 rounded-xl" />
+            </div>
+          ))
+        )}
+        <div ref={sentinelRef} className="flex-shrink-0 w-1" />
       </div>
     </div>
   );
