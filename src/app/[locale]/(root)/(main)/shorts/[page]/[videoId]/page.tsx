@@ -21,6 +21,7 @@ import { motion } from "motion/react";
 import { AnimateNumber, type AnimateNumberProps } from "motion-plus/react";
 
 const PENDING_REACTION_KEY = "pendingShortReaction";
+const SHORT_TRANSITION_MS = 220;
 const REACTION_NUMBER_FORMAT: AnimateNumberProps["format"] = {
   notation: "compact",
   compactDisplay: "short",
@@ -82,7 +83,10 @@ const ShortsPlayerPage = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const [showIcon, setShowIcon] = useState<"play" | "pause" | null>(null);
+  const [navigationDirection, setNavigationDirection] = useState<"up" | "down" | null>(null);
+  const [transitionPhase, setTransitionPhase] = useState<"idle" | "exiting">("idle");
   const iconTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const navigationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const togglePlayPause = () => {
     const iframe = iframeRef.current;
@@ -112,21 +116,40 @@ const ShortsPlayerPage = () => {
     prevShortRef.current = prevShort;
   }, [nextShort, prevShort]);
 
+  useEffect(() => {
+    return () => {
+      if (navigationTimerRef.current) clearTimeout(navigationTimerRef.current);
+    };
+  }, []);
+
   const navigate = (targetVideoId: string) => {
     router.push(`/${locale}/shorts/${page}/${targetVideoId}`);
   };
 
-  const navigateOnce = (targetVideoId: string | null | undefined) => {
+  const navigateOnce = (targetVideoId: string | null | undefined, direction: "up" | "down") => {
     if (!targetVideoId || navigatingGlobal) return;
     navigatingGlobal = true;
+    setNavigationDirection(direction);
+    setTransitionPhase("exiting");
+
+    if (navigationTimerRef.current) clearTimeout(navigationTimerRef.current);
     if (navigatingTimer) clearTimeout(navigatingTimer);
-    navigate(targetVideoId);
-    navigatingTimer = setTimeout(() => { navigatingGlobal = false; }, 1200);
+    navigationTimerRef.current = setTimeout(() => {
+      navigate(targetVideoId);
+      navigatingTimer = setTimeout(() => { navigatingGlobal = false; }, 1200);
+    }, SHORT_TRANSITION_MS);
   };
 
+  const slideTransitionClass =
+    transitionPhase === "idle" || !navigationDirection
+      ? "translate-y-0 opacity-100"
+      : navigationDirection === "down"
+        ? "-translate-y-10 opacity-0"
+        : "translate-y-10 opacity-0";
+
   const handleWheel = (deltaY: number) => {
-    if (deltaY > 0) navigateOnce(nextShortRef.current?.videoId);
-    else if (deltaY < 0) navigateOnce(prevShortRef.current?.videoId);
+    if (deltaY > 0) navigateOnce(nextShortRef.current?.videoId, "down");
+    else if (deltaY < 0) navigateOnce(prevShortRef.current?.videoId, "up");
   };
 
   useEffect(() => {
@@ -135,8 +158,8 @@ const ShortsPlayerPage = () => {
       handleWheel(e.deltaY);
     };
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowDown") navigateOnce(nextShortRef.current?.videoId);
-      if (e.key === "ArrowUp") navigateOnce(prevShortRef.current?.videoId);
+      if (e.key === "ArrowDown") navigateOnce(nextShortRef.current?.videoId, "down");
+      if (e.key === "ArrowUp") navigateOnce(prevShortRef.current?.videoId, "up");
     };
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("keydown", onKeyDown);
@@ -180,7 +203,11 @@ const ShortsPlayerPage = () => {
 
           {/* Video */}
           <div
-            className="relative col-start-2 rounded-2xl overflow-hidden bg-black flex-shrink-0 shadow-xl h-full"
+            className={cn(
+              "relative col-start-2 rounded-2xl overflow-hidden bg-black flex-shrink-0 shadow-xl h-full",
+              "transition-all duration-200 ease-out will-change-transform",
+              slideTransitionClass
+            )}
             style={{ aspectRatio: "9/16" }}
           >
             <iframe
@@ -222,7 +249,13 @@ const ShortsPlayerPage = () => {
           </div>
 
           {/* Right action column */}
-          <div className="col-start-3 ml-3 flex flex-col items-center gap-5 justify-self-start pb-2">
+          <div
+            className={cn(
+              "col-start-3 ml-3 flex flex-col items-center gap-5 justify-self-start pb-2",
+              "transition-all duration-200 ease-out will-change-transform",
+              slideTransitionClass
+            )}
+          >
 
             {/* Like */}
             <AnimatedReactionButton
@@ -268,7 +301,7 @@ const ShortsPlayerPage = () => {
             {/* Up / Down navigation */}
             <div className="flex flex-col items-center gap-2 mt-2">
               <button
-                onClick={() => navigateOnce(prevShort?.videoId)}
+                onClick={() => navigateOnce(prevShort?.videoId, "up")}
                 disabled={!prevShort}
                 className="w-10 h-10 rounded-full bg-muted flex items-center justify-center disabled:opacity-30 hover:bg-muted/70 transition-colors"
                 title="Anterior"
@@ -276,7 +309,7 @@ const ShortsPlayerPage = () => {
                 <ChevronUp className="w-5 h-5" />
               </button>
               <button
-                onClick={() => navigateOnce(nextShort?.videoId)}
+                onClick={() => navigateOnce(nextShort?.videoId, "down")}
                 disabled={!nextShort}
                 className="w-10 h-10 rounded-full bg-muted flex items-center justify-center disabled:opacity-30 hover:bg-muted/70 transition-colors"
                 title="Siguiente"
