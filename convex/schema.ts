@@ -47,6 +47,24 @@ export default defineSchema({
     .index("by_course", ["courseId"])
     .index("by_course_and_order", ["courseId", "order"]),
 
+  academyCourseSectionElements: defineTable({
+    sectionId: v.id("academyCourseSections"),
+    type: v.union(
+      v.literal("video"),
+      v.literal("quiz"),
+      v.literal("resource"),
+      v.literal("note")
+    ),
+    title: v.string(),
+    order: v.optional(v.number()),
+    durationLabel: v.optional(v.string()),
+    isPreview: v.optional(v.boolean()),
+    contentUrl: v.optional(v.string()),
+    contentText: v.optional(v.string()),
+  })
+    .index("by_section", ["sectionId"])
+    .index("by_section_and_order", ["sectionId", "order"]),
+
   shortReactions: defineTable({
     tokenIdentifier: v.string(),
     videoId: v.string(),

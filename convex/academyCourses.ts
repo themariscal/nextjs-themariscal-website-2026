@@ -215,3 +215,105 @@ export const addCourseSection = mutation({
     });
   },
 });
+
+export const createCourseSectionWithElements = mutation({
+  args: {
+    courseId: v.id("academyCourses"),
+    name: v.string(),
+    elements: v.array(
+      v.object({
+        type: v.union(
+          v.literal("video"),
+          v.literal("quiz"),
+          v.literal("resource"),
+          v.literal("note")
+        ),
+        title: v.string(),
+        durationLabel: v.optional(v.string()),
+        isPreview: v.optional(v.boolean()),
+        contentUrl: v.optional(v.string()),
+        contentText: v.optional(v.string()),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    const course = await ctx.db.get(args.courseId);
+    if (!course) {
+      throw new Error("Curso inválido.");
+    }
+
+    const sectionName = args.name.trim();
+    if (!sectionName) {
+      throw new Error("El nombre de la sección es requerido.");
+    }
+
+    if (args.elements.length === 0) {
+      throw new Error("Agregá al menos un elemento en la sección.");
+    }
+
+    const sections = await ctx.db
+      .query("academyCourseSections")
+      .withIndex("by_course", (q) => q.eq("courseId", args.courseId))
+      .take(500);
+
+    const lastOrder = sections.reduce((maxOrder, section) => {
+      return Math.max(maxOrder, section.order ?? 0);
+    }, 0);
+
+    const sectionId = await ctx.db.insert("academyCourseSections", {
+      courseId: args.courseId,
+      name: sectionName,
+      order: lastOrder + 1,
+    });
+
+    for (let index = 0; index < args.elements.length; index += 1) {
+      const element = args.elements[index];
+      const title = element.title.trim();
+
+      if (!title) {
+        throw new Error(`El elemento #${index + 1} debe tener título.`);
+      }
+
+      await ctx.db.insert("academyCourseSectionElements", {
+        sectionId,
+        type: element.type,
+        title,
+        order: index + 1,
+        durationLabel: element.durationLabel?.trim() || undefined,
+        isPreview: element.isPreview ?? false,
+        contentUrl: element.contentUrl?.trim() || undefined,
+        contentText: element.contentText?.trim() || undefined,
+      });
+    }
+
+    return sectionId;
+  },
+});
+
+export const getCourseSectionsWithElements = query({
+  args: {
+    courseId: v.id("academyCourses"),
+  },
+  handler: async (ctx, args) => {
+    const sections = await ctx.db
+      .query("academyCourseSections")
+      .withIndex("by_course_and_order", (q) => q.eq("courseId", args.courseId))
+      .order("asc")
+      .take(500);
+
+    return await Promise.all(
+      sections.map(async (section) => {
+        const elements = await ctx.db
+          .query("academyCourseSectionElements")
+          .withIndex("by_section_and_order", (q) => q.eq("sectionId", section._id))
+          .order("asc")
+          .take(500);
+
+        return {
+          ...section,
+          elements,
+        };
+      })
+    );
+  },
+});

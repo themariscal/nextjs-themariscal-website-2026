@@ -7,32 +7,85 @@ import { AdminFormLayout } from "@/components/elements/layouts/admin-form-layout
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
-import { createAcademySchemas } from "@/lib/schemas/academy-schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "convex/react";
-import { ArrowLeft, Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useQuery } from "convex/react";
+import {
+  ArrowLeft,
+  ChevronDown,
+  FileQuestion,
+  FileText,
+  Link2,
+  Plus,
+  Video,
+} from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import { z } from "zod";
+import { useMemo } from "react";
+
+type SectionElementType = "video" | "quiz" | "resource" | "note";
+
+type SectionElement = {
+  _id: Id<"academyCourseSectionElements">;
+  title: string;
+  type: SectionElementType;
+  durationLabel?: string;
+  isPreview?: boolean;
+};
+
+type SectionWithElements = {
+  _id: Id<"academyCourseSections">;
+  name: string;
+  order?: number;
+  elements: SectionElement[];
+};
+
+function parseDurationToSeconds(value?: string): number {
+  if (!value) return 0;
+
+  const mmss = value.match(/^(\d{1,2}):(\d{2})$/);
+  if (mmss) {
+    const minutes = Number(mmss[1]);
+    const seconds = Number(mmss[2]);
+    return minutes * 60 + seconds;
+  }
+
+  const hhmmss = value.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+  if (hhmmss) {
+    const hours = Number(hhmmss[1]);
+    const minutes = Number(hhmmss[2]);
+    const seconds = Number(hhmmss[3]);
+    return hours * 3600 + minutes * 60 + seconds;
+  }
+
+  return 0;
+}
+
+function formatDuration(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+
+  return `${minutes}m`;
+}
+
+function getElementIcon(type: SectionElementType) {
+  switch (type) {
+    case "video":
+      return Video;
+    case "quiz":
+      return FileQuestion;
+    case "resource":
+      return Link2;
+    case "note":
+      return FileText;
+    default:
+      return FileText;
+  }
+}
 
 export default function AdminAcademyCourseSectionsPage() {
   const params = useParams();
@@ -40,53 +93,33 @@ export default function AdminAcademyCourseSectionsPage() {
   const locale = (params.locale as string) ?? "en";
   const courseId = params.id as Id<"academyCourses">;
 
-  const [error, setError] = useState<string | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-
   const course = useQuery(api.academyCourses.getCourseById, { courseId });
-  const sections = useQuery(api.academyCourses.getCourseSections, { courseId });
-  const addCourseSection = useMutation(api.academyCourses.addCourseSection);
+  const sections = useQuery(api.academyCourses.getCourseSectionsWithElements, { courseId });
 
-  const { addCourseSectionSchema } = createAcademySchemas();
-  type AddCourseSectionType = z.infer<typeof addCourseSectionSchema>;
+  const stats = useMemo(() => {
+    const safeSections = (sections ?? []) as SectionWithElements[];
+    const totalElements = safeSections.reduce((acc, section) => acc + section.elements.length, 0);
+    const totalSeconds = safeSections.reduce((acc, section) => {
+      const sectionSeconds = section.elements.reduce((elementAcc, element) => {
+        return elementAcc + parseDurationToSeconds(element.durationLabel);
+      }, 0);
+      return acc + sectionSeconds;
+    }, 0);
 
-  const form = useForm<AddCourseSectionType>({
-    resolver: zodResolver(addCourseSectionSchema),
-    defaultValues: {
-      name: "",
-    },
-  });
-
-  const handleAddSection = form.handleSubmit(async (values) => {
-    try {
-      setError(null);
-      setIsSaving(true);
-      await addCourseSection({
-        courseId,
-        name: values.name,
-      });
-      toast.success("Sección agregada.");
-      form.reset({ name: "" });
-      setDialogOpen(false);
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("No se pudo agregar la sección.");
-      }
-    } finally {
-      setIsSaving(false);
-    }
-  });
+    return {
+      totalSections: safeSections.length,
+      totalElements,
+      totalSeconds,
+    };
+  }, [sections]);
 
   if (course === undefined || sections === undefined) {
     return (
-      <AdminFormLayout title="Sections" description="Cargando secciones del curso...">
+      <AdminFormLayout title="Sections" description="Cargando secciones del curso..." containerClassName="max-w-6xl">
         <div className="grid gap-3">
           <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-20 w-full" />
-          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-28 w-full" />
+          <Skeleton className="h-28 w-full" />
         </div>
       </AdminFormLayout>
     );
@@ -103,13 +136,13 @@ export default function AdminAcademyCourseSectionsPage() {
   return (
     <AdminFormLayout
       title="Sections"
-      description={`Gestioná las secciones del curso: ${course.name}`}
-      containerClassName="max-w-4xl"
+      description={`Estructura y contenidos del curso: ${course.name}`}
+      containerClassName="max-w-6xl"
     >
-      {error ? <AlertErrorCard title="Error" message={error} /> : null}
-
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <Badge variant="secondary">{sections.length} secciones</Badge>
+      <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
+        <div>
+          {stats.totalSections} secciones · {stats.totalElements} elementos · {formatDuration(stats.totalSeconds)} duración total
+        </div>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -119,7 +152,10 @@ export default function AdminAcademyCourseSectionsPage() {
             <ArrowLeft className="size-4" />
             Volver a cursos
           </Button>
-          <Button className="cursor-pointer" onClick={() => setDialogOpen(true)}>
+          <Button
+            className="cursor-pointer"
+            onClick={() => router.push(`/${locale}/admin/academy/courses/${courseId}/sections/new`)}
+          >
             <Plus className="size-4" />
             Agregar sección
           </Button>
@@ -129,61 +165,72 @@ export default function AdminAcademyCourseSectionsPage() {
       {sections.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-sm text-muted-foreground">
-            Este curso todavía no tiene secciones.
+            Este curso todavía no tiene secciones. Creá la primera sección para empezar.
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-3">
-          {sections.map((section) => (
-            <Card key={section._id}>
-              <CardHeader className="py-3">
-                <CardTitle className="text-base">{section.name}</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0 text-xs text-muted-foreground">
-                Orden: {section.order ?? "-"}
-              </CardContent>
-            </Card>
-          ))}
+        <div className="space-y-3">
+          {(sections as SectionWithElements[]).map((section, sectionIndex) => {
+            const sectionSeconds = section.elements.reduce((acc, element) => {
+              return acc + parseDurationToSeconds(element.durationLabel);
+            }, 0);
+
+            return (
+              <Collapsible key={section._id} defaultOpen={sectionIndex === 0}>
+                <Card>
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="cursor-pointer py-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <ChevronDown className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+                          <CardTitle className="text-base">{section.name}</CardTitle>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {section.elements.length} elementos · {formatDuration(sectionSeconds)}
+                        </div>
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+
+                  <CollapsibleContent>
+                    <CardContent className="space-y-2 border-t border-border/60 py-3">
+                      {section.elements.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">Esta sección no tiene elementos todavía.</p>
+                      ) : (
+                        section.elements.map((element) => {
+                          const Icon = getElementIcon(element.type);
+
+                          return (
+                            <div
+                              key={element._id}
+                              className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-md border border-border/40 p-3"
+                            >
+                              <div className="flex items-center gap-2">
+                                <Icon className="size-4 text-muted-foreground" />
+                                <span className="text-sm">{element.title}</span>
+                              </div>
+                              {element.isPreview ? (
+                                <Badge variant="outline" className="text-xs">
+                                  Preview
+                                </Badge>
+                              ) : (
+                                <span />
+                              )}
+                              <span className={cn("text-xs text-muted-foreground", !element.durationLabel && "opacity-40")}>
+                                {element.durationLabel ?? "-"}
+                              </span>
+                            </div>
+                          );
+                        })
+                      )}
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+            );
+          })}
         </div>
       )}
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Agregar sección</DialogTitle>
-            <DialogDescription>
-              Creá una nueva sección para este curso.
-            </DialogDescription>
-          </DialogHeader>
-
-          <FormProvider {...form}>
-            <form className="grid gap-4" onSubmit={handleAddSection}>
-              <FormField
-                name="name"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre de la sección</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Introducción" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" disabled={isSaving}>
-                  {isSaving ? "Guardando..." : "Agregar"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </FormProvider>
-        </DialogContent>
-      </Dialog>
     </AdminFormLayout>
   );
 }
