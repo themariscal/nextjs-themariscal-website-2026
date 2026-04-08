@@ -12,16 +12,16 @@ export const getByPage = query({
   handler: async (ctx, args) => {
     const bySection = await ctx.db
       .query("youtubeShorts")
-      .withIndex("bySection", (q) => q.eq("section", args.page))
-      .order("desc")
+      .withIndex("bySectionAndOrder", (q) => q.eq("section", args.page))
+      .order("asc")
       .collect();
 
     if (bySection.length > 0) return bySection;
 
     return await ctx.db
       .query("youtubeShorts")
-      .withIndex("byPage", (q) => q.eq("page", args.page))
-      .order("desc")
+      .withIndex("byPageAndOrder", (q) => q.eq("page", args.page))
+      .order("asc")
       .collect();
   },
 });
@@ -34,22 +34,22 @@ export const getByPagePaginated = query({
   handler: async (ctx, args) => {
     const hasSectionRows = await ctx.db
       .query("youtubeShorts")
-      .withIndex("bySection", (q) => q.eq("section", args.page))
-      .order("desc")
+      .withIndex("bySectionAndOrder", (q) => q.eq("section", args.page))
+      .order("asc")
       .take(1);
 
     if (hasSectionRows.length > 0) {
       return await ctx.db
         .query("youtubeShorts")
-        .withIndex("bySection", (q) => q.eq("section", args.page))
-        .order("desc")
+        .withIndex("bySectionAndOrder", (q) => q.eq("section", args.page))
+        .order("asc")
         .paginate(args.paginationOpts);
     }
 
     return await ctx.db
       .query("youtubeShorts")
-      .withIndex("byPage", (q) => q.eq("page", args.page))
-      .order("desc")
+      .withIndex("byPageAndOrder", (q) => q.eq("page", args.page))
+      .order("asc")
       .paginate(args.paginationOpts);
   },
 });
@@ -63,22 +63,22 @@ export const getAllPaginated = query({
     if (args.section) {
       const hasSectionRows = await ctx.db
         .query("youtubeShorts")
-        .withIndex("bySection", (q) => q.eq("section", args.section!))
-        .order("desc")
+        .withIndex("bySectionAndOrder", (q) => q.eq("section", args.section!))
+        .order("asc")
         .take(1);
 
       if (hasSectionRows.length > 0) {
         return await ctx.db
           .query("youtubeShorts")
-          .withIndex("bySection", (q) => q.eq("section", args.section!))
-          .order("desc")
+          .withIndex("bySectionAndOrder", (q) => q.eq("section", args.section!))
+          .order("asc")
           .paginate(args.paginationOpts);
       }
 
       return await ctx.db
         .query("youtubeShorts")
-        .withIndex("byPage", (q) => q.eq("page", args.section!))
-        .order("desc")
+        .withIndex("byPageAndOrder", (q) => q.eq("page", args.section!))
+        .order("asc")
         .paginate(args.paginationOpts);
     }
 

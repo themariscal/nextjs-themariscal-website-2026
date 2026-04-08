@@ -51,11 +51,10 @@ type ShortItem = {
 type SortableShortCardProps = {
   short: ShortItem;
   index: number;
-  onOpen: (id: string) => void;
   getShortSection: (short: { section?: string; page?: string }) => string;
 };
 
-function SortableShortCard({ short, index, onOpen, getShortSection }: SortableShortCardProps) {
+function SortableShortCard({ short, index, getShortSection }: SortableShortCardProps) {
   const {
     attributes,
     listeners,
@@ -74,21 +73,20 @@ function SortableShortCard({ short, index, onOpen, getShortSection }: SortableSh
         transition,
       }}
       className={`overflow-hidden ${isDragging ? "opacity-70 ring-2 ring-primary/40" : ""}`}
-      onClick={() => onOpen(short._id)}
     >
       <CardHeader className="px-3 pt-3 pb-2">
-        <CardTitle className="text-sm line-clamp-2 flex items-start justify-between gap-2">
-          <span>{short.title}</span>
+        <CardTitle className="text-sm line-clamp-2 flex items-start gap-2">
           <button
             ref={setActivatorNodeRef}
             type="button"
-            className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
+            className="size-8 rounded-md border border-border/60 bg-muted/40 flex items-center justify-center cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground hover:bg-muted"
             {...attributes}
             {...listeners}
             onClick={(e) => e.preventDefault()}
           >
             <GripVertical className="size-4" />
           </button>
+          <span className="pt-1">{short.title}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="px-3 pb-3 space-y-2">
@@ -300,10 +298,6 @@ export default function AdminShortsPage() {
                       short={short}
                       index={index}
                       getShortSection={getShortSection}
-                      onOpen={(id) => {
-                        setSelectedShortId(id);
-                        setDialogOpen(true);
-                      }}
                     />
                   ))}
                 </div>
