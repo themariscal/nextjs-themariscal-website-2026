@@ -518,7 +518,8 @@ function CoursePurchaseSidebar({
 
   return (
     <>
-      <Card className="overflow-hidden border-border/70 bg-background/95">
+      <div className="sticky top-20">
+        <Card className="overflow-hidden border-border/70 bg-background/95">
         <button
           type="button"
           className="group relative block aspect-video w-full bg-muted text-left cursor-pointer"
@@ -533,8 +534,8 @@ function CoursePurchaseSidebar({
           />
           <div className="absolute inset-0 bg-black/35" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex size-16 items-center justify-center rounded-full bg-background/90 text-primary shadow-lg">
-              <PlayCircle className="size-9" />
+            <div className="flex size-18 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl ring-4 ring-background/80">
+              <PlayCircle className="size-10" />
             </div>
           </div>
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-3 text-center text-sm font-medium text-white">
@@ -627,16 +628,17 @@ function CoursePurchaseSidebar({
             </p>
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
 
       <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
-        <DialogContent className="max-w-3xl p-0 overflow-hidden">
+        <DialogContent className="max-w-6xl p-0 overflow-hidden">
           <DialogHeader className="px-6 pt-6 pb-2">
             <DialogTitle>Course Preview</DialogTitle>
             <DialogDescription>{courseData.name}</DialogDescription>
           </DialogHeader>
           <div className="px-6 pb-6 space-y-4">
-            <div className="relative aspect-video overflow-hidden rounded-md border border-border/60 bg-black">
+            <div className="relative aspect-video min-h-[520px] overflow-hidden rounded-md border border-border/60 bg-black">
               <iframe
                 src={`https://www.youtube.com/embed/${activePreviewVideoId}`}
                 title="Course preview video"
