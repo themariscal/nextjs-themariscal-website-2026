@@ -43,6 +43,8 @@ import {
   ShieldCheck,
   Star,
   Tag,
+  ThumbsDown,
+  ThumbsUp,
   User,
   Video,
 } from "lucide-react";
@@ -300,6 +302,55 @@ function CourseMainContent({ courseData }: { courseData: PublicCourseData | null
       price: "€15.99",
       oldPrice: "€17.99",
       initials: "AZ",
+    },
+  ];
+  const mockReviews = [
+    {
+      author: "Joy",
+      date: "13 days ago",
+      rating: 4,
+      text: "I would suggest adding more quizzes for the rest of the sections, like the Python module.",
+    },
+    {
+      author: "Jorge B",
+      date: "1 month ago",
+      rating: 4,
+      text: "An excellent course. I’m not giving it the highest rating because I’d love deeper open-source examples.",
+    },
+    {
+      author: "Sudeshna",
+      date: "2 months ago",
+      rating: 5,
+      text: "I’m about halfway through and honestly it’s one of the best Udemy-style courses for LLMs and NLP.",
+    },
+    {
+      author: "Kwe",
+      date: "3 months ago",
+      rating: 4,
+      text: "Very good but where are the projects? Still, I’d give the course a solid 8/10.",
+    },
+  ];
+  const moreCoursesByAuthor = [
+    {
+      title: "The Data Science Course: Complete Data Science Bootcamp 2026",
+      subtitle: "Math, Statistics, Python, SQL, and practical analytics.",
+      price: "€13.99",
+      oldPrice: "€15.99",
+      image: "https://i.ytimg.com/vi/3rGDJDmuZ54/hqdefault.jpg",
+    },
+    {
+      title: "The Complete Financial Analyst Course 2026",
+      subtitle: "Excel, accounting, valuation, and business analysis.",
+      price: "€12.99",
+      oldPrice: "€16.99",
+      image: "https://i.ytimg.com/vi/NV6-rUPVFlk/hqdefault.jpg",
+    },
+    {
+      title: "The Project Management Course: Beginner to Project Manager",
+      subtitle: "Build PM foundations and ship projects with confidence.",
+      price: "€12.99",
+      oldPrice: "€16.99",
+      image: "https://i.ytimg.com/vi/taj0UJfKx04/hqdefault.jpg",
     },
   ];
 
@@ -769,6 +820,111 @@ function CourseMainContent({ courseData }: { courseData: PublicCourseData | null
                   The team focuses on structured, beginner-friendly learning paths that combine
                   conceptual depth with hands-on execution.
                 </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/60">
+            <CardContent className="space-y-6 pt-6">
+              <div className="text-3xl font-bold text-foreground">
+                <span className="inline-flex items-center gap-2">
+                  <Star className="size-5 fill-current text-primary" />
+                  4.6 course rating
+                </span>{" "}
+                <span className="text-muted-foreground">• 19K ratings</span>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                {mockReviews.map((review) => (
+                  <div
+                    key={`${review.author}-${review.date}`}
+                    className="space-y-3 rounded-lg border border-border/60 bg-background/60 p-4"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-9 items-center justify-center rounded-full bg-muted">
+                        <User className="size-4 text-muted-foreground" />
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-sm font-semibold text-foreground">{review.author}</p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span className="inline-flex items-center gap-0.5">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star
+                                key={i}
+                                className={cn(
+                                  "size-3",
+                                  i < review.rating
+                                    ? "fill-current text-primary"
+                                    : "text-muted-foreground/40"
+                                )}
+                              />
+                            ))}
+                          </span>
+                          <span>{review.date}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-sm leading-6 text-muted-foreground">{review.text}</p>
+
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>Helpful?</span>
+                      <ThumbsUp className="size-3.5" />
+                      <ThumbsDown className="size-3.5" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Button variant="outline" className="cursor-pointer">
+                Show all reviews
+              </Button>
+
+              <div className="space-y-4 border-t border-border/60 pt-6">
+                <h3 className="text-2xl font-bold text-foreground">
+                  More Courses by <span className="text-primary underline underline-offset-2">365 Careers</span>
+                </h3>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {moreCoursesByAuthor.map((item) => (
+                    <div
+                      key={item.title}
+                      className="overflow-hidden rounded-lg border border-border/60 bg-background/60"
+                    >
+                      <div className="relative aspect-[16/9] w-full">
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                        />
+                      </div>
+                      <div className="space-y-2 p-3">
+                        <p className="line-clamp-2 text-base font-semibold text-foreground">
+                          {item.title}
+                        </p>
+                        <p className="line-clamp-2 text-sm text-muted-foreground">
+                          {item.subtitle}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          <Badge variant="outline" className="gap-1">
+                            <Star className="size-3 fill-current" />
+                            4.6
+                          </Badge>
+                          <Badge variant="outline">All levels</Badge>
+                        </div>
+                        <div className="pt-1">
+                          <span className="text-lg font-bold text-foreground">{item.price}</span>{" "}
+                          <span className="text-sm text-muted-foreground line-through">{item.oldPrice}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Button variant="outline" className="w-full cursor-pointer text-primary">
+                  Report abuse
+                </Button>
               </div>
             </CardContent>
           </Card>
