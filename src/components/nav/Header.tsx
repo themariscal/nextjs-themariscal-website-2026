@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React, { useState } from "react";
-import { SiCodepen, SiGithub, SiLinkedin, SiX } from "react-icons/si";
+import { SiCodepen, SiGithub, SiX } from "react-icons/si";
+import { FaLinkedin } from "react-icons/fa";
 import { OutlineButton } from "../buttons/OutlineButton";
 import ToggleWrapper from "../motionComponent/DarkModeToggle";
 import DarkModeToggle from "../motionComponent/DarkModeToggle";
@@ -35,7 +36,7 @@ export const MyLinks = () => (
       target="_blank"
       rel="nofollow"
     >
-      <SiLinkedin />
+      <FaLinkedin />
     </Link>
     <Link
       className="text-zinc-300 hover:text-gray-300 transition-colors"
