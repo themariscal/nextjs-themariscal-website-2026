@@ -403,7 +403,7 @@ function CourseMainContent({ courseData }: { courseData: PublicCourseData | null
 
   if (courseData === undefined) {
     return (
-      <div className="w-full space-y-6 px-4 pb-24 pt-8">
+      <div className="w-full space-y-6 px-4 pb-8 pt-8">
         <Skeleton className="h-44 w-full" />
         <Skeleton className="h-36 w-full" />
         <Skeleton className="h-96 w-full" />
@@ -413,7 +413,7 @@ function CourseMainContent({ courseData }: { courseData: PublicCourseData | null
 
   if (!courseData) {
     return (
-      <div className="w-full px-4 pb-24 pt-8">
+      <div className="w-full px-4 pb-8 pt-8">
         <Card>
           <CardHeader>
             <CardTitle>Curso no encontrado</CardTitle>
@@ -427,7 +427,7 @@ function CourseMainContent({ courseData }: { courseData: PublicCourseData | null
   }
 
   return (
-    <div className="w-full px-4 pb-24 pt-8">
+    <div className="w-full px-4 pb-8 pt-8">
       <div className="space-y-6">
           <Card className="border-border/60">
             <CardHeader>
@@ -1240,16 +1240,16 @@ function CourseMarketplaceFooter() {
   return (
     <footer
       className={cn(
-        "relative z-[60] w-full bg-[#151827] text-slate-200",
+        "relative z-[60] mt-auto w-full bg-primary text-primary-foreground",
         isCollapsed ? "md:pl-24" : "md:pl-64"
       )}
     >
-      <div className="border-t border-slate-700/70">
+      <div className="border-t border-primary-foreground/20">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-5 md:px-6">
           <p className="text-sm">
-            Top companies choose <span className="font-semibold text-primary">Academy Business</span> to build in-demand career skills.
+            Top companies choose <span className="font-semibold text-primary-foreground">Academy Business</span> to build in-demand career skills.
           </p>
-          <div className="hidden items-center gap-4 text-xs text-slate-400 md:flex">
+          <div className="hidden items-center gap-4 text-xs text-primary-foreground/75 md:flex">
             <span>Nasdaq</span>
             <span>Volkswagen</span>
             <span>NetApp</span>
@@ -1258,14 +1258,14 @@ function CourseMarketplaceFooter() {
         </div>
       </div>
 
-      <div className="border-t border-slate-700/70">
+      <div className="border-t border-primary-foreground/20">
         <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-8 md:grid-cols-4 md:px-6">
           {footerColumnsTop.map((column) => (
             <div key={column.title} className="space-y-3">
-              <h4 className="text-sm font-semibold text-white">{column.title}</h4>
-              <ul className="space-y-2 text-xs text-slate-400">
+              <h4 className="text-sm font-semibold text-primary-foreground">{column.title}</h4>
+              <ul className="space-y-2 text-xs text-primary-foreground/75">
                 {column.links.map((link) => (
-                  <li key={link} className="hover:text-white transition-colors cursor-pointer">
+                  <li key={link} className="hover:text-primary-foreground transition-colors cursor-pointer">
                     {link}
                   </li>
                 ))}
@@ -1275,14 +1275,14 @@ function CourseMarketplaceFooter() {
         </div>
       </div>
 
-      <div className="border-t border-slate-700/70">
+      <div className="border-t border-primary-foreground/20">
         <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-8 md:grid-cols-4 md:px-6">
           {footerColumnsBottom.map((column) => (
             <div key={column.title} className="space-y-3">
-              <h4 className="text-sm font-semibold text-white">{column.title}</h4>
-              <ul className="space-y-2 text-xs text-slate-400">
+              <h4 className="text-sm font-semibold text-primary-foreground">{column.title}</h4>
+              <ul className="space-y-2 text-xs text-primary-foreground/75">
                 {column.links.map((link) => (
-                  <li key={link} className="hover:text-white transition-colors cursor-pointer">
+                  <li key={link} className="hover:text-primary-foreground transition-colors cursor-pointer">
                     {link}
                   </li>
                 ))}
@@ -1292,9 +1292,9 @@ function CourseMarketplaceFooter() {
         </div>
       </div>
 
-      <div className="border-t border-slate-700/70">
-        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-slate-400 md:px-6">
-          <div className="font-semibold text-white">academy</div>
+      <div className="border-t border-primary-foreground/20">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-primary-foreground/75 md:px-6">
+          <div className="font-semibold text-primary-foreground">academy</div>
           <span>© 2026 Academy, Inc.</span>
           <span>Cookie settings</span>
           <span>English</span>
@@ -1337,14 +1337,16 @@ export default function PublicAcademyCoursePage() {
 
   return (
     <MainLayout>
-      <>
-        <PrincipalLayout
-          hero={<CourseHero courseData={courseData} stats={stats} />}
-          content={<CourseMainContent courseData={courseData} />}
-          rightSidebar={<CoursePurchaseSidebar courseData={courseData} stats={stats} />}
-        />
+      <div className="flex min-h-screen flex-col">
+        <div className="flex-1">
+          <PrincipalLayout
+            hero={<CourseHero courseData={courseData} stats={stats} />}
+            content={<CourseMainContent courseData={courseData} />}
+            rightSidebar={<CoursePurchaseSidebar courseData={courseData} stats={stats} />}
+          />
+        </div>
         <CourseMarketplaceFooter />
-      </>
+      </div>
     </MainLayout>
   );
 }
