@@ -4,7 +4,7 @@ import MainLayout from "@/components/elements/layouts/main-layout";
 import { useQuery } from "convex/react";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { api } from "../../../../../../../convex/_generated/api";
+import { api } from "#convex/_generated/api";
 
 const ShortsPlayerPage = () => {
   const params = useParams();

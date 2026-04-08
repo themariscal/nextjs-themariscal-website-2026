@@ -3,7 +3,7 @@
 import { useQuery } from "convex/react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { api } from "../../../../convex/_generated/api";
+import { api } from "#convex/_generated/api";
 
 export const YouTubeShorts = ({ page }: { page: string }) => {
   const shorts = useQuery(api.youtubeShorts.getByPage, { page });
