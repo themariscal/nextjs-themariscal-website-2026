@@ -166,8 +166,8 @@ const ShortsPlayerPage = () => {
         />
       </div>
 
-      <div className="relative z-[10] flex items-center justify-center h-[calc(100svh-160px)] overflow-hidden">
-        <div className="flex items-end gap-3 h-full py-2">
+      <div className="relative z-[10] flex items-center justify-center h-[calc(100svh-80px)] overflow-hidden">
+        <div className="flex items-end gap-3 h-full pt-2 pb-0">
 
           {/* Video */}
           <div

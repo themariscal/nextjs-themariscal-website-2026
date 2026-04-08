@@ -84,7 +84,7 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
                     variant="outline"
                     size="sm"
                     className={cn(
-                        'h-9 min-w-36 rounded-t-xl rounded-b-none border-b-0 bg-background/95 px-5 shadow-md backdrop-blur-md',
+                        'h-9 min-w-36 rounded-t-xl rounded-b-none border-b-0 bg-background/70 px-5 shadow-md backdrop-blur-xl',
                         'inline-flex items-center justify-center gap-2'
                     )}
                     onClick={togglePlayerCollapsed}
@@ -101,7 +101,7 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
 
             <div
                 className={cn(
-                    'h-20 border-t border-border/50 bg-background/80 px-4 backdrop-blur-md transition-transform duration-300 ease-out',
+                    'h-20 border-t border-border/40 bg-background/70 px-4 backdrop-blur-xl transition-transform duration-300 ease-out',
                     'flex items-center justify-between',
                     isPlayerCollapsed && 'translate-y-full pointer-events-none'
                 )}
