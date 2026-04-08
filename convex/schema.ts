@@ -20,6 +20,25 @@ export default defineSchema({
     name: v.string(),
   }).index("by_name", ["name"]),
 
+  courseLanguages: defineTable({
+    name: v.string(),
+  }).index("by_name", ["name"]),
+
+  courseInstructors: defineTable({
+    name: v.string(),
+  }).index("by_name", ["name"]),
+
+  academyCourses: defineTable({
+    name: v.string(),
+    youtubeUrl: v.string(),
+    youtubeVideoId: v.string(),
+    languageId: v.id("courseLanguages"),
+    instructorId: v.id("courseInstructors"),
+    description: v.string(),
+  })
+    .index("by_language", ["languageId"])
+    .index("by_instructor", ["instructorId"]),
+
   shortReactions: defineTable({
     tokenIdentifier: v.string(),
     videoId: v.string(),
