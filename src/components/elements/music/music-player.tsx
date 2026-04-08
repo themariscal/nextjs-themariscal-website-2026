@@ -90,7 +90,7 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
                     onClick={togglePlayerCollapsed}
                     aria-label={isPlayerCollapsed ? 'Mostrar reproductor de musica' : 'Ocultar reproductor de musica'}
                 >
-                    <Music2 className="h-4 w-4" />
+                    {isPlayerCollapsed && <Music2 className="h-4 w-4" />}
                     {isPlayerCollapsed ? (
                         <ChevronUp className="h-4 w-4" />
                     ) : (
