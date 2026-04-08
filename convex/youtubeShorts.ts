@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { paginationOptsValidator } from "convex/server";
 
 export const getByPage = query({
   args: {
@@ -11,6 +12,20 @@ export const getByPage = query({
       .withIndex("byPage", (q) => q.eq("page", args.page))
       .order("asc")
       .collect();
+  },
+});
+
+export const getByPagePaginated = query({
+  args: {
+    page: v.string(),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("youtubeShorts")
+      .withIndex("byPage", (q) => q.eq("page", args.page))
+      .order("desc")
+      .paginate(args.paginationOpts);
   },
 });
 
