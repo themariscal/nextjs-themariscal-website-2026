@@ -73,6 +73,15 @@ export const getByVideoId = query({
   },
 });
 
+export const getById = query({
+  args: {
+    id: v.id("youtubeShorts"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const create = mutation({
   args: {
     videoId: v.string(),
@@ -94,12 +103,21 @@ export const update = mutation({
   args: {
     id: v.id("youtubeShorts"),
     title: v.optional(v.string()),
+    page: v.optional(v.string()),
+    videoId: v.optional(v.string()),
     order: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const { id, ...fields } = args;
-    const patch: Partial<{ title: string; order: number }> = {};
+    const patch: Partial<{
+      title: string;
+      page: string;
+      videoId: string;
+      order: number;
+    }> = {};
     if (fields.title !== undefined) patch.title = fields.title;
+    if (fields.page !== undefined) patch.page = fields.page;
+    if (fields.videoId !== undefined) patch.videoId = fields.videoId;
     if (fields.order !== undefined) patch.order = fields.order;
     await ctx.db.patch(id, patch);
   },

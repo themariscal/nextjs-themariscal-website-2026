@@ -184,7 +184,15 @@ export default function AdminShortsPage() {
                 </div>
 
                 <DialogFooter className="mt-8">
-                  <Button variant="outline">Editar</Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setDialogOpen(false);
+                      router.push(`/${locale}/admin/shorts/${selectedShort._id}/edit`);
+                    }}
+                  >
+                    Editar
+                  </Button>
                   <Button
                     onClick={() => {
                       setDialogOpen(false);
