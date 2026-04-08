@@ -25,9 +25,11 @@ export default defineSchema({
     text: v.string(),
     authorName: v.optional(v.string()),
     authorImage: v.optional(v.string()),
+    parentId: v.optional(v.id("shortComments")),
   })
     .index("by_video", ["videoId"])
-    .index("by_token", ["tokenIdentifier"]),
+    .index("by_token", ["tokenIdentifier"])
+    .index("by_parent", ["parentId"]),
 
   users: defineTable({
     externalId: v.string(),

@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "#convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { CommentsDialog } from "@/components/dialogs/shorts/comments-dialog";
+import { RequireAuth } from "@/components/auth/require-auth";
 
 const ShortsPlayerPage = () => {
   const params = useParams();
@@ -159,48 +160,52 @@ const ShortsPlayerPage = () => {
           <div className="flex flex-col items-center gap-5 pb-2">
 
             {/* Like */}
-            <button
-              onClick={() => handleReaction("like")}
-              className="flex flex-col items-center gap-1 group"
-              title="Me gusta"
-            >
-              <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-                myReaction === "like"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted group-hover:bg-muted/70"
-              )}>
-                <ThumbsUp className={cn(
-                  "w-5 h-5 transition-colors",
-                  myReaction === "like" ? "text-primary-foreground" : "text-foreground"
-                )} />
-              </div>
-              <span className="text-[10px] text-muted-foreground">
-                {formatCount(reactionCounts?.likes ?? 0) ?? "Me gusta"}
-              </span>
-            </button>
+            <RequireAuth mode="wrap">
+              <button
+                onClick={() => handleReaction("like")}
+                className="flex flex-col items-center gap-1 group"
+                title="Me gusta"
+              >
+                <div className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+                  myReaction === "like"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted group-hover:bg-muted/70"
+                )}>
+                  <ThumbsUp className={cn(
+                    "w-5 h-5 transition-colors",
+                    myReaction === "like" ? "text-primary-foreground" : "text-foreground"
+                  )} />
+                </div>
+                <span className="text-[10px] text-muted-foreground">
+                  {formatCount(reactionCounts?.likes ?? 0) ?? "Me gusta"}
+                </span>
+              </button>
+            </RequireAuth>
 
             {/* Dislike */}
-            <button
-              onClick={() => handleReaction("dislike")}
-              className="flex flex-col items-center gap-1 group"
-              title="No me gusta"
-            >
-              <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-                myReaction === "dislike"
-                  ? "bg-destructive text-destructive-foreground"
-                  : "bg-muted group-hover:bg-muted/70"
-              )}>
-                <ThumbsDown className={cn(
-                  "w-5 h-5 transition-colors",
-                  myReaction === "dislike" ? "text-destructive-foreground" : "text-foreground"
-                )} />
-              </div>
-              <span className="text-[10px] text-muted-foreground">
-                {formatCount(reactionCounts?.dislikes ?? 0) ?? "No me gusta"}
-              </span>
-            </button>
+            <RequireAuth mode="wrap">
+              <button
+                onClick={() => handleReaction("dislike")}
+                className="flex flex-col items-center gap-1 group"
+                title="No me gusta"
+              >
+                <div className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+                  myReaction === "dislike"
+                    ? "bg-destructive text-destructive-foreground"
+                    : "bg-muted group-hover:bg-muted/70"
+                )}>
+                  <ThumbsDown className={cn(
+                    "w-5 h-5 transition-colors",
+                    myReaction === "dislike" ? "text-destructive-foreground" : "text-foreground"
+                  )} />
+                </div>
+                <span className="text-[10px] text-muted-foreground">
+                  {formatCount(reactionCounts?.dislikes ?? 0) ?? "No me gusta"}
+                </span>
+              </button>
+            </RequireAuth>
 
             {/* Comments */}
             <CommentsDialog videoId={videoId}>

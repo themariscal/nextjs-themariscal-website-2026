@@ -5,6 +5,7 @@ export const addComment = mutation({
   args: {
     videoId: v.string(),
     text: v.string(),
+    parentId: v.optional(v.id("shortComments")),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -20,6 +21,7 @@ export const addComment = mutation({
       text,
       authorName: identity.nickname ?? identity.name ?? "Usuario",
       authorImage: identity.pictureUrl,
+      parentId: args.parentId,
     });
   },
 });
@@ -32,7 +34,7 @@ export const getComments = query({
     return await ctx.db
       .query("shortComments")
       .withIndex("by_video", (q) => q.eq("videoId", args.videoId))
-      .order("desc")
-      .take(100);
+      .order("asc")
+      .take(200);
   },
 });
