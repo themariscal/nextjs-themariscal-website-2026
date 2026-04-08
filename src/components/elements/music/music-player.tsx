@@ -66,7 +66,7 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
 
     return (
         <div className={cn(
-            'fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border',
+            'fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border/50',
             'h-20 px-4 flex items-center justify-between',
             className
         )}>
