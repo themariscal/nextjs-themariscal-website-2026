@@ -61,3 +61,8 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 2. Use `detect_changes` for code review.
 3. Use `get_affected_flows` to understand impact.
 4. Use `query_graph` pattern="tests_for" to check coverage.
+
+## Admin UI Memory
+
+- Todo lo que sea del área `admin` debe usar layout centrado por defecto.
+- Las nuevas páginas de `admin` deben mantener el contenido dentro de un contenedor centrado y consistente.
