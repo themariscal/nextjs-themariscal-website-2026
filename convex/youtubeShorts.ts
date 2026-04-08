@@ -158,6 +158,29 @@ export const getById = query({
   },
 });
 
+export const getBySectionForOrdering = query({
+  args: {
+    section: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (!args.section.trim()) return [];
+
+    const bySection = await ctx.db
+      .query("youtubeShorts")
+      .withIndex("bySectionAndOrder", (q) => q.eq("section", args.section))
+      .order("asc")
+      .collect();
+
+    if (bySection.length > 0) return bySection;
+
+    return await ctx.db
+      .query("youtubeShorts")
+      .withIndex("byPageAndOrder", (q) => q.eq("page", args.section))
+      .order("asc")
+      .collect();
+  },
+});
+
 export const create = mutation({
   args: {
     videoId: v.string(),
@@ -175,6 +198,23 @@ export const create = mutation({
       page: normalizedSection,
       order: args.order,
     });
+  },
+});
+
+export const bulkUpdateOrder = mutation({
+  args: {
+    items: v.array(
+      v.object({
+        id: v.id("youtubeShorts"),
+        order: v.number(),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    for (const item of args.items) {
+      await ctx.db.patch(item.id, { order: item.order });
+    }
+    return { updated: args.items.length };
   },
 });
 
