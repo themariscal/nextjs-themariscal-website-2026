@@ -12,7 +12,12 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "#convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { CommentsDialog } from "@/components/dialogs/shorts/comments-dialog";
-import { RequireAuth } from "@/components/auth/require-auth";
+import { useUser } from "@clerk/nextjs";
+import { toast } from "react-toastify";
+import { ResponsiveDialog } from "@/components/dialogs/layout";
+import { LoginContent } from "@/components/dialogs/auth/login-content";
+
+const PENDING_REACTION_KEY = "pendingShortReaction";
 
 const ShortsPlayerPage = () => {
   const params = useParams();
@@ -21,11 +26,44 @@ const ShortsPlayerPage = () => {
   const page = params?.page as string;
   const locale = (params?.locale as string) ?? "en";
 
+  const { isSignedIn, isLoaded } = useUser();
+
   const short = useQuery(api.youtubeShorts.getByVideoId, { videoId });
   const allShorts = useQuery(api.youtubeShorts.getByPage, { page });
   const myReaction = useQuery(api.youtubeShorts.getMyReaction, { videoId });
   const reactionCounts = useQuery(api.youtubeShorts.getReactionCounts, { videoId });
   const toggleReaction = useMutation(api.youtubeShorts.toggleReaction);
+
+  const [loginOpen, setLoginOpen] = useState(false);
+
+  // After OAuth redirect back: execute pending reaction + show toast
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+    const raw = localStorage.getItem(PENDING_REACTION_KEY);
+    if (!raw) return;
+    try {
+      const pending = JSON.parse(raw) as { videoId: string; reaction: "like" | "dislike"; timestamp: number };
+      const isRecent = Date.now() - pending.timestamp < 2 * 60 * 1000; // 2 minutes
+      if (pending.videoId === videoId && isRecent) {
+        localStorage.removeItem(PENDING_REACTION_KEY);
+        (async () => {
+          try {
+            await toggleReaction({ videoId, reaction: pending.reaction });
+            toast.success(
+              pending.reaction === "like"
+                ? "¡Me gusta registrado con éxito!"
+                : "No me gusta registrado con éxito",
+              { autoClose: 3000 }
+            );
+          } catch {
+            toast.error("No se pudo registrar la reacción");
+          }
+        })();
+      }
+    } catch {
+      localStorage.removeItem(PENDING_REACTION_KEY);
+    }
+  }, [isLoaded, isSignedIn, videoId]);
 
   const currentIndex = allShorts?.findIndex((s) => s.videoId === videoId) ?? -1;
   const prevShort = allShorts && currentIndex > 0 ? allShorts[currentIndex - 1] : null;
@@ -99,6 +137,14 @@ const ShortsPlayerPage = () => {
   }, []);
 
   const handleReaction = (reaction: "like" | "dislike") => {
+    if (!isSignedIn) {
+      localStorage.setItem(
+        PENDING_REACTION_KEY,
+        JSON.stringify({ videoId, reaction, timestamp: Date.now() })
+      );
+      setLoginOpen(true);
+      return;
+    }
     toggleReaction({ videoId, reaction });
   };
 
@@ -160,52 +206,48 @@ const ShortsPlayerPage = () => {
           <div className="flex flex-col items-center gap-5 pb-2">
 
             {/* Like */}
-            <RequireAuth mode="wrap">
-              <button
-                onClick={() => handleReaction("like")}
-                className="flex flex-col items-center gap-1 group"
-                title="Me gusta"
-              >
-                <div className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-                  myReaction === "like"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted group-hover:bg-muted/70"
-                )}>
-                  <ThumbsUp className={cn(
-                    "w-5 h-5 transition-colors",
-                    myReaction === "like" ? "text-primary-foreground" : "text-foreground"
-                  )} />
-                </div>
-                <span className="text-[10px] text-muted-foreground">
-                  {formatCount(reactionCounts?.likes ?? 0) ?? "Me gusta"}
-                </span>
-              </button>
-            </RequireAuth>
+            <button
+              onClick={() => handleReaction("like")}
+              className="flex flex-col items-center gap-1 group"
+              title="Me gusta"
+            >
+              <div className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+                myReaction === "like"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted group-hover:bg-muted/70"
+              )}>
+                <ThumbsUp className={cn(
+                  "w-5 h-5 transition-colors",
+                  myReaction === "like" ? "text-primary-foreground" : "text-foreground"
+                )} />
+              </div>
+              <span className="text-[10px] text-muted-foreground">
+                {formatCount(reactionCounts?.likes ?? 0) ?? "Me gusta"}
+              </span>
+            </button>
 
             {/* Dislike */}
-            <RequireAuth mode="wrap">
-              <button
-                onClick={() => handleReaction("dislike")}
-                className="flex flex-col items-center gap-1 group"
-                title="No me gusta"
-              >
-                <div className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-                  myReaction === "dislike"
-                    ? "bg-destructive text-destructive-foreground"
-                    : "bg-muted group-hover:bg-muted/70"
-                )}>
-                  <ThumbsDown className={cn(
-                    "w-5 h-5 transition-colors",
-                    myReaction === "dislike" ? "text-destructive-foreground" : "text-foreground"
-                  )} />
-                </div>
-                <span className="text-[10px] text-muted-foreground">
-                  {formatCount(reactionCounts?.dislikes ?? 0) ?? "No me gusta"}
-                </span>
-              </button>
-            </RequireAuth>
+            <button
+              onClick={() => handleReaction("dislike")}
+              className="flex flex-col items-center gap-1 group"
+              title="No me gusta"
+            >
+              <div className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+                myReaction === "dislike"
+                  ? "bg-destructive text-destructive-foreground"
+                  : "bg-muted group-hover:bg-muted/70"
+              )}>
+                <ThumbsDown className={cn(
+                  "w-5 h-5 transition-colors",
+                  myReaction === "dislike" ? "text-destructive-foreground" : "text-foreground"
+                )} />
+              </div>
+              <span className="text-[10px] text-muted-foreground">
+                {formatCount(reactionCounts?.dislikes ?? 0) ?? "No me gusta"}
+              </span>
+            </button>
 
             {/* Comments */}
             <CommentsDialog videoId={videoId}>
@@ -249,6 +291,15 @@ const ShortsPlayerPage = () => {
 
         </div>
       </div>
+
+      {/* Login dialog — opens programmatically when reacting while not signed in */}
+      <ResponsiveDialog
+        isOpen={loginOpen}
+        setIsOpen={setLoginOpen}
+        content={<LoginContent setDialogIsOpen={setLoginOpen} />}
+      >
+        <span className="sr-only" />
+      </ResponsiveDialog>
     </MainLayout>
   );
 };

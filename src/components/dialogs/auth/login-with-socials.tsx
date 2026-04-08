@@ -21,7 +21,7 @@ export function LoginWithSocials({
   const [isTikTokLoading, setTikTokLoading] = useState(false);
   const { signIn, setActive, isLoaded } = useSignIn();
   const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get('redirect_url');
+  const redirectUrl = searchParams.get('redirect_url') ?? (typeof window !== 'undefined' ? window.location.pathname : '/');
   const t = useTranslations("auth");
 
   async function handleLoginWithGoogle() {
