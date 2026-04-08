@@ -253,6 +253,8 @@ function CourseHero({
 }
 
 function CourseMainContent({ courseData }: { courseData: PublicCourseData | null | undefined }) {
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
   const stats = useMemo(() => {
     const sections = courseData?.sections ?? [];
 
@@ -496,6 +498,42 @@ function CourseMainContent({ courseData }: { courseData: PublicCourseData | null
                   <li>Creators and founders building AI-powered solutions.</li>
                 </ul>
               </section>
+
+              {isDescriptionExpanded ? (
+                <section className="space-y-4 border-t border-border/60 pt-6">
+                  <p className="text-foreground font-semibold">More details</p>
+                  <p>
+                    You will also work with guided mini-projects that simulate real product
+                    workflows, from defining a problem statement to implementing an AI-assisted
+                    feature with clear success metrics.
+                  </p>
+                  <p>
+                    The learning path is progressive: each module builds on the previous one so
+                    you can move from fundamentals to applied implementation without gaps.
+                  </p>
+                  <ul className="list-disc space-y-1 pl-5">
+                    <li>Weekly practical checkpoints and review prompts.</li>
+                    <li>Templates to structure your own AI experiments.</li>
+                    <li>Clear next steps to continue after finishing the course.</li>
+                  </ul>
+                </section>
+              ) : null}
+
+              <div className="border-t border-border/60 pt-5">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="cursor-pointer px-0 text-primary hover:text-primary"
+                  onClick={() => setIsDescriptionExpanded((prev) => !prev)}
+                >
+                  {isDescriptionExpanded ? "Mostrar menos" : "Mostrar más"}
+                  {isDescriptionExpanded ? (
+                    <ChevronDown className="size-4 rotate-180" />
+                  ) : (
+                    <ChevronDown className="size-4" />
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
       </div>
