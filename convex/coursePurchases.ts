@@ -89,7 +89,8 @@ export const enrollForFree = mutation({
 });
 
 /**
- * Returns true if the authenticated user has a completed purchase for this course.
+ * Returns true if the authenticated user has access to this course.
+ * Access = individual purchase OR (active premium sub AND course.includedInPremium).
  */
 export const hasPurchasedCourse = query({
   args: {
@@ -99,7 +100,7 @@ export const hasPurchasedCourse = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return false;
 
-    // Check by userId (requires user to exist in our users table)
+    // Check individual purchase by userId
     const user = await ctx.db
       .query("users")
       .withIndex("byExternalId", (q) => q.eq("externalId", identity.subject))
@@ -115,7 +116,7 @@ export const hasPurchasedCourse = query({
       if (byUser?.status === "completed") return true;
     }
 
-    // Check by email (covers guest purchases not yet linked to an account)
+    // Check by email (guest purchases not yet linked to account)
     const email = identity.email;
     if (email) {
       const byEmail = await ctx.db
@@ -125,6 +126,16 @@ export const hasPurchasedCourse = query({
         )
         .first();
       if (byEmail?.status === "completed") return true;
+    }
+
+    // Check premium subscription + course flag
+    const course = await ctx.db.get(args.courseId);
+    if (course?.includedInPremium) {
+      const subscription = await ctx.db
+        .query("subscriptions")
+        .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", identity.subject))
+        .unique();
+      if (subscription?.status === "active") return true;
     }
 
     return false;
