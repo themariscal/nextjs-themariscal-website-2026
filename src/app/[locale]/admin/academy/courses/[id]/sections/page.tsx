@@ -14,6 +14,7 @@ import { useQuery } from "convex/react";
 import {
   ArrowLeft,
   ChevronDown,
+  ExternalLink,
   FileQuestion,
   FileText,
   Link2,
@@ -41,10 +42,14 @@ type SectionWithElements = {
 };
 
 function formatPrice(price?: number, currency?: string): string {
-  if (!price || price === 0) return "Gratis";
-  const amount = price / 100;
-  const symbol = currency?.toUpperCase() === "USD" ? "$" : "€";
-  return `${symbol}${amount.toFixed(2)} ${(currency ?? "eur").toUpperCase()}`;
+  if (!price) return "Gratis";
+  const cur = (currency ?? "eur").toUpperCase();
+  const formatted = new Intl.NumberFormat("es-ES", {
+    style: "currency",
+    currency: cur,
+    minimumFractionDigits: 2,
+  }).format(price / 100);
+  return `${formatted} ${cur}`;
 }
 
 function parseDurationToSeconds(value?: string): number {
@@ -158,8 +163,15 @@ export default function AdminAcademyCourseSectionsPage() {
             <Button
               variant="outline"
               className="cursor-pointer"
-              onClick={() => window.open(`https://dashboard.stripe.com/test/products/${course.stripeProductId}`, "_blank")}
+              onClick={() =>
+                window.open(
+                  `https://dashboard.stripe.com/test/products/${course.stripeProductId}`,
+                  "_blank",
+                  "noopener,noreferrer"
+                )
+              }
             >
+              <ExternalLink className="size-4" />
               Ver en Stripe
             </Button>
           )}
