@@ -962,6 +962,10 @@ function CoursePurchaseSidebar({
 }) {
   const [isBuying, setIsBuying] = useState(false);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
+  const purchaseCourse = useMutation(api.academyCourses.purchaseCourse);
   const previewVideos = useMemo(
     () => (courseData ? getPreviewVideos(courseData) : []),
     [courseData]
@@ -980,12 +984,80 @@ function CoursePurchaseSidebar({
     setActivePreviewVideoId(courseData?.youtubeVideoId ?? "");
   }, [courseData?.youtubeVideoId]);
 
+<<<<<<< HEAD
+=======
+  const discountsByCoupon: Record<string, number> = {
+    MT260406G3NEW: 0.27,
+    MARISCAL10: 0.1,
+    ACADEMY15: 0.15,
+  };
+
+  const finalPrice = appliedCoupon
+    ? COURSE_BASE_PRICE * (1 - appliedCoupon.discount)
+    : COURSE_BASE_PRICE;
+
+  useEffect(() => {
+    if (!snackbarMessage) return;
+    const timeout = setTimeout(() => {
+      setSnackbarMessage(null);
+    }, 3200);
+
+    return () => clearTimeout(timeout);
+  }, [snackbarMessage]);
+
+>>>>>>> develop
   if (courseData === undefined) {
     return <Skeleton className="h-[560px] w-full" />;
   }
 
   if (!courseData) return null;
 
+<<<<<<< HEAD
+=======
+  const handleApplyCoupon = () => {
+    const normalized = couponCode.trim().toUpperCase();
+    if (!normalized) {
+      setCouponError("Ingresá un cupón.");
+      return;
+    }
+
+    const discount = discountsByCoupon[normalized];
+    if (!discount) {
+      setCouponError("Cupón inválido.");
+      setAppliedCoupon(null);
+      return;
+    }
+
+    setAppliedCoupon({ code: normalized, discount });
+    setCouponError(null);
+  };
+
+  const handleBuyNowClick = () => {
+    setPurchaseDialogOpen(true);
+  };
+
+  const handleConfirmPurchase = async () => {
+    if (!courseData || isPurchasing) return;
+
+    try {
+      setIsPurchasing(true);
+      const result = await purchaseCourse({ courseId: courseData._id });
+
+      if (result.status === "already_owned") {
+        setSnackbarMessage("Ya tienes este curso en Mis Cursos");
+      } else {
+        setSnackbarMessage("Tu curso se agregó correctamente");
+      }
+
+      setPurchaseDialogOpen(false);
+    } catch {
+      setSnackbarMessage("No se pudo adquirir el curso. Intenta de nuevo.");
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
+
+>>>>>>> develop
   return (
     <>
       <Card className="overflow-hidden border-border/70 bg-background/95">
@@ -1035,11 +1107,48 @@ function CoursePurchaseSidebar({
           </div>
 
           <div className="space-y-2">
+<<<<<<< HEAD
             {hasPurchased === undefined ? (
               <Skeleton className="h-10 w-full" />
             ) : hasPurchased ? (
               <Button className="w-full cursor-pointer" disabled>
                 Continuar aprendiendo
+=======
+            <Button className="w-full cursor-pointer">Add to cart</Button>
+            <Button
+              variant="outline"
+              className="w-full cursor-pointer"
+              onClick={handleBuyNowClick}
+            >
+              Buy now
+            </Button>
+          </div>
+
+          <div className="space-y-2 border-t border-border/60 pt-3">
+            <p className="text-sm text-muted-foreground">Subscribe and save</p>
+            <div className="text-2xl font-bold">From €10.00 <span className="text-sm font-normal text-muted-foreground">/month</span></div>
+          </div>
+
+          <div className="space-y-3 border-t border-border/60 pt-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium underline underline-offset-2">Apply Coupon</p>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Tag className="size-4" />
+                <Share2 className="size-4" />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Input
+                value={couponCode}
+                onChange={(event) => setCouponCode(event.target.value)}
+                placeholder="Enter Coupon"
+                className="h-9"
+              />
+              <Button type="button" variant="outline" className="h-9" onClick={handleApplyCoupon}>
+                <BadgePercent className="size-4" />
+                Apply
+>>>>>>> develop
               </Button>
             ) : !courseData.price || courseData.price === 0 ? (
               <Button
@@ -1165,6 +1274,33 @@ function CoursePurchaseSidebar({
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={purchaseDialogOpen} onOpenChange={setPurchaseDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>¿Deseas adquirir este curso?</DialogTitle>
+            <DialogDescription>{courseData.name}</DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setPurchaseDialogOpen(false)}
+              disabled={isPurchasing}
+            >
+              Cancelar
+            </Button>
+            <Button onClick={handleConfirmPurchase} disabled={isPurchasing}>
+              {isPurchasing ? "Adquiriendo..." : "Adquirir"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {snackbarMessage ? (
+        <div className="fixed bottom-4 right-4 z-[90] rounded-md border border-border bg-background/95 px-4 py-3 text-sm shadow-xl backdrop-blur">
+          {snackbarMessage}
+        </div>
+      ) : null}
     </>
   );
 }
