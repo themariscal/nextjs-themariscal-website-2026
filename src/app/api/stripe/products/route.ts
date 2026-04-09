@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { stripe } from "@/lib/stripe";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "#convex/_generated/api";
@@ -14,6 +15,15 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL);
  * Body: { courseId: string, name: string, price: number (cents), currency: string }
  */
 export async function POST(req: NextRequest) {
+  const { userId, has } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const isAdmin = has?.({ permission: "org:admin" }) || has?.({ role: "org:admin" });
+  if (!isAdmin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   try {
     const body = (await req.json()) as {
       courseId: string;
@@ -62,6 +72,15 @@ export async function POST(req: NextRequest) {
  * Body: { courseId: string, stripeProductId: string, newPrice: number (cents), currency: string }
  */
 export async function PATCH(req: NextRequest) {
+  const { userId, has } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const isAdmin = has?.({ permission: "org:admin" }) || has?.({ role: "org:admin" });
+  if (!isAdmin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   try {
     const body = (await req.json()) as {
       courseId: string;
