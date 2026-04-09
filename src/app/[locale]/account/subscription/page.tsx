@@ -3,8 +3,8 @@
 import { useQuery } from "convex/react";
 import { api } from "#convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
-import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
 import { Crown, Calendar, CreditCard, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,8 +16,25 @@ export default function SubscriptionPage() {
   const offerings = useQuery(api.subscriptionOfferings.listOfferings);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
   const params = useParams();
+  const searchParams = useSearchParams();
   const locale = params.locale as string;
+
+  useEffect(() => {
+    if (searchParams.get("success") !== "true") return;
+    setSyncing(true);
+    fetch("/api/revenuecat/sync", { method: "POST" })
+      .then(() => {
+        // Hard navigate to clean URL to pick up updated Clerk metadata + Convex subscription
+        window.location.href = `/${locale}/account/subscription`;
+      })
+      .catch((err) => {
+        console.error("RC sync failed", err);
+        setSyncing(false);
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isPremium = (user?.publicMetadata as { isPremium?: boolean })?.isPremium === true;
   const activeOffering = offerings?.find((o) => o.isActive);
@@ -45,6 +62,15 @@ export default function SubscriptionPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (syncing) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 text-center">
+        <Crown className="size-8 text-amber-500 mx-auto mb-4 animate-pulse" />
+        <p className="text-muted-foreground">Activando tu suscripción...</p>
+      </div>
+    );
   }
 
   if (isPremium && subscription) {

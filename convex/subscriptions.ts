@@ -1,4 +1,5 @@
 import { internalMutation, mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { v } from "convex/values";
 
 /**
@@ -58,6 +59,37 @@ export const getMySubscription = query({
       .query("subscriptions")
       .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", identity.subject))
       .unique();
+  },
+});
+
+/**
+ * Temporary: called from /api/revenuecat/sync when webhooks aren't available.
+ * Validates the caller is the same user being synced.
+ * Remove once webhooks are live.
+ */
+export const syncSubscriptionFromRC = mutation({
+  args: {
+    revenueCatCustomerId: v.string(),
+    productIdentifier: v.string(),
+    entitlementId: v.string(),
+    status: v.union(
+      v.literal("active"),
+      v.literal("expired"),
+      v.literal("cancelled"),
+      v.literal("billing_issue")
+    ),
+    planType: v.union(v.literal("monthly"), v.literal("annual")),
+    currentPeriodEnd: v.number(),
+    revenueCatEventType: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    await ctx.runMutation(internal.subscriptions.upsertSubscription, {
+      clerkUserId: identity.subject,
+      ...args,
+    });
   },
 });
 
