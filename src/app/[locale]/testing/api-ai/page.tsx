@@ -2,6 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import { Check, Copy } from "lucide-react";
 
 const VPS_BASE = "http://kact3j9asa5t056a6tawpsuw.187.77.87.209.sslip.io";
 
@@ -10,6 +14,93 @@ type Message = {
   content: string;
   service?: string;
 };
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded hover:bg-muted-foreground/20 text-muted-foreground hover:text-foreground"
+      title="Copiar"
+    >
+      {copied ? <Check size={14} /> : <Copy size={14} />}
+    </button>
+  );
+}
+
+function MessageBubble({ msg }: { msg: Message }) {
+  const isUser = msg.role === "user";
+
+  return (
+    <div className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}>
+      {!isUser && msg.service && (
+        <span className="text-xs text-muted-foreground mb-1 px-1">{msg.service}</span>
+      )}
+      <div className={`group relative max-w-[85%] ${isUser ? "flex flex-row-reverse gap-1.5" : "flex flex-row gap-1.5"}`}>
+        <div
+          className={`rounded-lg px-4 py-2.5 text-sm ${
+            isUser
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted text-foreground"
+          }`}
+        >
+          {isUser ? (
+            <span className="whitespace-pre-wrap">{msg.content}</span>
+          ) : msg.content ? (
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeHighlight]}
+              components={{
+                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                h1: ({ children }) => <h1 className="text-lg font-bold mt-3 mb-1">{children}</h1>,
+                h2: ({ children }) => <h2 className="text-base font-bold mt-3 mb-1">{children}</h2>,
+                h3: ({ children }) => <h3 className="text-sm font-bold mt-2 mb-1">{children}</h3>,
+                ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-0.5">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-0.5">{children}</ol>,
+                li: ({ children }) => <li className="text-sm">{children}</li>,
+                code: ({ className, children, ...props }) => {
+                  const isBlock = className?.includes("language-");
+                  return isBlock ? (
+                    <code className={`${className} block rounded text-xs`} {...props}>{children}</code>
+                  ) : (
+                    <code className="bg-black/20 rounded px-1 py-0.5 text-xs font-mono" {...props}>{children}</code>
+                  );
+                },
+                pre: ({ children }) => (
+                  <pre className="rounded-lg overflow-x-auto my-2 p-3 bg-black/30 text-xs">{children}</pre>
+                ),
+                table: ({ children }) => (
+                  <div className="overflow-x-auto my-2">
+                    <table className="border-collapse text-xs w-full">{children}</table>
+                  </div>
+                ),
+                th: ({ children }) => <th className="border border-muted-foreground/30 px-2 py-1 font-semibold bg-black/20">{children}</th>,
+                td: ({ children }) => <td className="border border-muted-foreground/30 px-2 py-1">{children}</td>,
+                blockquote: ({ children }) => <blockquote className="border-l-2 border-muted-foreground/40 pl-3 italic my-2 text-muted-foreground">{children}</blockquote>,
+                hr: () => <hr className="border-muted-foreground/20 my-2" />,
+                strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+              }}
+            >
+              {msg.content}
+            </ReactMarkdown>
+          ) : (
+            <span className="animate-pulse text-muted-foreground">▋</span>
+          )}
+        </div>
+        <div className="self-start pt-1.5">
+          {msg.content && <CopyButton text={msg.content} />}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ApiAiPage() {
   const { getToken } = useAuth();
@@ -25,7 +116,6 @@ export default function ApiAiPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Load available services on mount
   useEffect(() => {
     async function loadServices() {
       try {
@@ -38,7 +128,7 @@ export default function ApiAiPage() {
           setAvailableServices(data.services);
         }
       } catch {
-        // Non-critical, silently ignore
+        // Non-critical
       }
     }
     loadServices();
@@ -64,12 +154,10 @@ export default function ApiAiPage() {
         return;
       }
 
-      const body: { messages: Message[]; service?: string } = {
+      const body: { messages: { role: string; content: string }[]; service?: string } = {
         messages: updatedMessages.map(({ role, content }) => ({ role, content })),
       };
       if (selectedService !== "auto") body.service = selectedService;
-
-      console.log("[API AI] Enviando a:", `${VPS_BASE}/chat`, "| servicio:", selectedService);
 
       const res = await fetch(`${VPS_BASE}/chat`, {
         method: "POST",
@@ -79,8 +167,6 @@ export default function ApiAiPage() {
         },
         body: JSON.stringify(body),
       });
-
-      console.log("[API AI] Status:", res.status, "| CORS:", res.headers.get("access-control-allow-origin"));
 
       if (res.status === 401) {
         setError("No autorizado — verifica tu sesión Clerk.");
@@ -100,8 +186,6 @@ export default function ApiAiPage() {
       }
 
       const serviceUsed = res.headers.get("x-service-used") ?? undefined;
-
-      // Add empty assistant message to fill via streaming
       setMessages((prev) => [...prev, { role: "assistant", content: "", service: serviceUsed }]);
 
       const reader = res.body.getReader();
@@ -114,16 +198,11 @@ export default function ApiAiPage() {
         accumulated += decoder.decode(value, { stream: true });
         setMessages((prev) => {
           const updated = [...prev];
-          updated[updated.length - 1] = {
-            role: "assistant",
-            content: accumulated,
-            service: serviceUsed,
-          };
+          updated[updated.length - 1] = { role: "assistant", content: accumulated, service: serviceUsed };
           return updated;
         });
       }
     } catch (e) {
-      console.error("[API AI] Error:", e);
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.toLowerCase().includes("failed to fetch") || msg.toLowerCase().includes("networkerror")) {
         setError("Error de red — CORS o servidor caído. Detalle: " + msg);
@@ -144,7 +223,6 @@ export default function ApiAiPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-6rem)]">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">API AI — Test</h1>
         <select
@@ -160,7 +238,6 @@ export default function ApiAiPage() {
         </select>
       </div>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
         {messages.length === 0 && (
           <p className="text-muted-foreground text-sm">
@@ -168,25 +245,7 @@ export default function ApiAiPage() {
           </p>
         )}
         {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}
-          >
-            {msg.role === "assistant" && msg.service && (
-              <span className="text-xs text-muted-foreground mb-1 px-1">{msg.service}</span>
-            )}
-            <div
-              className={`rounded-lg px-4 py-2 max-w-[80%] whitespace-pre-wrap text-sm ${
-                msg.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-foreground"
-              }`}
-            >
-              {msg.content || (
-                <span className="animate-pulse text-muted-foreground">▋</span>
-              )}
-            </div>
-          </div>
+          <MessageBubble key={i} msg={msg} />
         ))}
         {error && (
           <div className="rounded-lg px-4 py-2 bg-destructive/10 text-destructive text-sm">
@@ -196,7 +255,6 @@ export default function ApiAiPage() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
       <div className="flex gap-2 items-end">
         <textarea
           className="flex-1 resize-none rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring min-h-[44px] max-h-[160px]"
