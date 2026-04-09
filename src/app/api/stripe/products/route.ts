@@ -4,70 +4,103 @@ import { ConvexHttpClient } from "convex/browser";
 import { api } from "#convex/_generated/api";
 import type { Id } from "#convex/_generated/dataModel";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
+  throw new Error("Missing NEXT_PUBLIC_CONVEX_URL environment variable");
+}
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL);
 
 /**
  * POST: Create a new Stripe Product + Price and save IDs to Convex.
- * Called when admin creates a new paid course or turns a free course into paid.
- *
  * Body: { courseId: string, name: string, price: number (cents), currency: string }
  */
 export async function POST(req: NextRequest) {
-  const { courseId, name, price, currency } = (await req.json()) as {
-    courseId: string;
-    name: string;
-    price: number;
-    currency: string;
-  };
+  try {
+    const body = (await req.json()) as {
+      courseId: string;
+      name: string;
+      price: number;
+      currency: string;
+    };
 
-  const product = await stripe.products.create({ name });
+    const { courseId, name, price, currency } = body;
 
-  const stripePrice = await stripe.prices.create({
-    product: product.id,
-    unit_amount: Math.round(price),
-    currency: currency.toLowerCase(),
-  });
+    if (!courseId || !name || typeof price !== "number" || price < 0 || !currency) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
 
-  await convex.mutation(api.academyCourses.updateStripeIds, {
-    courseId: courseId as Id<"academyCourses">,
-    stripeProductId: product.id,
-    stripePriceId: stripePrice.id,
-  });
+    const product = await stripe.products.create({ name });
 
-  return NextResponse.json({ stripeProductId: product.id, stripePriceId: stripePrice.id });
+    let stripePrice;
+    try {
+      stripePrice = await stripe.prices.create({
+        product: product.id,
+        unit_amount: Math.round(price),
+        currency: currency.toLowerCase(),
+      });
+    } catch (priceErr) {
+      // Roll back: archive the orphaned product
+      await stripe.products.update(product.id, { active: false });
+      throw priceErr;
+    }
+
+    await convex.mutation(api.academyCourses.updateStripeIds, {
+      courseId: courseId as Id<"academyCourses">,
+      stripeProductId: product.id,
+      stripePriceId: stripePrice.id,
+    });
+
+    return NextResponse.json({ stripeProductId: product.id, stripePriceId: stripePrice.id });
+  } catch (err) {
+    console.error("[stripe/products POST]", err);
+    const message = err instanceof Error ? err.message : "Internal error";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
 
 /**
- * PATCH: Archive existing Stripe Price and create a new one (price update).
- * Stripe does not allow editing a Price — you must create a new one.
- *
+ * PATCH: Archive existing Stripe Price and create a new one.
  * Body: { courseId: string, stripeProductId: string, newPrice: number (cents), currency: string }
  */
 export async function PATCH(req: NextRequest) {
-  const { courseId, stripeProductId, newPrice, currency } = (await req.json()) as {
-    courseId: string;
-    stripeProductId: string;
-    newPrice: number;
-    currency: string;
-  };
+  try {
+    const body = (await req.json()) as {
+      courseId: string;
+      stripeProductId: string;
+      newPrice: number;
+      currency: string;
+    };
 
-  // Archive all active prices on this product
-  const activePrices = await stripe.prices.list({ product: stripeProductId, active: true });
-  await Promise.all(activePrices.data.map((p) => stripe.prices.update(p.id, { active: false })));
+    const { courseId, stripeProductId, newPrice, currency } = body;
 
-  // Create new price
-  const stripePrice = await stripe.prices.create({
-    product: stripeProductId,
-    unit_amount: Math.round(newPrice),
-    currency: currency.toLowerCase(),
-  });
+    if (!courseId || !stripeProductId || typeof newPrice !== "number" || newPrice < 0 || !currency) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
 
-  await convex.mutation(api.academyCourses.updateStripePriceId, {
-    courseId: courseId as Id<"academyCourses">,
-    stripePriceId: stripePrice.id,
-    price: Math.round(newPrice),
-    currency: currency.toLowerCase(),
-  });
+    // Archive all active prices (limit: 100 covers all practical cases)
+    const activePrices = await stripe.prices.list({
+      product: stripeProductId,
+      active: true,
+      limit: 100,
+    });
+    await Promise.all(activePrices.data.map((p) => stripe.prices.update(p.id, { active: false })));
 
-  return NextResponse.json({ stripePriceId: stripePrice.id });
+    const stripePrice = await stripe.prices.create({
+      product: stripeProductId,
+      unit_amount: Math.round(newPrice),
+      currency: currency.toLowerCase(),
+    });
+
+    await convex.mutation(api.academyCourses.updateStripePriceId, {
+      courseId: courseId as Id<"academyCourses">,
+      stripePriceId: stripePrice.id,
+      price: Math.round(newPrice),
+      currency: currency.toLowerCase(),
+    });
+
+    return NextResponse.json({ stripePriceId: stripePrice.id });
+  } catch (err) {
+    console.error("[stripe/products PATCH]", err);
+    const message = err instanceof Error ? err.message : "Internal error";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
