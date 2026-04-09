@@ -31,6 +31,7 @@ function SuccessContent() {
 
   useEffect(() => {
     if (!sessionId) {
+      setIsVerifying(false);
       router.replace(`/${locale}/academy/courses/${courseSlug}`);
       return;
     }
@@ -50,7 +51,7 @@ function SuccessContent() {
       .finally(() => {
         setIsVerifying(false);
       });
-  }, [sessionId, locale, courseSlug, router]);
+  }, [sessionId, locale, courseSlug]);
 
   if (isVerifying || !isLoaded) {
     return (
