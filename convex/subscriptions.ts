@@ -2,8 +2,7 @@ import { internalMutation, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 /**
- * Called from the RC webhook handler. Upserts subscription state for a user.
- * internalMutation — called only from the Convex RC webhook httpAction in http.ts.
+ * Called from the Convex HTTP action in http.ts.
  * One record per user — patches existing if found, inserts if new.
  */
 export const upsertSubscription = internalMutation({
