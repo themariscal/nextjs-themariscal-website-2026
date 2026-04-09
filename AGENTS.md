@@ -4,6 +4,13 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
+## Git Worktree Rule
+
+- Todos los worktrees nuevos deben crearse dentro de `./.worktrees/` (relativo a raíz del proyecto).
+- No crear worktrees fuera de este repo.
+- Convención sugerida: `git worktree add .worktrees/<nombre-corto> -b <rama>`.
+- Después de crear worktree, copiar `.env.local` de raíz hacia worktree nuevo.
+- Comando sugerido: `cp .env.local .worktrees/<nombre-corto>/.env.local`.
 
 ## YouTube Shorts / Videos
 
