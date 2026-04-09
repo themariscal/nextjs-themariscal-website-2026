@@ -31,6 +31,7 @@ const items = [
       { title: "Hook Purchase", url: "/tester/hookpurchase" },
       { title: "Feature Flags", url: "/tester/feature-flags" },
       { title: "Stripe", url: "/tester/stripe" },
+      { title: "API AI", url: "/testing/api-ai" },
     ],
   },
 ];
