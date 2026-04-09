@@ -65,7 +65,8 @@ export default function AdminAcademyNewCoursePage() {
   type AddInstructorType = z.infer<typeof addInstructorSchema>;
 
   const form = useForm<CreateCourseType, unknown, CreateCourseType>({
-    resolver: zodResolver(createCourseSchema) as never,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(createCourseSchema) as any,
     defaultValues: {
       name: "",
       youtubeUrl: "",
@@ -108,6 +109,8 @@ export default function AdminAcademyNewCoursePage() {
         price: values.price,
         currency: values.currency,
       });
+
+      if (!courseId) throw new Error("No se pudo obtener el ID del curso creado.");
 
       // Create Stripe product if price > 0
       if (values.price && values.price > 0) {
@@ -331,7 +334,7 @@ export default function AdminAcademyNewCoursePage() {
                     step={1}
                     placeholder="4900"
                     value={field.value ?? ""}
-                    onChange={(e) => field.onChange(e.target.value)}
+                    onChange={(e) => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
                   />
                 </FormControl>
                 <FormMessage />
