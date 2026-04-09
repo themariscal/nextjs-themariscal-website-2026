@@ -5,7 +5,7 @@ import { v } from "convex/values";
  * Called from POST /api/stripe/webhook after signature verification.
  * Idempotent — safe to call multiple times with same session.
  */
-export const completePurchase = mutation({
+export const completePurchase = internalMutation({
   args: {
     courseId: v.id("academyCourses"),
     email: v.string(),
@@ -54,6 +54,7 @@ export const enrollForFree = mutation({
     if ((course.price ?? 0) !== 0) throw new Error("Este curso no es gratuito.");
 
     const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Debes iniciar sesión para inscribirte.");
 
     const user = identity
       ? await ctx.db
@@ -79,10 +80,10 @@ export const enrollForFree = mutation({
       courseId: args.courseId,
       userId: user?._id,
       email,
-      stripeSessionId: `free_${args.courseId}_${Date.now()}`,
+      stripeSessionId: `free_${args.courseId}_${user?._id ?? email}`,
       status: "completed",
       amountTotal: 0,
-      currency: "eur",
+      currency: (course.currency ?? "eur").toLowerCase(),
     });
   },
 });
