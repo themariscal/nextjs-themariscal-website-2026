@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import { useMusicStore } from "@/lib/stores/music-store";
 import { useSidebarStore } from "@/lib/stores/sidebar-store";
 import { extractYouTubeVideoId } from "@/lib/youtube-shorts";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import {
   BadgePercent,
   BookOpen,
@@ -956,6 +956,10 @@ function CoursePurchaseSidebar({
     discount: number;
   } | null>(null);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
+  const purchaseCourse = useMutation(api.academyCourses.purchaseCourse);
   const previewVideos = useMemo(
     () => (courseData ? getPreviewVideos(courseData) : []),
     [courseData]
@@ -977,6 +981,15 @@ function CoursePurchaseSidebar({
   const finalPrice = appliedCoupon
     ? COURSE_BASE_PRICE * (1 - appliedCoupon.discount)
     : COURSE_BASE_PRICE;
+
+  useEffect(() => {
+    if (!snackbarMessage) return;
+    const timeout = setTimeout(() => {
+      setSnackbarMessage(null);
+    }, 3200);
+
+    return () => clearTimeout(timeout);
+  }, [snackbarMessage]);
 
   if (courseData === undefined) {
     return <Skeleton className="h-[560px] w-full" />;
@@ -1000,6 +1013,31 @@ function CoursePurchaseSidebar({
 
     setAppliedCoupon({ code: normalized, discount });
     setCouponError(null);
+  };
+
+  const handleBuyNowClick = () => {
+    setPurchaseDialogOpen(true);
+  };
+
+  const handleConfirmPurchase = async () => {
+    if (!courseData || isPurchasing) return;
+
+    try {
+      setIsPurchasing(true);
+      const result = await purchaseCourse({ courseId: courseData._id });
+
+      if (result.status === "already_owned") {
+        setSnackbarMessage("Ya tienes este curso en Mis Cursos");
+      } else {
+        setSnackbarMessage("Tu curso se agregó correctamente");
+      }
+
+      setPurchaseDialogOpen(false);
+    } catch {
+      setSnackbarMessage("No se pudo adquirir el curso. Intenta de nuevo.");
+    } finally {
+      setIsPurchasing(false);
+    }
   };
 
   return (
@@ -1064,7 +1102,11 @@ function CoursePurchaseSidebar({
 
           <div className="space-y-2">
             <Button className="w-full cursor-pointer">Add to cart</Button>
-            <Button variant="outline" className="w-full cursor-pointer">
+            <Button
+              variant="outline"
+              className="w-full cursor-pointer"
+              onClick={handleBuyNowClick}
+            >
               Buy now
             </Button>
           </div>
@@ -1178,6 +1220,33 @@ function CoursePurchaseSidebar({
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={purchaseDialogOpen} onOpenChange={setPurchaseDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>¿Deseas adquirir este curso?</DialogTitle>
+            <DialogDescription>{courseData.name}</DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setPurchaseDialogOpen(false)}
+              disabled={isPurchasing}
+            >
+              Cancelar
+            </Button>
+            <Button onClick={handleConfirmPurchase} disabled={isPurchasing}>
+              {isPurchasing ? "Adquiriendo..." : "Adquirir"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {snackbarMessage ? (
+        <div className="fixed bottom-4 right-4 z-[90] rounded-md border border-border bg-background/95 px-4 py-3 text-sm shadow-xl backdrop-blur">
+          {snackbarMessage}
+        </div>
+      ) : null}
     </>
   );
 }

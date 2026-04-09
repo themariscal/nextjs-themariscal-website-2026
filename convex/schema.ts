@@ -65,6 +65,42 @@ export default defineSchema({
     .index("by_section", ["sectionId"])
     .index("by_section_and_order", ["sectionId", "order"]),
 
+  academyCourseEnrollments: defineTable({
+    tokenIdentifier: v.string(),
+    courseId: v.id("academyCourses"),
+    purchasedAt: v.number(),
+    completedAt: v.optional(v.number()),
+  })
+    .index("by_token_and_course", ["tokenIdentifier", "courseId"])
+    .index("by_token", ["tokenIdentifier"]),
+
+  academyCourseProgress: defineTable({
+    tokenIdentifier: v.string(),
+    courseId: v.id("academyCourses"),
+    sectionId: v.id("academyCourseSections"),
+    elementId: v.id("academyCourseSectionElements"),
+    completedAt: v.optional(v.number()),
+    watchedSeconds: v.optional(v.number()),
+    durationSeconds: v.optional(v.number()),
+    manualCompleted: v.optional(v.boolean()),
+    autoCompleted: v.optional(v.boolean()),
+    lastWatchedAt: v.optional(v.number()),
+  })
+    .index("by_token_and_course", ["tokenIdentifier", "courseId"])
+    .index("by_token_and_element", ["tokenIdentifier", "elementId"])
+    .index("by_course", ["courseId"]),
+
+  academyCoursePlaybackState: defineTable({
+    tokenIdentifier: v.string(),
+    courseId: v.id("academyCourses"),
+    sectionId: v.id("academyCourseSections"),
+    elementId: v.id("academyCourseSectionElements"),
+    positionSeconds: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_token_and_course", ["tokenIdentifier", "courseId"])
+    .index("by_token_and_element", ["tokenIdentifier", "elementId"]),
+
   shortReactions: defineTable({
     tokenIdentifier: v.string(),
     videoId: v.string(),

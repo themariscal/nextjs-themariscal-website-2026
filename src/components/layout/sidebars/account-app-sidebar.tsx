@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { User2, Heart, Bell, Settings, Shield, CreditCard } from "lucide-react";
+import { User2, Heart, Bell, Settings, Shield, CreditCard, BookOpen } from "lucide-react";
 
 import {
   Sidebar,
@@ -24,6 +24,11 @@ const accountItems = [
     title: "Mis favoritos",
     icon: Heart,
     url: "/account/favorites",
+  },
+  {
+    title: "Mis Cursos",
+    icon: BookOpen,
+    url: "/account/courses",
   },
   {
     title: "Notificaciones",
