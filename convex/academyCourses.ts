@@ -375,3 +375,201 @@ export const getPublicCourseBySlug = query({
     };
   },
 });
+
+export const purchaseCourse = mutation({
+  args: {
+    courseId: v.id("academyCourses"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Debes iniciar sesión para adquirir el curso.");
+    }
+
+    const course = await ctx.db.get(args.courseId);
+    if (!course) {
+      throw new Error("Curso inválido.");
+    }
+
+    const existingEnrollment = await ctx.db
+      .query("academyCourseEnrollments")
+      .withIndex("by_token_and_course", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier).eq("courseId", args.courseId)
+      )
+      .unique();
+
+    if (existingEnrollment) {
+      return { status: "already_owned" as const };
+    }
+
+    await ctx.db.insert("academyCourseEnrollments", {
+      tokenIdentifier: identity.tokenIdentifier,
+      courseId: args.courseId,
+      purchasedAt: Date.now(),
+    });
+
+    return { status: "purchased" as const };
+  },
+});
+
+export const getMyPurchasedCourses = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    const enrollments = await ctx.db
+      .query("academyCourseEnrollments")
+      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
+      .order("desc")
+      .take(500);
+
+    const items = await Promise.all(
+      enrollments.map(async (enrollment) => {
+        const course = await ctx.db.get(enrollment.courseId);
+        if (!course) return null;
+
+        return {
+          enrollmentId: enrollment._id,
+          purchasedAt: enrollment.purchasedAt,
+          courseId: course._id,
+          name: course.name,
+          description: course.description,
+          youtubeVideoId: course.youtubeVideoId,
+          slug: toFriendlySlug(course.name),
+        };
+      })
+    );
+
+    return items.filter((item): item is NonNullable<typeof item> => item !== null);
+  },
+});
+
+export const getPurchasedCoursePlayerBySlug = query({
+  args: {
+    slug: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Debes iniciar sesión para ver este curso.");
+    }
+
+    const requestedSlug = toFriendlySlug(args.slug);
+    if (!requestedSlug) return null;
+
+    const courses = await ctx.db.query("academyCourses").order("desc").take(500);
+    const course = courses.find((item) => toFriendlySlug(item.name) === requestedSlug) ?? null;
+    if (!course) return null;
+
+    const enrollment = await ctx.db
+      .query("academyCourseEnrollments")
+      .withIndex("by_token_and_course", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier).eq("courseId", course._id)
+      )
+      .unique();
+
+    if (!enrollment) {
+      return { accessDenied: true as const };
+    }
+
+    const sections = await ctx.db
+      .query("academyCourseSections")
+      .withIndex("by_course_and_order", (q) => q.eq("courseId", course._id))
+      .order("asc")
+      .take(500);
+
+    const sectionsWithElements = await Promise.all(
+      sections.map(async (section) => {
+        const elements = await ctx.db
+          .query("academyCourseSectionElements")
+          .withIndex("by_section_and_order", (q) => q.eq("sectionId", section._id))
+          .order("asc")
+          .take(500);
+
+        return {
+          ...section,
+          elements,
+        };
+      })
+    );
+
+    const progress = await ctx.db
+      .query("academyCourseProgress")
+      .withIndex("by_token_and_course", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier).eq("courseId", course._id)
+      )
+      .take(1000);
+
+    return {
+      accessDenied: false as const,
+      course: {
+        _id: course._id,
+        name: course.name,
+        description: course.description,
+        youtubeVideoId: course.youtubeVideoId,
+        youtubeUrl: course.youtubeUrl,
+        slug: requestedSlug,
+      },
+      sections: sectionsWithElements,
+      completedElementIds: progress.map((item) => item.elementId),
+    };
+  },
+});
+
+export const toggleCourseElementCompleted = mutation({
+  args: {
+    courseId: v.id("academyCourses"),
+    sectionId: v.id("academyCourseSections"),
+    elementId: v.id("academyCourseSectionElements"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Debes iniciar sesión para actualizar el progreso.");
+    }
+
+    const enrollment = await ctx.db
+      .query("academyCourseEnrollments")
+      .withIndex("by_token_and_course", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier).eq("courseId", args.courseId)
+      )
+      .unique();
+
+    if (!enrollment) {
+      throw new Error("No tienes acceso a este curso.");
+    }
+
+    const section = await ctx.db.get(args.sectionId);
+    if (!section || section.courseId !== args.courseId) {
+      throw new Error("Sección inválida.");
+    }
+
+    const element = await ctx.db.get(args.elementId);
+    if (!element || element.sectionId !== args.sectionId) {
+      throw new Error("Elemento inválido.");
+    }
+
+    const existing = await ctx.db
+      .query("academyCourseProgress")
+      .withIndex("by_token_and_element", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier).eq("elementId", args.elementId)
+      )
+      .unique();
+
+    if (existing) {
+      await ctx.db.delete(existing._id);
+      return { completed: false as const };
+    }
+
+    await ctx.db.insert("academyCourseProgress", {
+      tokenIdentifier: identity.tokenIdentifier,
+      courseId: args.courseId,
+      sectionId: args.sectionId,
+      elementId: args.elementId,
+      completedAt: Date.now(),
+    });
+
+    return { completed: true as const };
+  },
+});

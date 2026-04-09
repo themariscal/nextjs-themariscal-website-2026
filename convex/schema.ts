@@ -65,6 +65,25 @@ export default defineSchema({
     .index("by_section", ["sectionId"])
     .index("by_section_and_order", ["sectionId", "order"]),
 
+  academyCourseEnrollments: defineTable({
+    tokenIdentifier: v.string(),
+    courseId: v.id("academyCourses"),
+    purchasedAt: v.number(),
+  })
+    .index("by_token_and_course", ["tokenIdentifier", "courseId"])
+    .index("by_token", ["tokenIdentifier"]),
+
+  academyCourseProgress: defineTable({
+    tokenIdentifier: v.string(),
+    courseId: v.id("academyCourses"),
+    sectionId: v.id("academyCourseSections"),
+    elementId: v.id("academyCourseSectionElements"),
+    completedAt: v.number(),
+  })
+    .index("by_token_and_course", ["tokenIdentifier", "courseId"])
+    .index("by_token_and_element", ["tokenIdentifier", "elementId"])
+    .index("by_course", ["courseId"]),
+
   shortReactions: defineTable({
     tokenIdentifier: v.string(),
     videoId: v.string(),
