@@ -5,13 +5,14 @@ import type { Id } from "#convex/_generated/dataModel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { extractYouTubeVideoId } from "@/lib/youtube-shorts";
 import { useMutation, useQuery } from "convex/react";
 import { CheckCircle2, ChevronDown, Circle, Clock3, PlayCircle } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type SectionElement = {
   _id: Id<"academyCourseSectionElements">;
@@ -27,6 +28,15 @@ type CourseSection = {
   elements: SectionElement[];
 };
 
+type ElementProgress = {
+  manualCompleted: boolean;
+  autoCompleted: boolean;
+  watchedSeconds: number;
+  durationSeconds: number;
+  lastWatchedAt: number | null;
+  completedAt: number | null;
+};
+
 type PlayerData = {
   accessDenied: boolean;
   course?: {
@@ -37,7 +47,19 @@ type PlayerData = {
     slug: string;
   };
   sections?: CourseSection[];
-  completedElementIds?: Id<"academyCourseSectionElements">[];
+  progressByElement?: Record<string, ElementProgress>;
+  lastPlayback?: {
+    sectionId: Id<"academyCourseSections">;
+    elementId: Id<"academyCourseSectionElements">;
+    positionSeconds: number;
+    updatedAt: number;
+  } | null;
+  courseProgress?: {
+    totalElements: number;
+    completedElements: number;
+    percent: number;
+    isCompleted: boolean;
+  };
 } | null;
 
 type RouteParams = {
@@ -45,12 +67,85 @@ type RouteParams = {
   courseSlug?: string;
 };
 
+type YouTubePlayerState = -1 | 0 | 1 | 2 | 3 | 5;
+
+type YouTubePlayer = {
+  destroy: () => void;
+  getCurrentTime: () => number;
+  getDuration: () => number;
+  loadVideoById: (args: { videoId: string; startSeconds?: number }) => void;
+  cueVideoById?: (args: { videoId: string; startSeconds?: number }) => void;
+  pauseVideo: () => void;
+  playVideo: () => void;
+  seekTo: (seconds: number, allowSeekAhead: boolean) => void;
+};
+
+type YouTubeAPI = {
+  Player: new (
+    element: HTMLElement,
+    options: {
+      videoId: string;
+      playerVars?: Record<string, number>;
+      events?: {
+        onReady?: (event: { target: YouTubePlayer }) => void;
+        onStateChange?: (event: { data: YouTubePlayerState; target: YouTubePlayer }) => void;
+      };
+    }
+  ) => YouTubePlayer;
+};
+
+declare global {
+  interface Window {
+    YT?: YouTubeAPI;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
+function loadYouTubeApi(): Promise<YouTubeAPI> {
+  if (window.YT?.Player) {
+    return Promise.resolve(window.YT);
+  }
+
+  return new Promise((resolve) => {
+    const existing = document.querySelector('script[src="https://www.youtube.com/iframe_api"]');
+    if (!existing) {
+      const script = document.createElement("script");
+      script.src = "https://www.youtube.com/iframe_api";
+      document.body.appendChild(script);
+    }
+
+    window.onYouTubeIframeAPIReady = () => {
+      if (window.YT) {
+        resolve(window.YT);
+      }
+    };
+  });
+}
+
+function parseDurationToSeconds(value?: string): number {
+  if (!value) return 0;
+  const normalized = value.trim().toLowerCase();
+
+  const mmss = normalized.match(/^(\d{1,2}):(\d{2})$/);
+  if (mmss) return Number(mmss[1]) * 60 + Number(mmss[2]);
+
+  const hhmmss = normalized.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+  if (hhmmss) return Number(hhmmss[1]) * 3600 + Number(hhmmss[2]) * 60 + Number(hhmmss[3]);
+
+  const min = normalized.match(/^(\d+)\s*min$/);
+  if (min) return Number(min[1]) * 60;
+
+  return 0;
+}
+
 export default function PurchasedCoursePlayerPage() {
   const params = useParams() as RouteParams;
   const router = useRouter();
   const locale = params.locale ?? "en";
   const courseSlug = params.courseSlug ?? "";
+
   const toggleCompleted = useMutation(api.academyCourses.toggleCourseElementCompleted);
+  const upsertPlayback = useMutation(api.academyCourses.upsertCoursePlaybackProgress);
 
   const playerData = useQuery(api.academyCourses.getPurchasedCoursePlayerBySlug, {
     slug: courseSlug,
@@ -67,29 +162,44 @@ export default function PurchasedCoursePlayerPage() {
     return null;
   }, [sections]);
 
-  const [activeElement, setActiveElement] = useState<SectionElement | null>(null);
-  const [completedSet, setCompletedSet] = useState<Set<Id<"academyCourseSectionElements">>>(
-    new Set()
-  );
+  const elementById = useMemo(() => {
+    const map = new Map<string, SectionElement>();
+    for (const section of sections) {
+      for (const element of section.elements) {
+        map.set(String(element._id), element);
+      }
+    }
+    return map;
+  }, [sections]);
+
+  const sectionByElementId = useMemo(() => {
+    const map = new Map<string, Id<"academyCourseSections">>();
+    for (const section of sections) {
+      for (const element of section.elements) {
+        map.set(String(element._id), section._id);
+      }
+    }
+    return map;
+  }, [sections]);
+
+  const [activeElementId, setActiveElementId] = useState<Id<"academyCourseSectionElements"> | null>(null);
   const [pendingCompletionElementId, setPendingCompletionElementId] = useState<
     Id<"academyCourseSectionElements"> | null
   >(null);
+  const [youtubeApiReady, setYoutubeApiReady] = useState(false);
 
-  useEffect(() => {
-    if (!playerData) return;
+  const playerContainerRef = useRef<HTMLDivElement | null>(null);
+  const playerRef = useRef<YouTubePlayer | null>(null);
+  const currentVideoIdRef = useRef<string>("");
+  const currentPlayerStateRef = useRef<YouTubePlayerState>(-1);
+  const isPlayerReadyRef = useRef(false);
+  const saveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const watchedByElementRef = useRef<Record<string, number>>({});
 
-    if (playerData.accessDenied) {
-      router.replace(`/${locale}/academy/courses/${courseSlug}`);
-      return;
-    }
-
-    const completed = new Set(playerData.completedElementIds ?? []);
-    setCompletedSet(completed);
-
-    if (firstElement) {
-      setActiveElement(firstElement);
-    }
-  }, [courseSlug, firstElement, locale, playerData, router]);
+  const activeElement = activeElementId ? elementById.get(String(activeElementId)) ?? null : null;
+  const activeSectionId = activeElementId
+    ? sectionByElementId.get(String(activeElementId)) ?? null
+    : null;
 
   const activeVideoId = useMemo(() => {
     if (!activeElement) return playerData?.course?.youtubeVideoId ?? "";
@@ -99,6 +209,235 @@ export default function PurchasedCoursePlayerPage() {
     }
     return playerData?.course?.youtubeVideoId ?? "";
   }, [activeElement, playerData?.course?.youtubeVideoId]);
+
+  const progressByElement = useMemo(
+    () => playerData?.progressByElement ?? {},
+    [playerData?.progressByElement]
+  );
+  const courseProgress = playerData?.courseProgress ?? {
+    totalElements: 0,
+    completedElements: 0,
+    percent: 0,
+    isCompleted: false,
+  };
+
+  const tabs = ["Overview", "Q&A", "Notes", "Announcements", "Reviews", "Learning tools"];
+
+  useEffect(() => {
+    if (!playerData) return;
+
+    if (playerData.accessDenied) {
+      router.replace(`/${locale}/academy/courses/${courseSlug}`);
+      return;
+    }
+
+    if (playerData.lastPlayback?.elementId && elementById.has(String(playerData.lastPlayback.elementId))) {
+      setActiveElementId(playerData.lastPlayback.elementId);
+      return;
+    }
+
+    if (firstElement) {
+      setActiveElementId(firstElement._id);
+    }
+  }, [courseSlug, elementById, firstElement, locale, playerData, router]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    loadYouTubeApi().then(() => {
+      if (isMounted) {
+        setYoutubeApiReady(true);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const getResumeSecondsForElement = useCallback(
+    (elementId: Id<"academyCourseSectionElements"> | null) => {
+      if (!elementId) return 0;
+      const byProgress = progressByElement[String(elementId)]?.watchedSeconds ?? 0;
+      if (playerData?.lastPlayback?.elementId === elementId) {
+        return Math.max(byProgress, playerData.lastPlayback.positionSeconds ?? 0);
+      }
+      return byProgress;
+    },
+    [playerData?.lastPlayback?.elementId, playerData?.lastPlayback?.positionSeconds, progressByElement]
+  );
+
+  const persistProgress = useCallback(
+    async (forceWatchedSeconds?: number) => {
+      const courseId = playerData?.course?._id;
+      if (!courseId || !activeElementId || !activeSectionId || !playerRef.current) return;
+
+      const currentTime = Math.max(0, Math.floor(playerRef.current.getCurrentTime() || 0));
+      const durationFromPlayer = Math.max(0, Math.floor(playerRef.current.getDuration() || 0));
+      const durationFromMetadata = activeElement?.durationLabel
+        ? parseDurationToSeconds(activeElement.durationLabel)
+        : 0;
+      const durationSeconds = durationFromPlayer || durationFromMetadata;
+
+      const existingWatched = watchedByElementRef.current[String(activeElementId)] ?? 0;
+      const watchedSeconds = Math.max(existingWatched, forceWatchedSeconds ?? currentTime);
+      watchedByElementRef.current[String(activeElementId)] = watchedSeconds;
+
+      await upsertPlayback({
+        courseId,
+        sectionId: activeSectionId,
+        elementId: activeElementId,
+        positionSeconds: currentTime,
+        watchedSeconds,
+        durationSeconds,
+      });
+    },
+    [activeElement?.durationLabel, activeElementId, activeSectionId, playerData?.course?._id, upsertPlayback]
+  );
+
+  useEffect(() => {
+    if (!youtubeApiReady || !playerContainerRef.current || !activeVideoId) return;
+
+    if (!playerRef.current) {
+      const startSeconds = getResumeSecondsForElement(activeElementId);
+      const player = new window.YT!.Player(playerContainerRef.current, {
+        videoId: activeVideoId,
+        playerVars: {
+          autoplay: 1,
+          rel: 0,
+          modestbranding: 1,
+          controls: 1,
+          playsinline: 1,
+          start: Math.floor(startSeconds),
+        },
+        events: {
+          onReady: (event) => {
+            playerRef.current = event.target;
+            isPlayerReadyRef.current = true;
+            currentVideoIdRef.current = activeVideoId;
+            if (startSeconds > 0) {
+              event.target.seekTo(Math.floor(startSeconds), true);
+            }
+            event.target.playVideo();
+          },
+          onStateChange: async (event) => {
+            currentPlayerStateRef.current = event.data;
+
+            if (event.data === 2) {
+              await persistProgress();
+            }
+
+            if (event.data === 0) {
+              const duration = Math.floor(event.target.getDuration() || 0);
+              await persistProgress(duration > 0 ? duration : undefined);
+            }
+          },
+        },
+      });
+
+      playerRef.current = player;
+      return;
+    }
+
+    if (currentVideoIdRef.current !== activeVideoId && isPlayerReadyRef.current) {
+      const startSeconds = getResumeSecondsForElement(activeElementId);
+      const player = playerRef.current;
+      if (!player) return;
+
+      if (typeof player.loadVideoById === "function") {
+        player.loadVideoById({
+          videoId: activeVideoId,
+          startSeconds: Math.floor(startSeconds),
+        });
+      } else if (typeof player.cueVideoById === "function") {
+        player.cueVideoById({
+          videoId: activeVideoId,
+          startSeconds: Math.floor(startSeconds),
+        });
+        if (startSeconds > 0) {
+          player.seekTo(Math.floor(startSeconds), true);
+        }
+        player.playVideo();
+      } else {
+        player.destroy();
+        playerRef.current = null;
+        isPlayerReadyRef.current = false;
+        return;
+      }
+      currentVideoIdRef.current = activeVideoId;
+    }
+  }, [activeElementId, activeVideoId, getResumeSecondsForElement, persistProgress, youtubeApiReady]);
+
+  useEffect(() => {
+    if (!playerRef.current) return;
+
+    if (saveIntervalRef.current) {
+      clearInterval(saveIntervalRef.current);
+    }
+
+    saveIntervalRef.current = setInterval(() => {
+      if (currentPlayerStateRef.current !== 1) return;
+      void persistProgress();
+    }, 15000);
+
+    return () => {
+      if (saveIntervalRef.current) {
+        clearInterval(saveIntervalRef.current);
+        saveIntervalRef.current = null;
+      }
+    };
+  }, [persistProgress]);
+
+  useEffect(() => {
+    const onBeforeUnload = () => {
+      void persistProgress();
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        void persistProgress();
+      }
+    };
+
+    window.addEventListener("beforeunload", onBeforeUnload);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [persistProgress]);
+
+  useEffect(() => {
+    return () => {
+      if (saveIntervalRef.current) {
+        clearInterval(saveIntervalRef.current);
+      }
+      if (playerRef.current) {
+        playerRef.current.destroy();
+        playerRef.current = null;
+      }
+      isPlayerReadyRef.current = false;
+    };
+  }, []);
+
+  const handleToggleCompleted = async (
+    sectionId: Id<"academyCourseSections">,
+    elementId: Id<"academyCourseSectionElements">
+  ) => {
+    if (pendingCompletionElementId) return;
+    setPendingCompletionElementId(elementId);
+
+    try {
+      await toggleCompleted({
+        courseId: playerData!.course!._id,
+        sectionId,
+        elementId,
+      });
+    } finally {
+      setPendingCompletionElementId(null);
+    }
+  };
 
   if (playerData === undefined) {
     return (
@@ -132,51 +471,12 @@ export default function PurchasedCoursePlayerPage() {
   const course = playerData.course;
   if (!course) return null;
 
-  const tabs = ["Overview", "Q&A", "Notes", "Announcements", "Reviews", "Learning tools"];
-
-  const handleToggleCompleted = async (
-    sectionId: Id<"academyCourseSections">,
-    elementId: Id<"academyCourseSectionElements">
-  ) => {
-    if (pendingCompletionElementId) return;
-    setPendingCompletionElementId(elementId);
-
-    try {
-      const result = await toggleCompleted({
-        courseId: course._id,
-        sectionId,
-        elementId,
-      });
-
-      setCompletedSet((previous) => {
-        const next = new Set(previous);
-        if (result.completed) {
-          next.add(elementId);
-        } else {
-          next.delete(elementId);
-        }
-        return next;
-      });
-    } finally {
-      setPendingCompletionElementId(null);
-    }
-  };
-
   return (
     <div className="w-full bg-background">
       <div className="grid min-h-[calc(100vh-6rem)] grid-cols-1 border-y border-border/60 bg-gradient-to-b from-background via-background to-muted/15 lg:grid-cols-[minmax(0,1fr)_390px]">
         <div className="flex min-h-[62vh] flex-col border-r border-border/60">
           <div className="relative aspect-video w-full overflow-hidden bg-black">
-            {activeVideoId ? (
-              <iframe
-                src={`https://www.youtube.com/embed/${activeVideoId}`}
-                title="Video del curso"
-                className="h-full w-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              />
-            ) : null}
+            <div ref={playerContainerRef} className="h-full w-full" />
           </div>
 
           <div className="flex items-center gap-2 overflow-x-auto border-t border-border/50 px-3 py-2 sm:px-5">
@@ -196,10 +496,27 @@ export default function PurchasedCoursePlayerPage() {
             ))}
           </div>
 
-          <div className="space-y-2 border-t border-border/50 px-4 py-4 sm:px-6">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Mis Cursos</p>
+          <div className="space-y-3 border-t border-border/50 px-4 py-4 sm:px-6">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Mis Cursos</p>
+              {courseProgress.isCompleted ? (
+                <Badge className="bg-primary text-primary-foreground">Curso completado</Badge>
+              ) : null}
+            </div>
+
             <h1 className="text-2xl font-bold md:text-3xl">{course.name}</h1>
             <p className="max-w-4xl text-sm text-muted-foreground">{course.description}</p>
+
+            <div className="space-y-2 rounded-lg border border-border/60 bg-background/50 p-3">
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <span className="font-medium">Progreso del curso</span>
+                <span className="text-muted-foreground">
+                  {courseProgress.completedElements}/{courseProgress.totalElements} • {courseProgress.percent}%
+                </span>
+              </div>
+              <Progress value={courseProgress.percent} className="h-2.5" />
+            </div>
+
             {activeElement ? (
               <Badge variant="secondary" className="gap-1">
                 <PlayCircle className="size-3" />
@@ -223,33 +540,41 @@ export default function PurchasedCoursePlayerPage() {
                     <p className="text-sm font-semibold">
                       Sección {sectionIndex + 1}: {section.name}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      {section.elements.length} lecciones
-                    </p>
+                    <p className="text-xs text-muted-foreground">{section.elements.length} lecciones</p>
                   </div>
                   <ChevronDown className="mt-0.5 size-4 text-muted-foreground" />
                 </div>
 
                 <div className="space-y-1 p-2">
                   {section.elements.map((element, elementIndex) => {
-                    const isActive = activeElement?._id === element._id;
-                    const isCompleted = completedSet.has(element._id);
+                    const isActive = activeElementId === element._id;
+                    const elementProgress = progressByElement[String(element._id)];
+                    const isCompleted = Boolean(
+                      elementProgress?.manualCompleted || elementProgress?.autoCompleted
+                    );
 
                     return (
-                      <button
+                      <div
                         key={element._id}
-                        type="button"
                         className={cn(
-                          "w-full rounded-md border px-2 py-2 text-left transition-colors",
+                          "flex items-start gap-2 rounded-md border px-2 py-2",
                           isActive
                             ? "border-primary/70 bg-primary/10"
                             : "border-transparent hover:border-border hover:bg-muted/45"
                         )}
-                        onClick={() => {
-                          setActiveElement(element);
-                        }}
                       >
-                        <div className="flex items-start gap-2">
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          className="flex min-w-0 flex-1 cursor-pointer items-start gap-2"
+                          onClick={() => setActiveElementId(element._id)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              setActiveElementId(element._id);
+                            }
+                          }}
+                        >
                           <span className="pt-0.5 text-muted-foreground">
                             {isCompleted ? (
                               <CheckCircle2 className="size-4 text-primary" />
@@ -257,6 +582,7 @@ export default function PurchasedCoursePlayerPage() {
                               <Circle className="size-4" />
                             )}
                           </span>
+
                           <div className="min-w-0 flex-1">
                             <p className="line-clamp-2 text-sm">
                               {sectionIndex + 1}.{elementIndex + 1} {element.title}
@@ -268,29 +594,27 @@ export default function PurchasedCoursePlayerPage() {
                                   {element.durationLabel}
                                 </span>
                               ) : null}
-                              {isActive ? (
-                                <span className="text-primary">viendo ahora</span>
-                              ) : null}
+                              {isActive ? <span className="text-primary">viendo ahora</span> : null}
                             </div>
                           </div>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant={isCompleted ? "secondary" : "outline"}
-                            disabled={pendingCompletionElementId === element._id}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              void handleToggleCompleted(section._id, element._id);
-                            }}
-                          >
-                            {pendingCompletionElementId === element._id
-                              ? "..."
-                              : isCompleted
-                                ? "Listo"
-                                : "Completar"}
-                          </Button>
                         </div>
-                      </button>
+
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={isCompleted ? "secondary" : "outline"}
+                          disabled={pendingCompletionElementId === element._id}
+                          onClick={() => {
+                            void handleToggleCompleted(section._id, element._id);
+                          }}
+                        >
+                          {pendingCompletionElementId === element._id
+                            ? "..."
+                            : isCompleted
+                              ? "Listo"
+                              : "Completar"}
+                        </Button>
+                      </div>
                     );
                   })}
                 </div>

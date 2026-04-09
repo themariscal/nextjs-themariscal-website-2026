@@ -3,6 +3,7 @@
 import { api } from "#convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "convex/react";
 import Image from "next/image";
@@ -56,15 +57,34 @@ export default function AccountCoursesPage() {
                   />
                 </div>
                 <div className="min-w-0 flex-1 space-y-2">
-                  <p className="text-xs text-muted-foreground">Curso adquirido</p>
+                  <p className="text-xs text-muted-foreground">
+                    {course.isCompleted
+                      ? "Completado"
+                      : course.hasStarted
+                        ? "En progreso"
+                        : "No iniciado"}
+                  </p>
                   <h2 className="line-clamp-2 text-lg font-semibold">{course.name}</h2>
                   <p className="line-clamp-2 text-sm text-muted-foreground">
                     {course.description}
                   </p>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>Progreso</span>
+                      <span>{course.progressPercent}%</span>
+                    </div>
+                    <Progress value={course.progressPercent} className="h-2" />
+                  </div>
                 </div>
                 <div className="sm:pl-2">
                   <Button asChild>
-                    <Link href={`/${locale}/account/courses/${course.slug}`}>Ver curso</Link>
+                    <Link href={`/${locale}/account/courses/${course.slug}`}>
+                      {course.isCompleted
+                        ? "Ver progreso"
+                        : course.hasStarted
+                          ? "Continuar curso"
+                          : "Ver curso"}
+                    </Link>
                   </Button>
                 </div>
               </CardContent>
