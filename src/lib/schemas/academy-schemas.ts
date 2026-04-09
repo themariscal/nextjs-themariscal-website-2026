@@ -16,6 +16,11 @@ export const createAcademySchemas = () => ({
     languageId: z.string().trim().min(1, { message: "Seleccioná un idioma." }),
     instructorId: z.string().trim().min(1, { message: "Seleccioná un instructor." }),
     description: z.string().trim().min(10, { message: "La descripción debe tener al menos 10 caracteres." }),
+    price: z.preprocess(
+      (val) => (val === "" || val === undefined || val === null ? undefined : Number(val)),
+      z.number().min(0, { message: "El precio no puede ser negativo." }).optional()
+    ),
+    currency: z.string().length(3, { message: "Moneda inválida." }).optional().default("eur"),
   }),
 
   addLanguageSchema: z.object({
