@@ -7,7 +7,7 @@ import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import { Check, Copy, Lightbulb } from "lucide-react";
 
-const VPS_BASE = "http://kact3j9asa5t056a6tawpsuw.187.77.87.209.sslip.io";
+const VPS_BASE = "/api/vps";
 
 type Message = {
   role: "user" | "assistant";
