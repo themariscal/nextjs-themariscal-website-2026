@@ -89,8 +89,8 @@ export default function PricingPage() {
       // Trigger RC Web Billing checkout (shows embedded UI)
       await purchases.purchase({ rcPackage: pkg, customerEmail: email });
 
-      // Purchase successful — redirect to subscription page
-      router.push(`/${locale}/account/subscription?success=true`);
+      // Purchase successful — redirect via public callback page (avoids Clerk middleware race)
+      router.push(`/${locale}/subscription/callback?success=true`);
     } catch (err) {
       const rcErr = err as PurchasesError;
       if (rcErr.errorCode === ErrorCode.UserCancelledError) {
