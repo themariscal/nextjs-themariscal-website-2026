@@ -10,9 +10,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { extractYouTubeVideoId } from "@/lib/youtube-shorts";
 import { useMutation, useQuery } from "convex/react";
-import { CheckCircle2, ChevronDown, Circle, Clock3, PlayCircle } from "lucide-react";
+import { CheckCircle2, ChevronDown, Circle, Clock3, ExternalLink, FileText, PlayCircle } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type SectionElement = {
   _id: Id<"academyCourseSectionElements">;
@@ -197,6 +199,9 @@ export default function PurchasedCoursePlayerPage() {
   const [youtubeApiReady, setYoutubeApiReady] = useState(false);
   const [isPlayerReady, setIsPlayerReady] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [noteMarkdownContent, setNoteMarkdownContent] = useState<string>("");
+  const [isLoadingNoteMarkdown, setIsLoadingNoteMarkdown] = useState(false);
+  const [noteMarkdownError, setNoteMarkdownError] = useState<string | null>(null);
 
   const playerContainerRef = useRef<HTMLDivElement | null>(null);
   const playerRef = useRef<YouTubePlayer | null>(null);
@@ -216,6 +221,8 @@ export default function PurchasedCoursePlayerPage() {
     const index = sections.findIndex((section) => section._id === activeSectionId);
     return index >= 0 ? index : 0;
   }, [activeSectionId, sections]);
+
+  const isNoteElementActive = activeElement?.type === "note";
 
   useEffect(() => {
     if (sections.length === 0) return;
@@ -237,11 +244,12 @@ export default function PurchasedCoursePlayerPage() {
   const activeVideoId = useMemo(() => {
     const selectedElement = activeElement ?? firstElement;
     if (!selectedElement) return playerData?.course?.youtubeVideoId ?? "";
+    if (selectedElement.type === "note") return "";
     if (selectedElement.contentUrl) {
       const fromContentUrl = extractYouTubeVideoId(selectedElement.contentUrl);
       if (fromContentUrl) return fromContentUrl;
     }
-    return playerData?.course?.youtubeVideoId ?? "";
+    return "";
   }, [activeElement, firstElement, playerData?.course?.youtubeVideoId]);
 
   const progressByElement = useMemo(
@@ -387,6 +395,56 @@ export default function PurchasedCoursePlayerPage() {
     },
     [playerData?.course?._id, upsertPlayback]
   );
+
+  useEffect(() => {
+    if (!isNoteElementActive || !activeElement?.contentUrl) {
+      setNoteMarkdownContent("");
+      setIsLoadingNoteMarkdown(false);
+      setNoteMarkdownError(null);
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoadingNoteMarkdown(true);
+    setNoteMarkdownError(null);
+
+    fetch(activeElement.contentUrl)
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`No se pudo cargar el markdown (${response.status})`);
+        }
+        const markdown = await response.text();
+        if (!cancelled) {
+          setNoteMarkdownContent(markdown);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setNoteMarkdownError("No se pudo cargar esta nota en este momento.");
+          setNoteMarkdownContent("");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoadingNoteMarkdown(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeElement?.contentUrl, isNoteElementActive]);
+
+  useEffect(() => {
+    if (!isNoteElementActive) return;
+    if (!playerRef.current) return;
+
+    try {
+      playerRef.current.pauseVideo();
+    } catch {
+      // Player may not be ready yet; ignore.
+    }
+  }, [isNoteElementActive]);
 
   useEffect(() => {
     if (!youtubeApiReady || !playerContainerRef.current || !activeVideoId) return;
@@ -596,7 +654,49 @@ export default function PurchasedCoursePlayerPage() {
       <div className="grid min-h-[calc(100vh-6rem)] grid-cols-1 border-y border-border/60 bg-gradient-to-b from-background via-background to-muted/15 lg:grid-cols-[minmax(0,1fr)_390px]">
         <div className="flex min-h-[62vh] flex-col border-r border-border/60">
           <div className="relative aspect-video w-full overflow-hidden bg-black">
-            <div ref={playerContainerRef} className="h-full w-full" />
+            {isNoteElementActive ? (
+              <div className="h-full overflow-y-auto bg-background px-4 py-5 sm:px-8">
+                <div className="mx-auto max-w-4xl space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="inline-flex items-center gap-2 text-sm font-medium text-foreground">
+                      <FileText className="size-4 text-primary" />
+                      Notes
+                    </div>
+                    {activeElement?.contentUrl ? (
+                      <a
+                        href={activeElement.contentUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60"
+                      >
+                        Abrir fuente
+                        <ExternalLink className="size-3" />
+                      </a>
+                    ) : null}
+                  </div>
+
+                  <div className="rounded-lg border border-border/60 bg-card/45 p-4">
+                    {isLoadingNoteMarkdown ? (
+                      <p className="text-sm text-muted-foreground">Cargando notes...</p>
+                    ) : noteMarkdownError ? (
+                      <p className="text-sm text-destructive">{noteMarkdownError}</p>
+                    ) : noteMarkdownContent ? (
+                      <div className="prose prose-sm max-w-none dark:prose-invert">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {noteMarkdownContent}
+                        </ReactMarkdown>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Esta nota no tiene contenido disponible.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div ref={playerContainerRef} className="h-full w-full" />
+            )}
           </div>
 
           <div className="flex items-center gap-2 overflow-x-auto border-t border-border/50 px-3 py-2 sm:px-5">

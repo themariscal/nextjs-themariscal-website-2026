@@ -1113,3 +1113,74 @@ export const removeCourseElementById = mutation({
     return { removed: true as const, sectionId };
   },
 });
+
+export const appendMarkdownNotesToAllSections = mutation({
+  args: {
+    courseId: v.id("academyCourses"),
+    replaceExisting: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const course = await ctx.db.get(args.courseId);
+    if (!course) {
+      throw new Error("Curso inválido.");
+    }
+
+    const markdownLinks = [
+      "https://raw.githubusercontent.com/microsoft/TypeScript/main/README.md",
+      "https://raw.githubusercontent.com/facebook/react/main/README.md",
+      "https://raw.githubusercontent.com/vercel/next.js/canary/README.md",
+      "https://raw.githubusercontent.com/nodejs/node/main/README.md",
+      "https://raw.githubusercontent.com/tailwindlabs/tailwindcss/master/README.md",
+      "https://raw.githubusercontent.com/mdn/content/main/README.md",
+    ];
+
+    const sections = await ctx.db
+      .query("academyCourseSections")
+      .withIndex("by_course_and_order", (q) => q.eq("courseId", args.courseId))
+      .order("asc")
+      .take(500);
+
+    let inserted = 0;
+    let replaced = 0;
+
+    for (let index = 0; index < sections.length; index += 1) {
+      const section = sections[index];
+      const elements = await ctx.db
+        .query("academyCourseSectionElements")
+        .withIndex("by_section_and_order", (q) => q.eq("sectionId", section._id))
+        .order("asc")
+        .take(500);
+
+      const existingNotes = elements.filter((element) => element.type === "note");
+      if ((args.replaceExisting ?? false) && existingNotes.length > 0) {
+        for (const note of existingNotes) {
+          await ctx.db.delete(note._id);
+          replaced += 1;
+        }
+      } else if (existingNotes.length > 0) {
+        continue;
+      }
+
+      const maxOrder = elements.reduce((max, element) => Math.max(max, element.order ?? 0), 0);
+      const link = markdownLinks[index % markdownLinks.length];
+
+      await ctx.db.insert("academyCourseSectionElements", {
+        sectionId: section._id,
+        type: "note",
+        title: `Notes y Links (Markdown) - Sección ${index + 1}`,
+        order: maxOrder + 1,
+        durationLabel: "1min",
+        isPreview: false,
+        contentUrl: link,
+        contentText: `Archivo markdown de apoyo: ${link}`,
+      });
+      inserted += 1;
+    }
+
+    return {
+      sections: sections.length,
+      inserted,
+      replaced,
+    };
+  },
+});
