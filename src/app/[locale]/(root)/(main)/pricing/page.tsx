@@ -3,13 +3,14 @@
 import { useQuery } from "convex/react";
 import { api } from "#convex/_generated/api";
 import { useUser, SignInButton } from "@clerk/nextjs";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Crown, Check, CreditCard, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MainLayout from "@/components/elements/layouts/main-layout";
+import { Purchases, type PurchasesError, ErrorCode } from "@revenuecat/purchases-js";
 
 const FEATURES = [
   "Acceso a todos los cursos Premium",
@@ -19,8 +20,11 @@ const FEATURES = [
   "Soporte prioritario",
 ];
 
+const RC_PUBLIC_KEY = process.env.NEXT_PUBLIC_REVENUECAT_PUBLIC_KEY!;
+
 export default function PricingPage() {
   const { user, isLoaded } = useUser();
+  const router = useRouter();
   const offerings = useQuery(api.subscriptionOfferings.listOfferings);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,31 +34,60 @@ export default function PricingPage() {
   const isPremium =
     (user?.publicMetadata as { isPremium?: boolean })?.isPremium === true;
   const activeOffering = offerings?.find((o) => o.isActive);
+  const offeringsLoaded = offerings !== undefined;
 
   const savings = activeOffering
     ? activeOffering.monthlyPriceUsd * 12 - activeOffering.annualPriceUsd
     : 0;
 
   async function handleSubscribe(planType: "monthly" | "annual") {
+    if (!user) return;
     setLoading(true);
     setError(null);
+
     try {
-      const res = await fetch("/api/revenuecat/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planType, locale }),
-      });
-      const data = (await res.json()) as {
-        checkoutUrl?: string;
-        error?: string;
-      };
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-      } else {
-        setError(data.error ?? "Error al iniciar el pago. Intenta de nuevo.");
+      // Configure RC SDK with Clerk user ID
+      if (!Purchases.isConfigured()) {
+        Purchases.configure({ apiKey: RC_PUBLIC_KEY, appUserId: user.id });
       }
-    } catch {
-      setError("Error de conexión. Intenta de nuevo.");
+      const purchases = Purchases.getSharedInstance();
+
+      // Fetch offerings from RC
+      const rcOfferings = await purchases.getOfferings();
+      const currentOffering = rcOfferings.current ?? rcOfferings.all["premium"];
+
+      if (!currentOffering) {
+        setError("No hay planes disponibles en este momento.");
+        return;
+      }
+
+      // Find the matching package
+      const pkg = currentOffering.availablePackages.find((p) => {
+        const id = p.identifier.toLowerCase();
+        if (planType === "monthly") return id.includes("monthly") || id.includes("month") || id === "$rc_monthly";
+        return id.includes("annual") || id.includes("annual") || id === "$rc_annual";
+      }) ?? currentOffering.availablePackages[planType === "monthly" ? 0 : 1];
+
+      if (!pkg) {
+        setError("Plan no encontrado. Intenta de nuevo.");
+        return;
+      }
+
+      // Trigger RC Web Billing checkout (shows embedded UI)
+      await purchases.purchase({ rcPackage: pkg });
+
+      // Purchase successful — redirect to subscription page
+      router.push(`/${locale}/account/subscription?success=true`);
+    } catch (err) {
+      const rcErr = err as PurchasesError;
+      if (rcErr.errorCode === ErrorCode.UserCancelledError) {
+        // User closed checkout — no error shown
+        return;
+      }
+      console.error("[pricing] purchase error:", err);
+      setError(
+        rcErr.message ?? "Error al procesar el pago. Intenta de nuevo."
+      );
     } finally {
       setLoading(false);
     }
@@ -75,8 +108,8 @@ export default function PricingPage() {
             Eleva tu nivel con Premium
           </h1>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Accede a todos los cursos exclusivos, contenido de calidad y
-            aprende directamente de The Mariscal.
+            Accede a todos los cursos exclusivos, contenido de calidad y aprende
+            directamente de The Mariscal.
           </p>
         </div>
 
@@ -95,10 +128,7 @@ export default function PricingPage() {
               <p className="font-semibold">Ya tienes Premium activo</p>
               <p className="text-sm text-muted-foreground">
                 Gestiona tu suscripción en{" "}
-                <a
-                  href={`/${locale}/account/subscription`}
-                  className="underline"
-                >
+                <a href={`/${locale}/account/subscription`} className="underline">
                   tu cuenta
                 </a>
               </p>
@@ -124,6 +154,8 @@ export default function PricingPage() {
                         /mes
                       </span>
                     </p>
+                  ) : offeringsLoaded ? (
+                    <p className="text-4xl font-bold text-muted-foreground">—</p>
                   ) : (
                     <div className="h-10 w-32 bg-muted animate-pulse rounded" />
                   )}
@@ -152,7 +184,7 @@ export default function PricingPage() {
                     disabled={loading || !activeOffering}
                   >
                     <CreditCard className="size-4 mr-2" />
-                    Suscribirse mensual
+                    {loading ? "Cargando..." : "Suscribirse mensual"}
                   </Button>
                 )}
               </CardContent>
@@ -191,6 +223,8 @@ export default function PricingPage() {
                         ~${Math.round(activeOffering.annualPriceUsd / 12)}/mes
                       </p>
                     </>
+                  ) : offeringsLoaded ? (
+                    <p className="text-4xl font-bold text-muted-foreground">—</p>
                   ) : (
                     <div className="h-10 w-32 bg-muted animate-pulse rounded" />
                   )}
@@ -218,7 +252,7 @@ export default function PricingPage() {
                     disabled={loading || !activeOffering}
                   >
                     <Crown className="size-4 mr-2" />
-                    Suscribirse anual
+                    {loading ? "Cargando..." : "Suscribirse anual"}
                   </Button>
                 )}
               </CardContent>
@@ -226,7 +260,6 @@ export default function PricingPage() {
           </div>
         )}
 
-        {/* Fine print */}
         <p className="text-center text-xs text-muted-foreground">
           Puedes cancelar en cualquier momento desde tu cuenta. Sin permanencia.
         </p>
