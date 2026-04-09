@@ -3,8 +3,7 @@ import { v } from "convex/values";
 
 /**
  * Called from the RC webhook handler. Upserts subscription state for a user.
- * Using regular mutation (not internalMutation) so it's callable from
- * the Next.js webhook route via ConvexHttpClient.
+ * internalMutation — called only from the Convex RC webhook httpAction in http.ts.
  * One record per user — patches existing if found, inserts if new.
  */
 export const upsertSubscription = internalMutation({
@@ -69,6 +68,8 @@ export const getMySubscription = query({
 export const listActiveSubscribers = query({
   args: {},
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
     return await ctx.db
       .query("subscriptions")
       .withIndex("by_status", (q) => q.eq("status", "active"))

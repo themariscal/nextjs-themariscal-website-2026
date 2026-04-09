@@ -127,7 +127,11 @@ http.route({
   handler: httpAction(async (ctx, request) => {
     // Verify RC webhook secret
     const authHeader = request.headers.get("Authorization");
-    if (authHeader !== `Bearer ${process.env.REVENUECAT_WEBHOOK_SECRET}`) {
+    const webhookSecret = process.env.REVENUECAT_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      return new Response("Server misconfiguration", { status: 500 });
+    }
+    if (authHeader !== `Bearer ${webhookSecret}`) {
       return new Response("Unauthorized", { status: 401 });
     }
 
@@ -160,10 +164,13 @@ http.route({
           ? "billing_issue"
           : "expired";
 
-    const planType: "monthly" | "annual" = product_id.includes("annual") ? "annual" : "monthly";
+    const planType: "monthly" | "annual" = (product_id.toLowerCase().includes("annual") || product_id.toLowerCase().includes("yearly"))
+      ? "annual"
+      : "monthly";
+    // For cancellation/billing_issue events without expiry, use far future (won't be shown as active)
     const currentPeriodEnd = event.expiration_at_ms
       ? Math.floor(event.expiration_at_ms / 1000)
-      : 0;
+      : Math.floor(Date.now() / 1000);
     const entitlementId = event.entitlement_ids?.[0] ?? "premium";
 
     try {

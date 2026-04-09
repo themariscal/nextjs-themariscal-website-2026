@@ -15,6 +15,7 @@ export default function SubscriptionPage() {
   const subscription = useQuery(api.subscriptions.getMySubscription);
   const offerings = useQuery(api.subscriptionOfferings.listOfferings);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const params = useParams();
   const locale = params.locale as string;
 
@@ -36,10 +37,11 @@ export default function SubscriptionPage() {
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        console.error("Checkout error:", data.error);
+        setError(data.error ?? "Error al iniciar el pago. Intenta de nuevo.");
       }
     } catch (err) {
       console.error("Checkout error:", err);
+      setError("Error de conexión. Intenta de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -105,6 +107,10 @@ export default function SubscriptionPage() {
           Accede a cursos exclusivos y contenido premium
         </p>
       </div>
+
+      {error && (
+        <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">{error}</p>
+      )}
 
       {activeOffering && (
         <div className="grid gap-4 md:grid-cols-2">

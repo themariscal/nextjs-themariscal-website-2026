@@ -1237,6 +1237,8 @@ export const setIncludedInPremium = mutation({
 export const listAllCourses = query({
   args: {},
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
     return await ctx.db.query("academyCourses").take(500);
   },
 });

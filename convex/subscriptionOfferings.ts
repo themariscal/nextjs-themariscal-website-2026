@@ -27,6 +27,8 @@ export const createOffering = mutation({
     isActive: v.boolean(),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
     return await ctx.db.insert("subscriptionOfferings", args);
   },
 });
@@ -44,6 +46,8 @@ export const updateOffering = mutation({
     isActive: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
     const { id, ...fields } = args;
     const patch = Object.fromEntries(
       Object.entries(fields).filter(([, val]) => val !== undefined)
