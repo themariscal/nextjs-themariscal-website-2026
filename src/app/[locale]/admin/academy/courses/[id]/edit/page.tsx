@@ -67,14 +67,16 @@ export default function AdminAcademyEditCoursePage() {
   type AddLanguageType = z.infer<typeof addLanguageSchema>;
   type AddInstructorType = z.infer<typeof addInstructorSchema>;
 
-  const form = useForm<CourseFormType>({
-    resolver: zodResolver(createCourseSchema),
+  const form = useForm<CourseFormType, unknown, CourseFormType>({
+    resolver: zodResolver(createCourseSchema) as never,
     defaultValues: {
       name: "",
       youtubeUrl: "",
       languageId: "",
       instructorId: "",
       description: "",
+      price: undefined,
+      currency: "eur",
     },
   });
 
@@ -117,8 +119,8 @@ export default function AdminAcademyEditCoursePage() {
       setError(null);
       setIsSaving(true);
 
-      const languageIdValue = values.languageId || String(course.languageId);
-      const instructorIdValue = values.instructorId || String(course.instructorId);
+      const languageIdValue = values.languageId || String(course?.languageId ?? "");
+      const instructorIdValue = values.instructorId || String(course?.instructorId ?? "");
 
       const videoId = extractYouTubeVideoId(values.youtubeUrl);
       if (!videoId) {
