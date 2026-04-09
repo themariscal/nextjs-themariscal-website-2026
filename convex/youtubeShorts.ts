@@ -165,19 +165,30 @@ export const getBySectionForOrdering = query({
   handler: async (ctx, args) => {
     if (!args.section.trim()) return [];
 
-    const bySection = await ctx.db
-      .query("youtubeShorts")
-      .withIndex("bySectionAndOrder", (q) => q.eq("section", args.section))
-      .order("asc")
-      .collect();
+    const [bySection, byPage] = await Promise.all([
+      ctx.db
+        .query("youtubeShorts")
+        .withIndex("bySectionAndOrder", (q) => q.eq("section", args.section))
+        .order("asc")
+        .collect(),
+      ctx.db
+        .query("youtubeShorts")
+        .withIndex("byPageAndOrder", (q) => q.eq("page", args.section))
+        .order("asc")
+        .collect(),
+    ]);
 
-    if (bySection.length > 0) return bySection;
+    // Merge and deduplicate (docs with both section+page appear in both lists)
+    const seen = new Set<string>();
+    const merged: typeof bySection = [];
+    for (const doc of [...bySection, ...byPage]) {
+      if (!seen.has(doc._id)) {
+        seen.add(doc._id);
+        merged.push(doc);
+      }
+    }
 
-    return await ctx.db
-      .query("youtubeShorts")
-      .withIndex("byPageAndOrder", (q) => q.eq("page", args.section))
-      .order("asc")
-      .collect();
+    return merged.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   },
 });
 
@@ -212,7 +223,13 @@ export const bulkUpdateOrder = mutation({
   },
   handler: async (ctx, args) => {
     for (const item of args.items) {
-      await ctx.db.patch(item.id, { order: item.order });
+      const doc = await ctx.db.get(item.id);
+      const patch: { order: number; section?: string } = { order: item.order };
+      // Migrate page → section for legacy docs
+      if (doc && !doc.section && doc.page) {
+        patch.section = doc.page;
+      }
+      await ctx.db.patch(item.id, patch);
     }
     return { updated: args.items.length };
   },
@@ -244,6 +261,21 @@ export const update = mutation({
     if (fields.videoId !== undefined) patch.videoId = fields.videoId;
     if (fields.order !== undefined) patch.order = fields.order;
     await ctx.db.patch(id, patch);
+  },
+});
+
+export const migratePageToSection = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const docs = await ctx.db.query("youtubeShorts").collect();
+    let count = 0;
+    for (const doc of docs) {
+      if (!doc.section && doc.page) {
+        await ctx.db.patch(doc._id, { section: doc.page });
+        count++;
+      }
+    }
+    return { migrated: count };
   },
 });
 
