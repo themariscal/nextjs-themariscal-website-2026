@@ -208,7 +208,7 @@ All in test mode during development.
 
 ## 10. Branch & Setup
 
-- Branch: `feature/stripe-integration` (no worktree — pnpm incompatibility)
+- Branch: `feature/stripe-integration` (worktrees OK with npm)
 - Package: `stripe` (server SDK)
 - No `@stripe/stripe-js` needed (Checkout hosted = redirect only, no client SDK)
 

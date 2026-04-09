@@ -47,7 +47,7 @@ git checkout -b feature/stripe-integration
 - [ ] **Step 2: Install Stripe SDK**
 
 ```bash
-pnpm add stripe
+npm install stripe
 ```
 
 Expected: `stripe` appears in `package.json` dependencies.
@@ -69,7 +69,7 @@ Webhook secret: generated in Task 9 when running Stripe CLI.
 - [ ] **Step 4: Commit setup**
 
 ```bash
-git add package.json pnpm-lock.yaml
+git add package.json package-lock.json
 git commit -m "feat: install stripe SDK"
 ```
 
@@ -1130,7 +1130,7 @@ const handleCreateCourse = form.handleSubmit(async (values) => {
 
 - [ ] **Step 2: Verify in dev**
 
-1. Run `pnpm dev` + `npx convex dev`
+1. Run `npm run dev` + `npx convex dev`
 2. Go to `/admin/academy/courses/new`
 3. Fill form with price `49` and currency `EUR`
 4. Submit — course should save and a Stripe product should appear in the Stripe test dashboard
