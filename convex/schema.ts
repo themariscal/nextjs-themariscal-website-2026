@@ -5,8 +5,6 @@ export default defineSchema({
   youtubeShorts: defineTable({
     videoId: v.string(),
     title: v.string(),
-    // `section` is the new canonical field.
-    // `page` remains optional for backward compatibility with existing routes/data.
     section: v.optional(v.string()),
     page: v.optional(v.string()),
     order: v.optional(v.number()),
@@ -35,6 +33,12 @@ export default defineSchema({
     languageId: v.id("courseLanguages"),
     instructorId: v.id("courseInstructors"),
     description: v.string(),
+    // Pricing (stored in cents, e.g. 4900 = €49.00; 0 = free)
+    price: v.optional(v.number()),
+    currency: v.optional(v.string()),
+    // Stripe
+    stripeProductId: v.optional(v.string()),
+    stripePriceId: v.optional(v.string()),
   })
     .index("by_language", ["languageId"])
     .index("by_instructor", ["instructorId"]),
@@ -132,4 +136,25 @@ export default defineSchema({
     .index("byExternalId", ["externalId"])
     .index("byEmail", ["email"])
     .index("byUsername", ["username"]),
+
+  coursePurchases: defineTable({
+    courseId: v.id("academyCourses"),
+    userId: v.optional(v.id("users")),
+    email: v.string(),
+    stripeSessionId: v.string(),
+    stripePaymentIntentId: v.optional(v.string()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("completed"),
+      v.literal("refunded")
+    ),
+    amountTotal: v.number(),
+    currency: v.string(),
+  })
+    .index("by_email", ["email"])
+    .index("by_course", ["courseId"])
+    .index("by_session", ["stripeSessionId"])
+    .index("by_user", ["userId"])
+    .index("by_user_and_course", ["userId", "courseId"])
+    .index("by_email_and_course", ["email", "courseId"]),
 });

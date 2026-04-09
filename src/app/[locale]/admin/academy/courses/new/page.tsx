@@ -64,14 +64,17 @@ export default function AdminAcademyNewCoursePage() {
   type AddLanguageType = z.infer<typeof addLanguageSchema>;
   type AddInstructorType = z.infer<typeof addInstructorSchema>;
 
-  const form = useForm<CreateCourseType>({
-    resolver: zodResolver(createCourseSchema),
+  const form = useForm<CreateCourseType, unknown, CreateCourseType>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(createCourseSchema) as any,
     defaultValues: {
       name: "",
       youtubeUrl: "",
       languageId: "",
       instructorId: "",
       description: "",
+      price: undefined,
+      currency: "eur",
     },
   });
 
@@ -96,22 +99,51 @@ export default function AdminAcademyNewCoursePage() {
         return;
       }
 
-      await createCourse({
+      const courseId = await createCourse({
         name: values.name,
         youtubeUrl: values.youtubeUrl,
         youtubeVideoId: videoId,
         languageId: values.languageId as Id<"courseLanguages">,
         instructorId: values.instructorId as Id<"courseInstructors">,
         description: values.description,
+        price: values.price,
+        currency: values.currency,
       });
 
-      toast.success("Curso agregado.");
+      if (!courseId) throw new Error("No se pudo obtener el ID del curso creado.");
+
+      // Create Stripe product if price > 0
+      if (values.price && values.price > 0) {
+        try {
+          const res = await fetch("/api/stripe/products", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              courseId,
+              name: values.name,
+              price: values.price,
+              currency: values.currency,
+            }),
+          });
+          if (!res.ok) {
+            const data = await res.json();
+            toast.warn(`Curso creado, pero Stripe falló: ${data.error ?? "error desconocido"}`);
+          } else {
+            toast.success("Curso creado y producto en Stripe creado.");
+          }
+        } catch {
+          toast.warn("Curso creado, pero no se pudo conectar con Stripe.");
+        }
+      } else {
+        toast.success("Curso creado.");
+      }
+
       router.push(`/${locale}/admin/academy/courses`);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Error al guardar el curso.");
+        setError("Error al crear el curso.");
       }
     } finally {
       setIsSaving(false);
@@ -283,6 +315,51 @@ export default function AdminAcademyNewCoursePage() {
                     placeholder="Contá de qué trata el curso..."
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            name="price"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Precio (en centavos, 0 = gratis)</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="number"
+                    min={0}
+                    step={1}
+                    placeholder="4900"
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            name="currency"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Moneda</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccioná moneda" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="eur">EUR — Euro</SelectItem>
+                    <SelectItem value="usd">USD — Dólar</SelectItem>
+                    <SelectItem value="gbp">GBP — Libra</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}

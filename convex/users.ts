@@ -6,24 +6,42 @@ export const upsertFromClerk = internalMutation({
     data: v.any(),
   },
   async handler(ctx, { data }) {
+    const email = (
+      data.email_addresses as Array<{ email_address: string }>
+    )[0]?.email_address as string | undefined;
+
     const userAttributes = {
       externalId: data.id as string,
-      email: data.email_addresses[0]?.email_address as string,
+      email: email ?? "",
       firstName: data.first_name ?? undefined,
       lastName: data.last_name ?? undefined,
       username: data.username ?? undefined,
       imageUrl: data.image_url ?? undefined,
     };
 
-    const user = await ctx.db
+    const existing = await ctx.db
       .query("users")
       .withIndex("byExternalId", (q) => q.eq("externalId", data.id))
       .unique();
 
-    if (user === null) {
-      await ctx.db.insert("users", userAttributes);
+    if (existing === null) {
+      const userId = await ctx.db.insert("users", userAttributes);
+
+      // Link any guest course purchases to this new user account
+      if (email) {
+        const guestPurchases = await ctx.db
+          .query("coursePurchases")
+          .withIndex("by_email", (q) => q.eq("email", email))
+          .collect();
+
+        for (const purchase of guestPurchases) {
+          if (purchase.userId === undefined) {
+            await ctx.db.patch(purchase._id, { userId });
+          }
+        }
+      }
     } else {
-      await ctx.db.patch(user._id, userAttributes);
+      await ctx.db.patch(existing._id, userAttributes);
     }
   },
 });

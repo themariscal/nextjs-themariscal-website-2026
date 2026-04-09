@@ -19,7 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useMusicStore } from "@/lib/stores/music-store";
@@ -27,7 +26,6 @@ import { useSidebarStore } from "@/lib/stores/sidebar-store";
 import { extractYouTubeVideoId } from "@/lib/youtube-shorts";
 import { useMutation, useQuery } from "convex/react";
 import {
-  BadgePercent,
   BookOpen,
   Check,
   ChevronDown,
@@ -41,7 +39,6 @@ import {
   MessageSquare,
   PlayCircle,
   Plus,
-  Share2,
   ShieldCheck,
   Star,
   Tag,
@@ -73,6 +70,9 @@ type PublicCourseData = {
   youtubeVideoId: string;
   languageName: string | null;
   instructorName: string | null;
+  price?: number;
+  currency?: string;
+  stripePriceId?: string;
   sections: Array<{
     _id: Id<"academyCourseSections">;
     name: string;
@@ -87,8 +87,15 @@ type PreviewVideoItem = {
   sectionName?: string;
 };
 
-const COURSE_BASE_PRICE = 10.99;
-const COURSE_PREVIOUS_PRICE = 49.99;
+function formatCoursePrice(price?: number, currency?: string): string {
+  if (!price || price === 0) return "Gratis";
+  const cur = (currency ?? "eur").toUpperCase();
+  return new Intl.NumberFormat("es-ES", {
+    style: "currency",
+    currency: cur,
+    minimumFractionDigits: 2,
+  }).format(price / 100);
+}
 
 function parseDurationToSeconds(value?: string): number {
   if (!value) return 0;
@@ -941,6 +948,8 @@ function CourseMainContent({ courseData }: { courseData: PublicCourseData | null
 function CoursePurchaseSidebar({
   courseData,
   stats,
+  locale,
+  courseSlug,
 }: {
   courseData: PublicCourseData | null | undefined;
   stats: {
@@ -948,13 +957,10 @@ function CoursePurchaseSidebar({
     totalElements: number;
     totalSeconds: number;
   };
+  locale: string;
+  courseSlug: string;
 }) {
-  const [couponCode, setCouponCode] = useState("");
-  const [couponError, setCouponError] = useState<string | null>(null);
-  const [appliedCoupon, setAppliedCoupon] = useState<{
-    code: string;
-    discount: number;
-  } | null>(null);
+  const [isBuying, setIsBuying] = useState(false);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
@@ -968,10 +974,18 @@ function CoursePurchaseSidebar({
     courseData?.youtubeVideoId ?? ""
   );
 
+  const hasPurchased = useQuery(
+    api.coursePurchases.hasPurchasedCourse,
+    courseData ? { courseId: courseData._id } : "skip"
+  );
+  const enrollForFree = useMutation(api.coursePurchases.enrollForFree);
+
   useEffect(() => {
     setActivePreviewVideoId(courseData?.youtubeVideoId ?? "");
   }, [courseData?.youtubeVideoId]);
 
+<<<<<<< HEAD
+=======
   const discountsByCoupon: Record<string, number> = {
     MT260406G3NEW: 0.27,
     MARISCAL10: 0.1,
@@ -991,12 +1005,15 @@ function CoursePurchaseSidebar({
     return () => clearTimeout(timeout);
   }, [snackbarMessage]);
 
+>>>>>>> develop
   if (courseData === undefined) {
     return <Skeleton className="h-[560px] w-full" />;
   }
 
   if (!courseData) return null;
 
+<<<<<<< HEAD
+=======
   const handleApplyCoupon = () => {
     const normalized = couponCode.trim().toUpperCase();
     if (!normalized) {
@@ -1040,6 +1057,7 @@ function CoursePurchaseSidebar({
     }
   };
 
+>>>>>>> develop
   return (
     <>
       <Card className="overflow-hidden border-border/70 bg-background/95">
@@ -1068,24 +1086,12 @@ function CoursePurchaseSidebar({
 
         <CardContent className="space-y-4 p-4">
           <div>
-            <p className="text-xs text-muted-foreground">Buy individual course</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold">€{finalPrice.toFixed(2)}</span>
-              <span className="text-sm text-muted-foreground line-through">
-                €{COURSE_PREVIOUS_PRICE.toFixed(2)}
+            {courseData.price && courseData.price > 0 ? (
+              <span className="text-3xl font-extrabold">
+                {formatCoursePrice(courseData.price, courseData.currency)}
               </span>
-              {appliedCoupon ? (
-                <span className="text-sm text-primary font-medium">
-                  {Math.round(appliedCoupon.discount * 100)}% off
-                </span>
-              ) : null}
-            </div>
-            {appliedCoupon ? (
-              <p className="mt-1 text-xs text-primary">
-                Cupón <strong>{appliedCoupon.code}</strong> aplicado.
-              </p>
             ) : (
-              <p className="mt-1 text-xs text-primary">12 hours left at this price!</p>
+              <span className="text-3xl font-extrabold text-primary">Gratis</span>
             )}
           </div>
 
@@ -1101,6 +1107,13 @@ function CoursePurchaseSidebar({
           </div>
 
           <div className="space-y-2">
+<<<<<<< HEAD
+            {hasPurchased === undefined ? (
+              <Skeleton className="h-10 w-full" />
+            ) : hasPurchased ? (
+              <Button className="w-full cursor-pointer" disabled>
+                Continuar aprendiendo
+=======
             <Button className="w-full cursor-pointer">Add to cart</Button>
             <Button
               variant="outline"
@@ -1135,17 +1148,58 @@ function CoursePurchaseSidebar({
               <Button type="button" variant="outline" className="h-9" onClick={handleApplyCoupon}>
                 <BadgePercent className="size-4" />
                 Apply
+>>>>>>> develop
               </Button>
-            </div>
-            {couponError ? (
-              <p className="text-xs text-destructive">{couponError}</p>
-            ) : null}
-            {appliedCoupon ? (
-              <div className="flex items-center justify-between rounded-md border border-border/60 bg-muted/40 px-3 py-2 text-sm">
-                <span>{appliedCoupon.code}</span>
-                <span className="font-medium text-primary">Applied!</span>
-              </div>
-            ) : null}
+            ) : !courseData.price || courseData.price === 0 ? (
+              <Button
+                className="w-full cursor-pointer"
+                onClick={async () => {
+                  if (!courseData) return;
+                  setIsBuying(true);
+                  try {
+                    await enrollForFree({ courseId: courseData._id });
+                  } catch (err) {
+                    console.error("enrollForFree error:", err);
+                    // User will see the button re-enable; logged-out user needs to sign in
+                  } finally {
+                    setIsBuying(false);
+                  }
+                }}
+                disabled={isBuying}
+              >
+                {isBuying ? "Inscribiendo..." : "Inscribirme gratis"}
+              </Button>
+            ) : (
+              <Button
+                className="w-full cursor-pointer"
+                onClick={async () => {
+                  if (!courseData) return;
+                  setIsBuying(true);
+                  let navigating = false;
+                  try {
+                    const res = await fetch("/api/stripe/checkout", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ courseId: courseData._id, locale, courseSlug }),
+                    });
+                    const data = await res.json() as { sessionUrl?: string };
+                    if (data.sessionUrl) {
+                      navigating = true;
+                      window.location.href = data.sessionUrl;
+                    }
+                  } catch {
+                    // Stripe redirect failed
+                  } finally {
+                    if (!navigating) setIsBuying(false);
+                  }
+                }}
+                disabled={isBuying}
+              >
+                {isBuying
+                  ? "Redirigiendo..."
+                  : `Comprar — ${formatCoursePrice(courseData.price, courseData.currency)}`}
+              </Button>
+            )}
           </div>
 
           <div className="space-y-2 border-t border-border/60 pt-3 text-xs text-muted-foreground">
@@ -1253,11 +1307,21 @@ function CoursePurchaseSidebar({
 
 function CourseMobilePurchaseBar({
   courseData,
+  locale,
+  courseSlug,
 }: {
   courseData: PublicCourseData | null | undefined;
+  locale: string;
+  courseSlug: string;
 }) {
   const isPlayerCollapsed = useMusicStore((state) => state.isPlayerCollapsed);
   const { isCollapsed } = useSidebarStore();
+  const [isBuying, setIsBuying] = useState(false);
+  const hasPurchased = useQuery(
+    api.coursePurchases.hasPurchasedCourse,
+    courseData ? { courseId: courseData._id } : "skip"
+  );
+  const enrollForFree = useMutation(api.coursePurchases.enrollForFree);
 
   if (!courseData) return null;
 
@@ -1273,16 +1337,61 @@ function CourseMobilePurchaseBar({
         <div className="flex items-center gap-3">
           <div className="shrink-0">
             <p className="text-3xl font-extrabold leading-none">
-              €{COURSE_BASE_PRICE.toFixed(2)}
-            </p>
-            <p className="text-sm font-medium text-muted-foreground line-through">
-              €{COURSE_PREVIOUS_PRICE.toFixed(2)}
+              {formatCoursePrice(courseData.price, courseData.currency)}
             </p>
           </div>
 
-          <Button className="h-12 flex-1 text-base font-semibold cursor-pointer">
-            Add to cart
-          </Button>
+          {hasPurchased === undefined ? (
+            <Skeleton className="h-12 flex-1" />
+          ) : hasPurchased ? (
+            <Button className="h-12 flex-1 text-base font-semibold cursor-pointer" disabled>
+              Continuar aprendiendo
+            </Button>
+          ) : !courseData.price || courseData.price === 0 ? (
+            <Button
+              className="h-12 flex-1 text-base font-semibold cursor-pointer"
+              disabled={isBuying}
+              onClick={async () => {
+                setIsBuying(true);
+                try {
+                  await enrollForFree({ courseId: courseData._id });
+                } catch (err) {
+                  console.error("enrollForFree error:", err);
+                  // User will see the button re-enable; logged-out user needs to sign in
+                } finally {
+                  setIsBuying(false);
+                }
+              }}
+            >
+              {isBuying ? "..." : "Inscribirme gratis"}
+            </Button>
+          ) : (
+            <Button
+              className="h-12 flex-1 text-base font-semibold cursor-pointer"
+              disabled={isBuying}
+              onClick={async () => {
+                setIsBuying(true);
+                let navigating = false;
+                try {
+                  const res = await fetch("/api/stripe/checkout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ courseId: courseData._id, locale, courseSlug }),
+                  });
+                  const data = await res.json() as { sessionUrl?: string };
+                  if (data.sessionUrl) {
+                    navigating = true;
+                    window.location.href = data.sessionUrl;
+                  }
+                } catch { /* ignore */ }
+                finally {
+                  if (!navigating) setIsBuying(false);
+                }
+              }}
+            >
+              {isBuying ? "..." : "Comprar"}
+            </Button>
+          )}
         </div>
       </div>
     </div>
@@ -1416,6 +1525,7 @@ function CourseMarketplaceFooter() {
 export default function PublicAcademyCoursePage() {
   const params = useParams();
   const courseSlug = (params.courseSlug as string) ?? "";
+  const locale = (params.locale as string) ?? "es";
   const isPlayerCollapsed = useMusicStore((state) => state.isPlayerCollapsed);
 
   const courseData = useQuery(api.academyCourses.getPublicCourseBySlug, {
@@ -1457,11 +1567,11 @@ export default function PublicAcademyCoursePage() {
           <PrincipalLayout
             hero={<CourseHero courseData={courseData} stats={stats} />}
             content={<CourseMainContent courseData={courseData} />}
-            rightSidebar={<CoursePurchaseSidebar courseData={courseData} stats={stats} />}
+            rightSidebar={<CoursePurchaseSidebar courseData={courseData} stats={stats} locale={locale} courseSlug={courseSlug} />}
             containerWidthClassName="max-w-[86rem]"
           />
         </div>
-        <CourseMobilePurchaseBar courseData={courseData} />
+        <CourseMobilePurchaseBar courseData={courseData} locale={locale} courseSlug={courseSlug} />
         <CourseMarketplaceFooter />
       </div>
     </MainLayout>

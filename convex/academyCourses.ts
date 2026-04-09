@@ -151,6 +151,8 @@ export const createCourse = mutation({
     languageId: v.id("courseLanguages"),
     instructorId: v.id("courseInstructors"),
     description: v.string(),
+    price: v.optional(v.number()),
+    currency: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const [language, instructor] = await Promise.all([
@@ -158,13 +160,8 @@ export const createCourse = mutation({
       ctx.db.get(args.instructorId),
     ]);
 
-    if (!language) {
-      throw new Error("Idioma inválido.");
-    }
-
-    if (!instructor) {
-      throw new Error("Instructor inválido.");
-    }
+    if (!language) throw new Error("Idioma inválido.");
+    if (!instructor) throw new Error("Instructor inválido.");
 
     return await ctx.db.insert("academyCourses", {
       name: args.name.trim(),
@@ -173,6 +170,8 @@ export const createCourse = mutation({
       languageId: args.languageId,
       instructorId: args.instructorId,
       description: args.description.trim(),
+      price: args.price,
+      currency: args.currency,
     });
   },
 });
@@ -229,6 +228,8 @@ export const updateCourse = mutation({
     languageId: v.id("courseLanguages"),
     instructorId: v.id("courseInstructors"),
     description: v.string(),
+    price: v.optional(v.number()),
+    currency: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const [course, language, instructor] = await Promise.all([
@@ -237,17 +238,9 @@ export const updateCourse = mutation({
       ctx.db.get(args.instructorId),
     ]);
 
-    if (!course) {
-      throw new Error("Curso inválido.");
-    }
-
-    if (!language) {
-      throw new Error("Idioma inválido.");
-    }
-
-    if (!instructor) {
-      throw new Error("Instructor inválido.");
-    }
+    if (!course) throw new Error("Curso inválido.");
+    if (!language) throw new Error("Idioma inválido.");
+    if (!instructor) throw new Error("Instructor inválido.");
 
     await ctx.db.patch(args.courseId, {
       name: args.name.trim(),
@@ -256,6 +249,8 @@ export const updateCourse = mutation({
       languageId: args.languageId,
       instructorId: args.instructorId,
       description: args.description.trim(),
+      price: args.price,
+      currency: args.currency,
     });
 
     return args.courseId;
@@ -455,6 +450,46 @@ export const getPublicCourseBySlug = query({
       slug: requestedSlug,
       sections: sectionsWithElements,
     };
+  },
+});
+
+/**
+ * Called from POST /api/stripe/products after creating a new Stripe Product + Price.
+ */
+export const updateStripeIds = mutation({
+  args: {
+    courseId: v.id("academyCourses"),
+    stripeProductId: v.string(),
+    stripePriceId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const course = await ctx.db.get(args.courseId);
+    if (!course) throw new Error("Curso no encontrado.");
+    await ctx.db.patch(args.courseId, {
+      stripeProductId: args.stripeProductId,
+      stripePriceId: args.stripePriceId,
+    });
+  },
+});
+
+/**
+ * Called from PATCH /api/stripe/products after archiving old Price + creating new one.
+ */
+export const updateStripePriceId = mutation({
+  args: {
+    courseId: v.id("academyCourses"),
+    stripePriceId: v.string(),
+    price: v.number(),
+    currency: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const course = await ctx.db.get(args.courseId);
+    if (!course) throw new Error("Curso no encontrado.");
+    await ctx.db.patch(args.courseId, {
+      stripePriceId: args.stripePriceId,
+      price: args.price,
+      currency: args.currency,
+    });
   },
 });
 

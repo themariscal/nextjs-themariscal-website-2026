@@ -9,6 +9,7 @@
  */
 
 import type * as academyCourses from "../academyCourses.js";
+import type * as coursePurchases from "../coursePurchases.js";
 import type * as http from "../http.js";
 import type * as shortComments from "../shortComments.js";
 import type * as users from "../users.js";
@@ -22,6 +23,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   academyCourses: typeof academyCourses;
+  coursePurchases: typeof coursePurchases;
   http: typeof http;
   shortComments: typeof shortComments;
   users: typeof users;

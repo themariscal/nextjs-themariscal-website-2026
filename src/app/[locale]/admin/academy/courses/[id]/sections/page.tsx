@@ -14,6 +14,7 @@ import { useQuery } from "convex/react";
 import {
   ArrowLeft,
   ChevronDown,
+  ExternalLink,
   FileQuestion,
   FileText,
   Link2,
@@ -39,6 +40,17 @@ type SectionWithElements = {
   order?: number;
   elements: SectionElement[];
 };
+
+function formatPrice(price?: number, currency?: string): string {
+  if (!price) return "Gratis";
+  const cur = (currency ?? "eur").toUpperCase();
+  const formatted = new Intl.NumberFormat("es-ES", {
+    style: "currency",
+    currency: cur,
+    minimumFractionDigits: 2,
+  }).format(price / 100);
+  return `${formatted} ${cur}`;
+}
 
 function parseDurationToSeconds(value?: string): number {
   if (!value) return 0;
@@ -140,10 +152,29 @@ export default function AdminAcademyCourseSectionsPage() {
       containerClassName="max-w-6xl"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
-        <div>
+        <div className="flex items-center gap-2">
           {stats.totalSections} secciones · {stats.totalElements} elementos · {formatDuration(stats.totalSeconds)} duración total
+          <Badge variant="outline" className="text-xs">
+            {formatPrice(course.price, course.currency)}
+          </Badge>
         </div>
         <div className="flex items-center gap-2">
+          {course.stripeProductId && (
+            <Button
+              variant="outline"
+              className="cursor-pointer"
+              onClick={() =>
+                window.open(
+                  `https://dashboard.stripe.com/test/products/${course.stripeProductId}`,
+                  "_blank",
+                  "noopener,noreferrer"
+                )
+              }
+            >
+              <ExternalLink className="size-4" />
+              Ver en Stripe
+            </Button>
+          )}
           <Button
             variant="outline"
             className="cursor-pointer"
