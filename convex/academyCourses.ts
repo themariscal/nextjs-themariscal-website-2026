@@ -153,6 +153,7 @@ export const createCourse = mutation({
     description: v.string(),
     price: v.optional(v.number()),
     currency: v.optional(v.string()),
+    includedInPremium: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const [language, instructor] = await Promise.all([
@@ -172,6 +173,7 @@ export const createCourse = mutation({
       description: args.description.trim(),
       price: args.price,
       currency: args.currency,
+      includedInPremium: args.includedInPremium ?? false,
     });
   },
 });
@@ -638,14 +640,21 @@ export const getPurchasedCoursePlayerBySlug = query({
     const course = courses.find((item) => toFriendlySlug(item.name) === requestedSlug) ?? null;
     if (!course) return null;
 
-    const enrollment = await ctx.db
-      .query("academyCourseEnrollments")
-      .withIndex("by_token_and_course", (q) =>
-        q.eq("tokenIdentifier", identity.tokenIdentifier).eq("courseId", course._id)
-      )
-      .unique();
+    const [enrollment, subscription] = await Promise.all([
+      ctx.db
+        .query("academyCourseEnrollments")
+        .withIndex("by_token_and_course", (q) =>
+          q.eq("tokenIdentifier", identity.tokenIdentifier).eq("courseId", course._id)
+        )
+        .unique(),
+      ctx.db
+        .query("subscriptions")
+        .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", identity.subject))
+        .unique(),
+    ]);
 
-    if (!enrollment) {
+    const isPremium = subscription?.status === "active";
+    if (!enrollment && !(isPremium && (course.includedInPremium ?? false))) {
       return { accessDenied: true as const };
     }
 
@@ -1231,6 +1240,66 @@ export const setIncludedInPremium = mutation({
     await ctx.db.patch(args.courseId, {
       includedInPremium: args.includedInPremium,
     });
+  },
+});
+
+export const patchIncludedInPremium = mutation({
+  args: {
+    courseId: v.id("academyCourses"),
+    includedInPremium: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.courseId, { includedInPremium: args.includedInPremium });
+  },
+});
+
+export const getAcademyCoursesWithAccess = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    const courses = await ctx.db.query("academyCourses").order("desc").take(500);
+
+    const coursesWithMeta = await Promise.all(
+      courses.map(async (course) => {
+        const [language, instructor] = await Promise.all([
+          ctx.db.get(course.languageId),
+          ctx.db.get(course.instructorId),
+        ]);
+        return {
+          ...course,
+          languageName: language?.name ?? null,
+          instructorName: instructor?.name ?? null,
+          slug: toFriendlySlug(course.name),
+          hasAccess: false as boolean,
+        };
+      })
+    );
+
+    if (!identity) return coursesWithMeta;
+
+    const [subscription, enrollments] = await Promise.all([
+      ctx.db
+        .query("subscriptions")
+        .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", identity.subject))
+        .unique(),
+      ctx.db
+        .query("academyCourseEnrollments")
+        .withIndex("by_token", (q) =>
+          q.eq("tokenIdentifier", identity.tokenIdentifier)
+        )
+        .take(500),
+    ]);
+
+    const isPremium = subscription?.status === "active";
+    const enrolledIds = new Set(enrollments.map((e) => String(e.courseId)));
+
+    return coursesWithMeta.map((course) => ({
+      ...course,
+      hasAccess:
+        enrolledIds.has(String(course._id)) ||
+        (isPremium && (course.includedInPremium ?? false)),
+    }));
   },
 });
 
