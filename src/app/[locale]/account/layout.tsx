@@ -17,9 +17,11 @@ export default function RootLayout({
     return (
         <SidebarProvider>
             <Topbar />
-            <div className="pt-12">
-                <AccountAppSidebar />
-            </div>
+            {!isCoursesRoute ? (
+                <div className="pt-12">
+                    <AccountAppSidebar />
+                </div>
+            ) : null}
 
             <main className="w-full">
                 <div

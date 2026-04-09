@@ -919,3 +919,166 @@ export const toggleCourseElementCompleted = mutation({
     return { completed: true as const };
   },
 });
+
+export const removeSectionByName = mutation({
+  args: {
+    courseId: v.id("academyCourses"),
+    sectionName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const course = await ctx.db.get(args.courseId);
+    if (!course) {
+      throw new Error("Curso inválido.");
+    }
+
+    const sections = await ctx.db
+      .query("academyCourseSections")
+      .withIndex("by_course", (q) => q.eq("courseId", args.courseId))
+      .take(500);
+
+    const target = sections.find(
+      (section) => section.name.trim().toLowerCase() === args.sectionName.trim().toLowerCase()
+    );
+
+    if (!target) {
+      return { removed: false as const, removedElements: 0 };
+    }
+
+    const elements = await ctx.db
+      .query("academyCourseSectionElements")
+      .withIndex("by_section", (q) => q.eq("sectionId", target._id))
+      .take(500);
+
+    for (const element of elements) {
+      await ctx.db.delete(element._id);
+    }
+
+    await ctx.db.delete(target._id);
+
+    const remainingSections = await ctx.db
+      .query("academyCourseSections")
+      .withIndex("by_course_and_order", (q) => q.eq("courseId", args.courseId))
+      .order("asc")
+      .take(500);
+
+    for (let index = 0; index < remainingSections.length; index += 1) {
+      const section = remainingSections[index];
+      const expectedOrder = index + 1;
+      if ((section.order ?? expectedOrder) !== expectedOrder) {
+        await ctx.db.patch(section._id, { order: expectedOrder });
+      }
+    }
+
+    return { removed: true as const, removedElements: elements.length };
+  },
+});
+
+export const randomizeVideoPreviews = mutation({
+  args: {
+    courseId: v.id("academyCourses"),
+    previewCount: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const course = await ctx.db.get(args.courseId);
+    if (!course) {
+      throw new Error("Curso inválido.");
+    }
+
+    const sections = await ctx.db
+      .query("academyCourseSections")
+      .withIndex("by_course", (q) => q.eq("courseId", args.courseId))
+      .take(500);
+
+    const elements = (
+      await Promise.all(
+        sections.map((section) =>
+          ctx.db
+            .query("academyCourseSectionElements")
+            .withIndex("by_section", (q) => q.eq("sectionId", section._id))
+            .take(500)
+        )
+      )
+    ).flat();
+
+    const videoElements = elements.filter((element) => element.type === "video");
+    if (videoElements.length === 0) {
+      return { updated: 0, previewIds: [] as string[] };
+    }
+
+    const requestedCount = args.previewCount ?? 6;
+    const count = Math.max(1, Math.min(videoElements.length, Math.floor(requestedCount)));
+
+    const shuffled = [...videoElements];
+    for (let i = shuffled.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    const selectedIds = new Set(shuffled.slice(0, count).map((element) => String(element._id)));
+
+    let updated = 0;
+    for (const element of videoElements) {
+      const nextPreview = selectedIds.has(String(element._id));
+      if ((element.isPreview ?? false) !== nextPreview) {
+        await ctx.db.patch(element._id, { isPreview: nextPreview });
+        updated += 1;
+      }
+    }
+
+    return {
+      updated,
+      previewIds: [...selectedIds],
+    };
+  },
+});
+
+export const renumberSectionTitles = mutation({
+  args: {
+    courseId: v.id("academyCourses"),
+  },
+  handler: async (ctx, args) => {
+    const course = await ctx.db.get(args.courseId);
+    if (!course) {
+      throw new Error("Curso inválido.");
+    }
+
+    const sections = await ctx.db
+      .query("academyCourseSections")
+      .withIndex("by_course_and_order", (q) => q.eq("courseId", args.courseId))
+      .order("asc")
+      .take(500);
+
+    let updated = 0;
+
+    for (let index = 0; index < sections.length; index += 1) {
+      const section = sections[index];
+      const nextOrder = index + 1;
+
+      const currentName = section.name.trim();
+      const rest = currentName.replace(/^section\s+\d+\s*:\s*/i, "");
+      const nextName = /^section\s+\d+\s*:/i.test(currentName)
+        ? `Section ${nextOrder}: ${rest}`
+        : currentName;
+
+      const patch: {
+        order?: number;
+        name?: string;
+      } = {};
+
+      if ((section.order ?? nextOrder) !== nextOrder) {
+        patch.order = nextOrder;
+      }
+
+      if (nextName !== section.name) {
+        patch.name = nextName;
+      }
+
+      if (Object.keys(patch).length > 0) {
+        await ctx.db.patch(section._id, patch);
+        updated += 1;
+      }
+    }
+
+    return { updated, total: sections.length };
+  },
+});
