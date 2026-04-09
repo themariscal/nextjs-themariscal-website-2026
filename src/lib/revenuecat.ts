@@ -44,6 +44,31 @@ function rcHeaders() {
 }
 
 /**
+ * Sets subscriber attributes in RevenueCat (email, display name, username).
+ * RC uses $email and $displayName as reserved keys shown in the dashboard.
+ * `username` is a custom attribute — visible in subscriber detail view.
+ * Docs: https://www.revenuecat.com/docs/subscribers/customer-info#subscriber-attributes
+ */
+export async function setSubscriberAttributes(
+  appUserId: string,
+  attributes: { email?: string; displayName?: string; username?: string }
+): Promise<void> {
+  const rcAttributes: Record<string, { value: string }> = {};
+  if (attributes.email) rcAttributes["$email"] = { value: attributes.email };
+  if (attributes.displayName) rcAttributes["$displayName"] = { value: attributes.displayName };
+  if (attributes.username) rcAttributes["username"] = { value: attributes.username };
+
+  if (Object.keys(rcAttributes).length === 0) return;
+
+  await fetch(`${RC_BASE_URL}/subscribers/${encodeURIComponent(appUserId)}/attributes`, {
+    method: "POST",
+    headers: rcHeaders(),
+    body: JSON.stringify({ attributes: rcAttributes }),
+  });
+  // Fire-and-forget: don't fail checkout if attributes fail
+}
+
+/**
  * Creates a RevenueCat Web Billing checkout session.
  * Returns the hosted checkout URL to redirect the user to.
  *
@@ -57,11 +82,13 @@ export async function createWebBillingCheckout({
   productId,
   successUrl,
   cancelUrl,
+  customerEmail,
 }: {
   appUserId: string;
   productId: string;
   successUrl: string;
   cancelUrl: string;
+  customerEmail?: string;
 }): Promise<string> {
   const res = await fetch(`${RC_BASE_URL}/web_billing/checkouts`, {
     method: "POST",
@@ -80,5 +107,13 @@ export async function createWebBillingCheckout({
   }
 
   const data = (await res.json()) as { checkout_url: string };
-  return data.checkout_url;
+  let checkoutUrl = data.checkout_url;
+
+  if (customerEmail) {
+    const url = new URL(checkoutUrl);
+    url.searchParams.set("email", customerEmail);
+    checkoutUrl = url.toString();
+  }
+
+  return checkoutUrl;
 }

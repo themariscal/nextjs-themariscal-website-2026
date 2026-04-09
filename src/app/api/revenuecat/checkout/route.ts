@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { createWebBillingCheckout } from "@/lib/revenuecat";
+import { auth, clerkClient } from "@clerk/nextjs/server";
+import { createWebBillingCheckout, setSubscriberAttributes } from "@/lib/revenuecat";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "#convex/_generated/api";
 
@@ -37,12 +37,26 @@ export async function POST(req: NextRequest) {
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? req.nextUrl.origin;
 
+  // Fetch Clerk user to set RC attributes and pre-fill checkout email
+  let customerEmail: string | undefined;
+  try {
+    const clerk = await clerkClient();
+    const clerkUser = await clerk.users.getUser(userId);
+    customerEmail = clerkUser.emailAddresses[0]?.emailAddress;
+    const displayName = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") || undefined;
+    const username = clerkUser.username ?? undefined;
+    await setSubscriberAttributes(userId, { email: customerEmail, displayName, username });
+  } catch (err) {
+    console.warn("[rc/checkout] Clerk user fetch failed (non-fatal)", err);
+  }
+
   try {
     const checkoutUrl = await createWebBillingCheckout({
       appUserId: userId,
       productId,
       successUrl: `${baseUrl}/${locale}/account/subscription?success=true`,
       cancelUrl: `${baseUrl}/${locale}/account/subscription`,
+      customerEmail,
     });
 
     return NextResponse.json({ checkoutUrl });

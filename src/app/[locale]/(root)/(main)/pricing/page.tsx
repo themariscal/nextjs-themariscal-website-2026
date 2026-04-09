@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MainLayout from "@/components/elements/layouts/main-layout";
-import { Purchases, type PurchasesError, ErrorCode } from "@revenuecat/purchases-js";
+import { Purchases, ReservedCustomerAttribute, type PurchasesError, ErrorCode } from "@revenuecat/purchases-js";
 
 const FEATURES = [
   "Acceso a todos los cursos Premium",
@@ -52,6 +52,19 @@ export default function PricingPage() {
       }
       const purchases = Purchases.getSharedInstance();
 
+      // Set user attributes so RC dashboard shows them and checkout form is pre-filled
+      const email = user.emailAddresses[0]?.emailAddress;
+      const displayName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.username || undefined;
+      const phone = user.phoneNumbers[0]?.phoneNumber;
+      const attrs: Record<string, string | null> = {};
+      if (email) attrs[ReservedCustomerAttribute.Email] = email;
+      if (displayName) attrs[ReservedCustomerAttribute.DisplayName] = displayName;
+      if (phone) attrs[ReservedCustomerAttribute.PhoneNumber] = phone;
+      if (user.username) attrs["username"] = user.username;
+      if (Object.keys(attrs).length > 0) {
+        await purchases.setAttributes(attrs);
+      }
+
       // Fetch offerings from RC
       const rcOfferings = await purchases.getOfferings();
       const currentOffering = rcOfferings.current ?? rcOfferings.all["premium"];
@@ -74,7 +87,7 @@ export default function PricingPage() {
       }
 
       // Trigger RC Web Billing checkout (shows embedded UI)
-      await purchases.purchase({ rcPackage: pkg });
+      await purchases.purchase({ rcPackage: pkg, customerEmail: email });
 
       // Purchase successful — redirect to subscription page
       router.push(`/${locale}/account/subscription?success=true`);

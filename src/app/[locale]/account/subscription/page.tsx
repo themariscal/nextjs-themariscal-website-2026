@@ -9,6 +9,7 @@ import { Crown, Calendar, CreditCard, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Purchases, ErrorCode, PurchasesError } from "@revenuecat/purchases-js";
 
 export default function SubscriptionPage() {
   const { user } = useUser();
@@ -26,7 +27,6 @@ export default function SubscriptionPage() {
     setSyncing(true);
     fetch("/api/revenuecat/sync", { method: "POST" })
       .then(() => {
-        // Hard navigate to clean URL to pick up updated Clerk metadata + Convex subscription
         window.location.href = `/${locale}/account/subscription`;
       })
       .catch((err) => {
@@ -43,22 +43,52 @@ export default function SubscriptionPage() {
     : null;
 
   async function handleSubscribe(planType: "monthly" | "annual") {
+    if (!user?.id || !activeOffering) return;
     setLoading(true);
+    setError(null);
+
     try {
-      const res = await fetch("/api/revenuecat/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planType, locale }),
-      });
-      const data = (await res.json()) as { checkoutUrl?: string; error?: string };
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-      } else {
-        setError(data.error ?? "Error al iniciar el pago. Intenta de nuevo.");
+      const publicKey = process.env.NEXT_PUBLIC_REVENUECAT_PUBLIC_KEY!;
+      const targetProductId =
+        planType === "monthly"
+          ? activeOffering.revenueCatProductIdMonthly
+          : activeOffering.revenueCatProductIdAnnual;
+
+      // Configure SDK with Clerk user ID so subscription links to the right account
+      const purchases = Purchases.configure(publicKey, user.id);
+
+      const rcOfferings = await purchases.getOfferings();
+      const allPackages = Object.values(rcOfferings.all).flatMap((o) => o.availablePackages);
+      const rcPackage = allPackages.find(
+        (pkg) => pkg.webBillingProduct.identifier === targetProductId
+      );
+
+      if (!rcPackage) {
+        setError("Producto no encontrado. Contacta soporte.");
+        return;
       }
+
+      const customerEmail = user.emailAddresses[0]?.emailAddress;
+
+      await purchases.purchase({
+        rcPackage,
+        customerEmail,
+        selectedLocale: locale,
+        skipSuccessPage: true,
+      });
+
+      // Purchase succeeded — sync and redirect
+      setSyncing(true);
+      await fetch("/api/revenuecat/sync", { method: "POST" });
+      window.location.href = `/${locale}/account/subscription`;
+
     } catch (err) {
+      if (err instanceof PurchasesError && err.errorCode === ErrorCode.UserCancelledError) {
+        // User closed the checkout — no error shown
+        return;
+      }
       console.error("Checkout error:", err);
-      setError("Error de conexión. Intenta de nuevo.");
+      setError("Error al iniciar el pago. Intenta de nuevo.");
     } finally {
       setLoading(false);
     }
