@@ -102,6 +102,8 @@ export default function AdminAcademyEditCoursePage() {
       languageId,
       instructorId,
       description: course.description,
+      price: course.price,
+      currency: course.currency ?? "eur",
     });
 
     // Force-select values after reset so shadcn Select reflects persisted ids.
@@ -119,8 +121,10 @@ export default function AdminAcademyEditCoursePage() {
       setError(null);
       setIsSaving(true);
 
-      const languageIdValue = values.languageId || String(course?.languageId ?? "");
-      const instructorIdValue = values.instructorId || String(course?.instructorId ?? "");
+      if (!course) return;
+
+      const languageIdValue = values.languageId || String(course.languageId ?? "");
+      const instructorIdValue = values.instructorId || String(course.instructorId ?? "");
 
       const videoId = extractYouTubeVideoId(values.youtubeUrl);
       if (!videoId) {
@@ -138,7 +142,51 @@ export default function AdminAcademyEditCoursePage() {
         description: values.description,
       });
 
-      toast.success("Curso actualizado.");
+      // Stripe price change logic
+      const priceChanged = values.price !== course.price;
+      const newPrice = values.price ?? 0;
+
+      if (priceChanged && newPrice > 0) {
+        try {
+          let stripeRes: Response;
+          if (course.stripeProductId) {
+            // Update existing Stripe product: archive old price, create new
+            stripeRes = await fetch("/api/stripe/products", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                courseId,
+                stripeProductId: course.stripeProductId,
+                newPrice,
+                currency: values.currency,
+              }),
+            });
+          } else {
+            // First time adding a price: create Stripe product
+            stripeRes = await fetch("/api/stripe/products", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                courseId,
+                name: values.name,
+                price: newPrice,
+                currency: values.currency,
+              }),
+            });
+          }
+          if (!stripeRes.ok) {
+            const data = await stripeRes.json();
+            toast.warn(`Cambios guardados, pero Stripe falló: ${data.error ?? "error desconocido"}`);
+          } else {
+            toast.success("Curso actualizado y precio en Stripe actualizado.");
+          }
+        } catch {
+          toast.warn("Cambios guardados, pero no se pudo conectar con Stripe.");
+        }
+      } else {
+        toast.success("Curso actualizado.");
+      }
+
       router.push(`/${locale}/admin/academy/courses`);
     } catch (err) {
       if (err instanceof Error) {
@@ -378,6 +426,51 @@ export default function AdminAcademyEditCoursePage() {
                     placeholder="Contá de qué trata el curso..."
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            name="price"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Precio (en centavos, 0 = gratis)</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="number"
+                    min={0}
+                    step={1}
+                    placeholder="4900"
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            name="currency"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Moneda</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccioná moneda" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="eur">EUR — Euro</SelectItem>
+                    <SelectItem value="usd">USD — Dólar</SelectItem>
+                    <SelectItem value="gbp">GBP — Libra</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
