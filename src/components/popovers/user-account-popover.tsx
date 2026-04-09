@@ -17,6 +17,7 @@ import {
   CreditCard,
   ShieldCheck,
   FlaskConical,
+  Crown,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
@@ -35,6 +36,7 @@ export function UserAccountPopover() {
   const t = useTranslations("header.userAccount");
 
   const email = user?.emailAddresses?.[0]?.emailAddress || 'test@test.com';
+  const isPremium = (user?.publicMetadata as Record<string, unknown>)?.isPremium === true;
   const displayName = user?.username || t("defaultUser");
   const userPhotoURL = user?.imageUrl || 'https://github.com/shadcn.png';
 
@@ -161,7 +163,15 @@ export function UserAccountPopover() {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <p className="text-sm font-medium">{displayName}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium">{displayName}</p>
+                {isPremium && (
+                  <span className="flex items-center gap-1 text-xs font-semibold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
+                    <Crown className="size-3" />
+                    Premium
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-muted-foreground">{email}</p>
             </div>
           </div>
