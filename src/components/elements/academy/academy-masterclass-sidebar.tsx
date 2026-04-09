@@ -73,7 +73,9 @@ export function AcademyMasterclassSidebar({
           </p>
         </div>
 
-        <div className="text-3xl font-extrabold">€199</div>
+        <div className="text-3xl font-extrabold">
+          {masterclass.price ? `€${(masterclass.price / 100).toFixed(2)}` : "€199"}
+        </div>
 
         <ul className="space-y-2 text-xs text-muted-foreground">
           <li className="flex items-center gap-2">
