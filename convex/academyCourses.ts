@@ -1,4 +1,4 @@
-import { mutation, query, type MutationCtx } from "./_generated/server";
+import { internalMutation, mutation, query, type MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { v } from "convex/values";
 
@@ -649,11 +649,13 @@ export const getPurchasedCoursePlayerBySlug = query({
         .unique(),
       ctx.db
         .query("subscriptions")
-        .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", identity.subject))
-        .unique(),
+        .withIndex("by_clerk_user_and_status", (q) =>
+          q.eq("clerkUserId", identity.subject).eq("status", "active")
+        )
+        .first(),
     ]);
 
-    const isPremium = subscription?.status === "active";
+    const isPremium = subscription !== null;
     if (!enrollment && !(isPremium && (course.includedInPremium ?? false))) {
       return { accessDenied: true as const };
     }
@@ -1243,7 +1245,7 @@ export const setIncludedInPremium = mutation({
   },
 });
 
-export const patchIncludedInPremium = mutation({
+export const patchIncludedInPremium = internalMutation({
   args: {
     courseId: v.id("academyCourses"),
     includedInPremium: v.boolean(),
@@ -1281,8 +1283,10 @@ export const getAcademyCoursesWithAccess = query({
     const [subscription, enrollments] = await Promise.all([
       ctx.db
         .query("subscriptions")
-        .withIndex("by_clerk_user", (q) => q.eq("clerkUserId", identity.subject))
-        .unique(),
+        .withIndex("by_clerk_user_and_status", (q) =>
+          q.eq("clerkUserId", identity.subject).eq("status", "active")
+        )
+        .first(),
       ctx.db
         .query("academyCourseEnrollments")
         .withIndex("by_token", (q) =>
@@ -1291,7 +1295,7 @@ export const getAcademyCoursesWithAccess = query({
         .take(500),
     ]);
 
-    const isPremium = subscription?.status === "active";
+    const isPremium = subscription !== null;
     const enrolledIds = new Set(enrollments.map((e) => String(e.courseId)));
 
     return coursesWithMeta.map((course) => ({
