@@ -87,8 +87,13 @@ export default function ApiAiPage() {
           return updated;
         });
       }
-    } catch {
-      setError("No se pudo conectar al servidor.");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.toLowerCase().includes("failed to fetch") || msg.toLowerCase().includes("networkerror")) {
+        setError("Error de red — posible problema de CORS o servidor caído. Detalle: " + msg);
+      } else {
+        setError("Error al conectar: " + msg);
+      }
     } finally {
       setIsLoading(false);
     }
