@@ -159,6 +159,7 @@ export default defineSchema({
     .index("by_user_and_course", ["userId", "courseId"])
     .index("by_email_and_course", ["email", "courseId"]),
 
+  // One record per user (upserted on each RC webhook). revenueCatEventType stores last event for debugging.
   subscriptions: defineTable({
     clerkUserId: v.string(),
     revenueCatCustomerId: v.string(),
@@ -171,10 +172,12 @@ export default defineSchema({
       v.literal("billing_issue")
     ),
     planType: v.union(v.literal("monthly"), v.literal("annual")),
-    currentPeriodEnd: v.number(),
+    currentPeriodEnd: v.number(), // Unix epoch seconds (from RevenueCat expiration_at_ms / 1000)
+    // last RC webhook event type (e.g. INITIAL_PURCHASE, RENEWAL)
     revenueCatEventType: v.string(),
   })
     .index("by_clerk_user", ["clerkUserId"])
+    .index("by_clerk_user_and_status", ["clerkUserId", "status"])
     .index("by_revenuecat_customer", ["revenueCatCustomerId"]),
 
   subscriptionOfferings: defineTable({
