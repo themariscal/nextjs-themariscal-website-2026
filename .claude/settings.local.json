@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm /Users/martinmacmini/00-NuevasApps/nextjs-themariscal-website-2026/.git/worktrees/claude-reveneucat-integration/index.lock)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
