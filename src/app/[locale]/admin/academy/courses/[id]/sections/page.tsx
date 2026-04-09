@@ -40,6 +40,13 @@ type SectionWithElements = {
   elements: SectionElement[];
 };
 
+function formatPrice(price?: number, currency?: string): string {
+  if (!price || price === 0) return "Gratis";
+  const amount = price / 100;
+  const symbol = currency?.toUpperCase() === "USD" ? "$" : "€";
+  return `${symbol}${amount.toFixed(2)} ${(currency ?? "eur").toUpperCase()}`;
+}
+
 function parseDurationToSeconds(value?: string): number {
   if (!value) return 0;
 
@@ -140,10 +147,22 @@ export default function AdminAcademyCourseSectionsPage() {
       containerClassName="max-w-6xl"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
-        <div>
+        <div className="flex items-center gap-2">
           {stats.totalSections} secciones · {stats.totalElements} elementos · {formatDuration(stats.totalSeconds)} duración total
+          <Badge variant="outline" className="text-xs">
+            {formatPrice(course.price, course.currency)}
+          </Badge>
         </div>
         <div className="flex items-center gap-2">
+          {course.stripeProductId && (
+            <Button
+              variant="outline"
+              className="cursor-pointer"
+              onClick={() => window.open(`https://dashboard.stripe.com/test/products/${course.stripeProductId}`, "_blank")}
+            >
+              Ver en Stripe
+            </Button>
+          )}
           <Button
             variant="outline"
             className="cursor-pointer"
