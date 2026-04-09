@@ -187,6 +187,7 @@ export default function PurchasedCoursePlayerPage() {
     Id<"academyCourseSectionElements"> | null
   >(null);
   const [youtubeApiReady, setYoutubeApiReady] = useState(false);
+  const [isPlayerReady, setIsPlayerReady] = useState(false);
 
   const playerContainerRef = useRef<HTMLDivElement | null>(null);
   const playerRef = useRef<YouTubePlayer | null>(null);
@@ -203,13 +204,14 @@ export default function PurchasedCoursePlayerPage() {
     : null;
 
   const activeVideoId = useMemo(() => {
-    if (!activeElement) return playerData?.course?.youtubeVideoId ?? "";
-    if (activeElement.contentUrl) {
-      const fromContentUrl = extractYouTubeVideoId(activeElement.contentUrl);
+    const selectedElement = activeElement ?? firstElement;
+    if (!selectedElement) return playerData?.course?.youtubeVideoId ?? "";
+    if (selectedElement.contentUrl) {
+      const fromContentUrl = extractYouTubeVideoId(selectedElement.contentUrl);
       if (fromContentUrl) return fromContentUrl;
     }
     return playerData?.course?.youtubeVideoId ?? "";
-  }, [activeElement, playerData?.course?.youtubeVideoId]);
+  }, [activeElement, firstElement, playerData?.course?.youtubeVideoId]);
 
   const progressByElement = useMemo(
     () => playerData?.progressByElement ?? {},
@@ -353,6 +355,7 @@ export default function PurchasedCoursePlayerPage() {
           onReady: (event) => {
             playerRef.current = event.target;
             isPlayerReadyRef.current = true;
+            setIsPlayerReady(true);
             currentVideoIdRef.current = activeVideoId;
             if (startSeconds > 0) {
               event.target.seekTo(Math.floor(startSeconds), true);
@@ -378,7 +381,7 @@ export default function PurchasedCoursePlayerPage() {
       return;
     }
 
-    if (currentVideoIdRef.current !== activeVideoId && isPlayerReadyRef.current) {
+    if (currentVideoIdRef.current !== activeVideoId && isPlayerReady) {
       const startSeconds = getResumeSecondsForElement(activeElementId);
       const player = playerRef.current;
       if (!player) return;
@@ -405,7 +408,14 @@ export default function PurchasedCoursePlayerPage() {
       }
       currentVideoIdRef.current = activeVideoId;
     }
-  }, [activeElementId, activeVideoId, getResumeSecondsForElement, persistProgress, youtubeApiReady]);
+  }, [
+    activeElementId,
+    activeVideoId,
+    getResumeSecondsForElement,
+    isPlayerReady,
+    persistProgress,
+    youtubeApiReady,
+  ]);
 
   useEffect(() => {
     if (!playerRef.current) return;
@@ -457,6 +467,7 @@ export default function PurchasedCoursePlayerPage() {
         playerRef.current = null;
       }
       isPlayerReadyRef.current = false;
+      setIsPlayerReady(false);
     };
   }, []);
 
