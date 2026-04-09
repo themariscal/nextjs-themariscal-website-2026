@@ -949,6 +949,7 @@ function CoursePurchaseSidebar({
   courseData,
   stats,
   locale,
+  courseSlug,
 }: {
   courseData: PublicCourseData | null | undefined;
   stats: {
@@ -957,6 +958,7 @@ function CoursePurchaseSidebar({
     totalSeconds: number;
   };
   locale: string;
+  courseSlug: string;
 }) {
   const [isBuying, setIsBuying] = useState(false);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
@@ -1047,6 +1049,9 @@ function CoursePurchaseSidebar({
                   setIsBuying(true);
                   try {
                     await enrollForFree({ courseId: courseData._id });
+                  } catch (err) {
+                    console.error("enrollForFree error:", err);
+                    // User will see the button re-enable; logged-out user needs to sign in
                   } finally {
                     setIsBuying(false);
                   }
@@ -1061,20 +1066,22 @@ function CoursePurchaseSidebar({
                 onClick={async () => {
                   if (!courseData) return;
                   setIsBuying(true);
+                  let navigating = false;
                   try {
                     const res = await fetch("/api/stripe/checkout", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ courseId: courseData._id, locale }),
+                      body: JSON.stringify({ courseId: courseData._id, locale, courseSlug }),
                     });
                     const data = await res.json() as { sessionUrl?: string };
                     if (data.sessionUrl) {
+                      navigating = true;
                       window.location.href = data.sessionUrl;
                     }
                   } catch {
                     // Stripe redirect failed
                   } finally {
-                    setIsBuying(false);
+                    if (!navigating) setIsBuying(false);
                   }
                 }}
                 disabled={isBuying}
@@ -1165,9 +1172,11 @@ function CoursePurchaseSidebar({
 function CourseMobilePurchaseBar({
   courseData,
   locale,
+  courseSlug,
 }: {
   courseData: PublicCourseData | null | undefined;
   locale: string;
+  courseSlug: string;
 }) {
   const isPlayerCollapsed = useMusicStore((state) => state.isPlayerCollapsed);
   const { isCollapsed } = useSidebarStore();
@@ -1196,7 +1205,9 @@ function CourseMobilePurchaseBar({
             </p>
           </div>
 
-          {hasPurchased ? (
+          {hasPurchased === undefined ? (
+            <Skeleton className="h-12 flex-1" />
+          ) : hasPurchased ? (
             <Button className="h-12 flex-1 text-base font-semibold cursor-pointer" disabled>
               Continuar aprendiendo
             </Button>
@@ -1206,8 +1217,14 @@ function CourseMobilePurchaseBar({
               disabled={isBuying}
               onClick={async () => {
                 setIsBuying(true);
-                try { await enrollForFree({ courseId: courseData._id }); }
-                finally { setIsBuying(false); }
+                try {
+                  await enrollForFree({ courseId: courseData._id });
+                } catch (err) {
+                  console.error("enrollForFree error:", err);
+                  // User will see the button re-enable; logged-out user needs to sign in
+                } finally {
+                  setIsBuying(false);
+                }
               }}
             >
               {isBuying ? "..." : "Inscribirme gratis"}
@@ -1218,16 +1235,22 @@ function CourseMobilePurchaseBar({
               disabled={isBuying}
               onClick={async () => {
                 setIsBuying(true);
+                let navigating = false;
                 try {
                   const res = await fetch("/api/stripe/checkout", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ courseId: courseData._id, locale }),
+                    body: JSON.stringify({ courseId: courseData._id, locale, courseSlug }),
                   });
                   const data = await res.json() as { sessionUrl?: string };
-                  if (data.sessionUrl) window.location.href = data.sessionUrl;
+                  if (data.sessionUrl) {
+                    navigating = true;
+                    window.location.href = data.sessionUrl;
+                  }
                 } catch { /* ignore */ }
-                finally { setIsBuying(false); }
+                finally {
+                  if (!navigating) setIsBuying(false);
+                }
               }}
             >
               {isBuying ? "..." : "Comprar"}
@@ -1408,11 +1431,11 @@ export default function PublicAcademyCoursePage() {
           <PrincipalLayout
             hero={<CourseHero courseData={courseData} stats={stats} />}
             content={<CourseMainContent courseData={courseData} />}
-            rightSidebar={<CoursePurchaseSidebar courseData={courseData} stats={stats} locale={locale} />}
+            rightSidebar={<CoursePurchaseSidebar courseData={courseData} stats={stats} locale={locale} courseSlug={courseSlug} />}
             containerWidthClassName="max-w-[86rem]"
           />
         </div>
-        <CourseMobilePurchaseBar courseData={courseData} locale={locale} />
+        <CourseMobilePurchaseBar courseData={courseData} locale={locale} courseSlug={courseSlug} />
         <CourseMarketplaceFooter />
       </div>
     </MainLayout>
