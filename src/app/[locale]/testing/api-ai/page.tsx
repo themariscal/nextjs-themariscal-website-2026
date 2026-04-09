@@ -3,11 +3,12 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 
-const VPS_URL = "http://kact3j9asa5t056a6tawpsuw.187.77.87.209.sslip.io/chat";
+const VPS_BASE = "http://kact3j9asa5t056a6tawpsuw.187.77.87.209.sslip.io";
 
 type Message = {
   role: "user" | "assistant";
   content: string;
+  service?: string;
 };
 
 export default function ApiAiPage() {
@@ -16,11 +17,32 @@ export default function ApiAiPage() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState<string>("auto");
+  const [availableServices, setAvailableServices] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Load available services on mount
+  useEffect(() => {
+    async function loadServices() {
+      try {
+        const token = await getToken();
+        const res = await fetch(`${VPS_BASE}/services`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (res.ok) {
+          const data = await res.json() as { services: string[] };
+          setAvailableServices(data.services);
+        }
+      } catch {
+        // Non-critical, silently ignore
+      }
+    }
+    loadServices();
+  }, [getToken]);
 
   async function sendMessage() {
     const content = input.trim();
@@ -42,21 +64,23 @@ export default function ApiAiPage() {
         return;
       }
 
-      console.log("[API AI] Enviando request a:", VPS_URL);
-      console.log("[API AI] Token obtenido:", token.slice(0, 20) + "...");
-      console.log("[API AI] Mensajes:", updatedMessages.length);
+      const body: { messages: Message[]; service?: string } = {
+        messages: updatedMessages.map(({ role, content }) => ({ role, content })),
+      };
+      if (selectedService !== "auto") body.service = selectedService;
 
-      const res = await fetch(VPS_URL, {
+      console.log("[API AI] Enviando a:", `${VPS_BASE}/chat`, "| servicio:", selectedService);
+
+      const res = await fetch(`${VPS_BASE}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ messages: updatedMessages }),
+        body: JSON.stringify(body),
       });
 
-      console.log("[API AI] Respuesta status:", res.status);
-      console.log("[API AI] Headers CORS:", res.headers.get("access-control-allow-origin"));
+      console.log("[API AI] Status:", res.status, "| CORS:", res.headers.get("access-control-allow-origin"));
 
       if (res.status === 401) {
         setError("No autorizado — verifica tu sesión Clerk.");
@@ -64,7 +88,8 @@ export default function ApiAiPage() {
         return;
       }
       if (!res.ok) {
-        setError(`Error del servidor AI (${res.status}).`);
+        const errBody = await res.text();
+        setError(`Error del servidor (${res.status}): ${errBody}`);
         setIsLoading(false);
         return;
       }
@@ -74,8 +99,10 @@ export default function ApiAiPage() {
         return;
       }
 
+      const serviceUsed = res.headers.get("x-service-used") ?? undefined;
+
       // Add empty assistant message to fill via streaming
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: "", service: serviceUsed }]);
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -90,17 +117,18 @@ export default function ApiAiPage() {
           updated[updated.length - 1] = {
             role: "assistant",
             content: accumulated,
+            service: serviceUsed,
           };
           return updated;
         });
       }
     } catch (e) {
-      console.error("[API AI] Error completo:", e);
+      console.error("[API AI] Error:", e);
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.toLowerCase().includes("failed to fetch") || msg.toLowerCase().includes("networkerror")) {
-        setError("Error de red — posible problema de CORS o servidor caído. Detalle: " + msg);
+        setError("Error de red — CORS o servidor caído. Detalle: " + msg);
       } else {
-        setError("Error al conectar: " + msg);
+        setError("Error: " + msg);
       }
     } finally {
       setIsLoading(false);
@@ -115,8 +143,22 @@ export default function ApiAiPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-6rem)] max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">API AI — Test</h1>
+    <div className="flex flex-col h-[calc(100vh-6rem)]">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">API AI — Test</h1>
+        <select
+          value={selectedService}
+          onChange={(e) => setSelectedService(e.target.value)}
+          disabled={isLoading}
+          className="rounded-lg border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+        >
+          <option value="auto">Auto (round-robin)</option>
+          {availableServices.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+      </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
@@ -128,8 +170,11 @@ export default function ApiAiPage() {
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+            className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}
           >
+            {msg.role === "assistant" && msg.service && (
+              <span className="text-xs text-muted-foreground mb-1 px-1">{msg.service}</span>
+            )}
             <div
               className={`rounded-lg px-4 py-2 max-w-[80%] whitespace-pre-wrap text-sm ${
                 msg.role === "user"
@@ -171,13 +216,9 @@ export default function ApiAiPage() {
         </button>
       </div>
 
-      {/* Clear */}
       {messages.length > 0 && (
         <button
-          onClick={() => {
-            setMessages([]);
-            setError(null);
-          }}
+          onClick={() => { setMessages([]); setError(null); }}
           className="mt-2 text-xs text-muted-foreground hover:text-foreground transition-colors self-start"
         >
           Limpiar chat
