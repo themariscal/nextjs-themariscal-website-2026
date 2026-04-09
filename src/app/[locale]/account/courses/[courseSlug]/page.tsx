@@ -195,6 +195,7 @@ export default function PurchasedCoursePlayerPage() {
   const isPlayerReadyRef = useRef(false);
   const saveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const watchedByElementRef = useRef<Record<string, number>>({});
+  const hasInitializedActiveElementRef = useRef(false);
 
   const activeElement = activeElementId ? elementById.get(String(activeElementId)) ?? null : null;
   const activeSectionId = activeElementId
@@ -221,6 +222,21 @@ export default function PurchasedCoursePlayerPage() {
     isCompleted: false,
   };
 
+  const nextUncompletedElement = useMemo(() => {
+    for (const section of sections) {
+      for (const element of section.elements) {
+        const elementProgress = progressByElement[String(element._id)];
+        const isCompleted = Boolean(
+          elementProgress?.manualCompleted || elementProgress?.autoCompleted
+        );
+        if (!isCompleted) {
+          return element;
+        }
+      }
+    }
+    return null;
+  }, [progressByElement, sections]);
+
   const tabs = ["Overview", "Q&A", "Notes", "Announcements", "Reviews", "Learning tools"];
 
   useEffect(() => {
@@ -231,15 +247,38 @@ export default function PurchasedCoursePlayerPage() {
       return;
     }
 
+    const hasActiveElement =
+      activeElementId !== null && elementById.has(String(activeElementId));
+    if (hasInitializedActiveElementRef.current && hasActiveElement) {
+      return;
+    }
+
+    if (nextUncompletedElement) {
+      setActiveElementId(nextUncompletedElement._id);
+      hasInitializedActiveElementRef.current = true;
+      return;
+    }
+
     if (playerData.lastPlayback?.elementId && elementById.has(String(playerData.lastPlayback.elementId))) {
       setActiveElementId(playerData.lastPlayback.elementId);
+      hasInitializedActiveElementRef.current = true;
       return;
     }
 
     if (firstElement) {
       setActiveElementId(firstElement._id);
+      hasInitializedActiveElementRef.current = true;
     }
-  }, [courseSlug, elementById, firstElement, locale, playerData, router]);
+  }, [
+    activeElementId,
+    courseSlug,
+    elementById,
+    firstElement,
+    locale,
+    nextUncompletedElement,
+    playerData,
+    router,
+  ]);
 
   useEffect(() => {
     let isMounted = true;

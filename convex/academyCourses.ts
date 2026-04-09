@@ -1082,3 +1082,34 @@ export const renumberSectionTitles = mutation({
     return { updated, total: sections.length };
   },
 });
+
+export const removeCourseElementById = mutation({
+  args: {
+    elementId: v.id("academyCourseSectionElements"),
+  },
+  handler: async (ctx, args) => {
+    const element = await ctx.db.get(args.elementId);
+    if (!element) {
+      return { removed: false as const };
+    }
+
+    const sectionId = element.sectionId;
+    await ctx.db.delete(args.elementId);
+
+    const remaining = await ctx.db
+      .query("academyCourseSectionElements")
+      .withIndex("by_section_and_order", (q) => q.eq("sectionId", sectionId))
+      .order("asc")
+      .take(500);
+
+    for (let index = 0; index < remaining.length; index += 1) {
+      const item = remaining[index];
+      const nextOrder = index + 1;
+      if ((item.order ?? nextOrder) !== nextOrder) {
+        await ctx.db.patch(item._id, { order: nextOrder });
+      }
+    }
+
+    return { removed: true as const, sectionId };
+  },
+});
