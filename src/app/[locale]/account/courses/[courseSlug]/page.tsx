@@ -286,14 +286,14 @@ export default function PurchasedCoursePlayerPage() {
       return;
     }
 
-    if (nextUncompletedElement) {
-      setActiveElementId(nextUncompletedElement._id);
+    if (playerData.lastPlayback?.elementId && elementById.has(String(playerData.lastPlayback.elementId))) {
+      setActiveElementId(playerData.lastPlayback.elementId);
       hasInitializedActiveElementRef.current = true;
       return;
     }
 
-    if (playerData.lastPlayback?.elementId && elementById.has(String(playerData.lastPlayback.elementId))) {
-      setActiveElementId(playerData.lastPlayback.elementId);
+    if (nextUncompletedElement) {
+      setActiveElementId(nextUncompletedElement._id);
       hasInitializedActiveElementRef.current = true;
       return;
     }
@@ -367,6 +367,27 @@ export default function PurchasedCoursePlayerPage() {
     [activeElement?.durationLabel, activeElementId, activeSectionId, playerData?.course?._id, upsertPlayback]
   );
 
+  const persistSelectedElement = useCallback(
+    async (sectionId: Id<"academyCourseSections">, element: SectionElement) => {
+      const courseId = playerData?.course?._id;
+      if (!courseId) return;
+
+      const durationSeconds = element.durationLabel
+        ? parseDurationToSeconds(element.durationLabel)
+        : 0;
+
+      await upsertPlayback({
+        courseId,
+        sectionId,
+        elementId: element._id,
+        positionSeconds: 0,
+        watchedSeconds: 0,
+        durationSeconds,
+      });
+    },
+    [playerData?.course?._id, upsertPlayback]
+  );
+
   useEffect(() => {
     if (!youtubeApiReady || !playerContainerRef.current || !activeVideoId) return;
 
@@ -395,6 +416,10 @@ export default function PurchasedCoursePlayerPage() {
           },
           onStateChange: async (event) => {
             currentPlayerStateRef.current = event.data;
+
+            if (event.data === 1) {
+              await persistProgress();
+            }
 
             if (event.data === 2) {
               await persistProgress();
@@ -683,13 +708,17 @@ export default function PurchasedCoursePlayerPage() {
                             role="button"
                             tabIndex={0}
                             className="flex min-w-0 flex-1 cursor-pointer items-start gap-2"
-                            onClick={() => setActiveElementId(element._id)}
-                            onKeyDown={(event) => {
-                              if (event.key === "Enter" || event.key === " ") {
-                                event.preventDefault();
-                                setActiveElementId(element._id);
-                              }
-                            }}
+                          onClick={() => {
+                            setActiveElementId(element._id);
+                            void persistSelectedElement(section._id, element);
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              setActiveElementId(element._id);
+                              void persistSelectedElement(section._id, element);
+                            }
+                          }}
                           >
                             <span className="pt-0.5 text-muted-foreground">
                               {isCompleted ? (
