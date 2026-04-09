@@ -196,6 +196,7 @@ export default function PurchasedCoursePlayerPage() {
   >(null);
   const [youtubeApiReady, setYoutubeApiReady] = useState(false);
   const [isPlayerReady, setIsPlayerReady] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
 
   const playerContainerRef = useRef<HTMLDivElement | null>(null);
   const playerRef = useRef<YouTubePlayer | null>(null);
@@ -215,6 +216,23 @@ export default function PurchasedCoursePlayerPage() {
     const index = sections.findIndex((section) => section._id === activeSectionId);
     return index >= 0 ? index : 0;
   }, [activeSectionId, sections]);
+
+  useEffect(() => {
+    if (sections.length === 0) return;
+    if (expandedSections.size > 0) return;
+
+    const next = new Set<string>();
+    const currentSection = sections[activeSectionIndex];
+    if (currentSection) {
+      next.add(String(currentSection._id));
+    }
+    const followingSection = sections[activeSectionIndex + 1];
+    if (followingSection) {
+      next.add(String(followingSection._id));
+    }
+
+    setExpandedSections(next);
+  }, [activeSectionIndex, expandedSections.size, sections]);
 
   const activeVideoId = useMemo(() => {
     const selectedElement = activeElement ?? firstElement;
@@ -612,17 +630,37 @@ export default function PurchasedCoursePlayerPage() {
           <div className="flex-1 space-y-4 overflow-y-auto p-3">
             {sections.map((section, sectionIndex) => (
               <div key={section._id} className="rounded-lg border border-border/60 bg-background/65">
-                <div className="flex items-start justify-between gap-2 border-b border-border/60 px-3 py-2">
+                <button
+                  type="button"
+                  className="flex w-full items-start justify-between gap-2 border-b border-border/60 px-3 py-2 text-left"
+                  onClick={() => {
+                    setExpandedSections((prev) => {
+                      const next = new Set(prev);
+                      const key = String(section._id);
+                      if (next.has(key)) {
+                        next.delete(key);
+                      } else {
+                        next.add(key);
+                      }
+                      return next;
+                    });
+                  }}
+                >
                   <div>
                     <p className="text-sm font-semibold">
                       Sección {sectionIndex + 1}: {section.name}
                     </p>
                     <p className="text-xs text-muted-foreground">{section.elements.length} lecciones</p>
                   </div>
-                  <ChevronDown className="mt-0.5 size-4 text-muted-foreground" />
-                </div>
+                  <ChevronDown
+                    className={cn(
+                      "mt-0.5 size-4 text-muted-foreground transition-transform",
+                      expandedSections.has(String(section._id)) ? "rotate-180" : ""
+                    )}
+                  />
+                </button>
 
-                {sectionIndex === activeSectionIndex || sectionIndex === activeSectionIndex + 1 ? (
+                {expandedSections.has(String(section._id)) ? (
                   <div className="space-y-1 p-2">
                     {section.elements.map((element, elementIndex) => {
                       const isActive = activeElementId === element._id;
@@ -696,11 +734,7 @@ export default function PurchasedCoursePlayerPage() {
                       );
                     })}
                   </div>
-                ) : (
-                  <div className="px-3 py-2 text-xs text-muted-foreground">
-                    Sección colapsada
-                  </div>
-                )}
+                ) : null}
               </div>
             ))}
 
