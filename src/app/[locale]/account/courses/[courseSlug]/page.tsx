@@ -182,6 +182,14 @@ export default function PurchasedCoursePlayerPage() {
     return map;
   }, [sections]);
 
+  const orderedElements = useMemo(
+    () =>
+      sections.flatMap((section) =>
+        section.elements.map((element) => ({ sectionId: section._id, element }))
+      ),
+    [sections]
+  );
+
   const [activeElementId, setActiveElementId] = useState<Id<"academyCourseSectionElements"> | null>(null);
   const [pendingCompletionElementId, setPendingCompletionElementId] = useState<
     Id<"academyCourseSectionElements"> | null
@@ -202,6 +210,11 @@ export default function PurchasedCoursePlayerPage() {
   const activeSectionId = activeElementId
     ? sectionByElementId.get(String(activeElementId)) ?? null
     : null;
+  const activeSectionIndex = useMemo(() => {
+    if (!activeSectionId) return 0;
+    const index = sections.findIndex((section) => section._id === activeSectionId);
+    return index >= 0 ? index : 0;
+  }, [activeSectionId, sections]);
 
   const activeVideoId = useMemo(() => {
     const selectedElement = activeElement ?? firstElement;
@@ -479,11 +492,25 @@ export default function PurchasedCoursePlayerPage() {
     setPendingCompletionElementId(elementId);
 
     try {
-      await toggleCompleted({
+      const result = await toggleCompleted({
         courseId: playerData!.course!._id,
         sectionId,
         elementId,
       });
+
+      if (result.completed) {
+        const currentIndex = orderedElements.findIndex(
+          (item) => item.element._id === elementId
+        );
+        const nextItem =
+          currentIndex >= 0 && currentIndex < orderedElements.length - 1
+            ? orderedElements[currentIndex + 1]
+            : null;
+
+        if (nextItem) {
+          setActiveElementId(nextItem.element._id);
+        }
+      }
     } finally {
       setPendingCompletionElementId(null);
     }
@@ -595,79 +622,85 @@ export default function PurchasedCoursePlayerPage() {
                   <ChevronDown className="mt-0.5 size-4 text-muted-foreground" />
                 </div>
 
-                <div className="space-y-1 p-2">
-                  {section.elements.map((element, elementIndex) => {
-                    const isActive = activeElementId === element._id;
-                    const elementProgress = progressByElement[String(element._id)];
-                    const isCompleted = Boolean(
-                      elementProgress?.manualCompleted || elementProgress?.autoCompleted
-                    );
+                {sectionIndex === activeSectionIndex || sectionIndex === activeSectionIndex + 1 ? (
+                  <div className="space-y-1 p-2">
+                    {section.elements.map((element, elementIndex) => {
+                      const isActive = activeElementId === element._id;
+                      const elementProgress = progressByElement[String(element._id)];
+                      const isCompleted = Boolean(
+                        elementProgress?.manualCompleted || elementProgress?.autoCompleted
+                      );
 
-                    return (
-                      <div
-                        key={element._id}
-                        className={cn(
-                          "flex items-start gap-2 rounded-md border px-2 py-2",
-                          isActive
-                            ? "border-primary/70 bg-primary/10"
-                            : "border-transparent hover:border-border hover:bg-muted/45"
-                        )}
-                      >
+                      return (
                         <div
-                          role="button"
-                          tabIndex={0}
-                          className="flex min-w-0 flex-1 cursor-pointer items-start gap-2"
-                          onClick={() => setActiveElementId(element._id)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter" || event.key === " ") {
-                              event.preventDefault();
-                              setActiveElementId(element._id);
-                            }
-                          }}
+                          key={element._id}
+                          className={cn(
+                            "flex items-start gap-2 rounded-md border px-2 py-2",
+                            isActive
+                              ? "border-primary/70 bg-primary/10"
+                              : "border-transparent hover:border-border hover:bg-muted/45"
+                          )}
                         >
-                          <span className="pt-0.5 text-muted-foreground">
-                            {isCompleted ? (
-                              <CheckCircle2 className="size-4 text-primary" />
-                            ) : (
-                              <Circle className="size-4" />
-                            )}
-                          </span>
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            className="flex min-w-0 flex-1 cursor-pointer items-start gap-2"
+                            onClick={() => setActiveElementId(element._id)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                setActiveElementId(element._id);
+                              }
+                            }}
+                          >
+                            <span className="pt-0.5 text-muted-foreground">
+                              {isCompleted ? (
+                                <CheckCircle2 className="size-4 text-primary" />
+                              ) : (
+                                <Circle className="size-4" />
+                              )}
+                            </span>
 
-                          <div className="min-w-0 flex-1">
-                            <p className="line-clamp-2 text-sm">
-                              {sectionIndex + 1}.{elementIndex + 1} {element.title}
-                            </p>
-                            <div className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
-                              {element.durationLabel ? (
-                                <span className="inline-flex items-center gap-1">
-                                  <Clock3 className="size-3" />
-                                  {element.durationLabel}
-                                </span>
-                              ) : null}
-                              {isActive ? <span className="text-primary">viendo ahora</span> : null}
+                            <div className="min-w-0 flex-1">
+                              <p className="line-clamp-2 text-sm">
+                                {sectionIndex + 1}.{elementIndex + 1} {element.title}
+                              </p>
+                              <div className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
+                                {element.durationLabel ? (
+                                  <span className="inline-flex items-center gap-1">
+                                    <Clock3 className="size-3" />
+                                    {element.durationLabel}
+                                  </span>
+                                ) : null}
+                                {isActive ? <span className="text-primary">viendo ahora</span> : null}
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant={isCompleted ? "secondary" : "outline"}
-                          disabled={pendingCompletionElementId === element._id}
-                          onClick={() => {
-                            void handleToggleCompleted(section._id, element._id);
-                          }}
-                        >
-                          {pendingCompletionElementId === element._id
-                            ? "..."
-                            : isCompleted
-                              ? "Listo"
-                              : "Completar"}
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant={isCompleted ? "secondary" : "outline"}
+                            disabled={pendingCompletionElementId === element._id}
+                            onClick={() => {
+                              void handleToggleCompleted(section._id, element._id);
+                            }}
+                          >
+                            {pendingCompletionElementId === element._id
+                              ? "..."
+                              : isCompleted
+                                ? "Listo"
+                                : "Completar"}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="px-3 py-2 text-xs text-muted-foreground">
+                    Sección colapsada
+                  </div>
+                )}
               </div>
             ))}
 
