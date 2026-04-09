@@ -153,6 +153,7 @@ export default function ApiAiPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string>("auto");
   const [availableServices, setAvailableServices] = useState<string[]>([]);
+  const [includeAuth, setIncludeAuth] = useState<boolean>(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -190,11 +191,16 @@ export default function ApiAiPage() {
     setIsLoading(true);
 
     try {
-      const token = await getToken();
-      if (!token) {
-        setError("No se pudo obtener token de sesión. Recarga la página.");
-        setIsLoading(false);
-        return;
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+
+      if (includeAuth) {
+        const token = await getToken();
+        if (!token) {
+          setError("No se pudo obtener token de sesión. Recarga la página.");
+          setIsLoading(false);
+          return;
+        }
+        headers["Authorization"] = `Bearer ${token}`;
       }
 
       const body: { messages: { role: string; content: string }[]; service?: string } = {
@@ -204,10 +210,7 @@ export default function ApiAiPage() {
 
       const res = await fetch(`${VPS_BASE}/chat`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers,
         body: JSON.stringify(body),
       });
 
@@ -266,19 +269,32 @@ export default function ApiAiPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-6rem)]">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
         <h1 className="text-2xl font-bold">API AI — Test</h1>
-        <select
-          value={selectedService}
-          onChange={(e) => setSelectedService(e.target.value)}
-          disabled={isLoading}
-          className="rounded-lg border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
-        >
-          <option value="auto">Auto (round-robin)</option>
-          {availableServices.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          <select
+            value={includeAuth ? "with" : "without"}
+            onChange={(e) => setIncludeAuth(e.target.value === "with")}
+            disabled={isLoading}
+            className={`rounded-lg border px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 bg-background ${
+              includeAuth ? "border-green-500/50 text-green-400" : "border-red-500/50 text-red-400"
+            }`}
+          >
+            <option value="with">Con auth Clerk</option>
+            <option value="without">Sin auth Clerk</option>
+          </select>
+          <select
+            value={selectedService}
+            onChange={(e) => setSelectedService(e.target.value)}
+            disabled={isLoading}
+            className="rounded-lg border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+          >
+            <option value="auto">Auto (round-robin)</option>
+            {availableServices.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
