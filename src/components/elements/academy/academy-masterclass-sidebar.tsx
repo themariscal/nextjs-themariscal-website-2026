@@ -47,7 +47,7 @@ export function AcademyMasterclassSidebar({
       >
         <Image
           src={`https://i.ytimg.com/vi/${masterclass.youtubeVideoId}/hqdefault.jpg`}
-          alt="Claude Code Masterclass"
+          alt={masterclass.name}
           fill
           className="object-cover transition-transform duration-200 group-hover:scale-105"
           sizes="320px"
@@ -62,7 +62,7 @@ export function AcademyMasterclassSidebar({
 
       <CardContent className="space-y-4 p-4">
         <div className="space-y-1">
-          <Badge variant="destructive" className="text-xs">
+          <Badge variant="outline" className="text-xs border-destructive text-destructive">
             No incluido en Premium
           </Badge>
           <h3 className="font-bold text-base leading-tight">

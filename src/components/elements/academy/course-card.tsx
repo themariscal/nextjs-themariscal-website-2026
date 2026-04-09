@@ -71,7 +71,7 @@ export function CourseCard({ course }: { course: CourseWithAccess }) {
           variant={isStarCourse ? "default" : course.includedInPremium ? "secondary" : "outline"}
           className="w-fit text-xs"
         >
-          {isStarCourse ? "⭐ " : ""}{badgeLabel}
+          {isStarCourse ? <span aria-hidden="true">⭐ </span> : ""}{badgeLabel}
         </Badge>
 
         <Link href={ctaHref} className="hover:underline">
