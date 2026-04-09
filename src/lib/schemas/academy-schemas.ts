@@ -17,10 +17,22 @@ export const createAcademySchemas = () => ({
     instructorId: z.string().trim().min(1, { message: "Seleccioná un instructor." }),
     description: z.string().trim().min(10, { message: "La descripción debe tener al menos 10 caracteres." }),
     price: z.preprocess(
-      (val) => (val === "" || val === undefined || val === null ? undefined : Number(val)),
-      z.number().min(0, { message: "El precio no puede ser negativo." }).optional()
+      (val) => {
+        if (val === "" || val === undefined || val === null) return undefined;
+        const n = Number(val);
+        return Number.isFinite(n) ? n : val; // keep non-numeric to trigger z.number() type error
+      },
+      z.number({ invalid_type_error: "El precio debe ser un número válido." })
+        .int({ message: "El precio debe ser un número entero (en centavos)." })
+        .min(0, { message: "El precio no puede ser negativo." })
+        .optional()
     ),
-    currency: z.string().length(3, { message: "Moneda inválida." }).optional().default("eur"),
+    currency: z
+      .string()
+      .length(3, { message: "Moneda inválida." })
+      .regex(/^[a-z]{3}$/, { message: "Moneda inválida. Usa un código ISO 4217 en minúsculas (ej: eur, usd)." })
+      .optional()
+      .default("eur"),
   }),
 
   addLanguageSchema: z.object({
