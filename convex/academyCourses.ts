@@ -1219,3 +1219,22 @@ export const appendMarkdownNotesToAllSections = mutation({
     };
   },
 });
+
+export const setIncludedInPremium = mutation({
+  args: {
+    courseId: v.id("academyCourses"),
+    includedInPremium: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.courseId, {
+      includedInPremium: args.includedInPremium,
+    });
+  },
+});
+
+export const listAllCourses = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("academyCourses").collect();
+  },
+});
