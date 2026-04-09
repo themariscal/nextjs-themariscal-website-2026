@@ -42,6 +42,10 @@ export default function ApiAiPage() {
         return;
       }
 
+      console.log("[API AI] Enviando request a:", VPS_URL);
+      console.log("[API AI] Token obtenido:", token.slice(0, 20) + "...");
+      console.log("[API AI] Mensajes:", updatedMessages.length);
+
       const res = await fetch(VPS_URL, {
         method: "POST",
         headers: {
@@ -50,6 +54,9 @@ export default function ApiAiPage() {
         },
         body: JSON.stringify({ messages: updatedMessages }),
       });
+
+      console.log("[API AI] Respuesta status:", res.status);
+      console.log("[API AI] Headers CORS:", res.headers.get("access-control-allow-origin"));
 
       if (res.status === 401) {
         setError("No autorizado — verifica tu sesión Clerk.");
@@ -88,6 +95,7 @@ export default function ApiAiPage() {
         });
       }
     } catch (e) {
+      console.error("[API AI] Error completo:", e);
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.toLowerCase().includes("failed to fetch") || msg.toLowerCase().includes("networkerror")) {
         setError("Error de red — posible problema de CORS o servidor caído. Detalle: " + msg);
