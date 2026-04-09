@@ -5,7 +5,7 @@ import { useAuth } from "@clerk/nextjs";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Lightbulb } from "lucide-react";
 
 const VPS_BASE = "http://kact3j9asa5t056a6tawpsuw.187.77.87.209.sslip.io";
 
@@ -35,6 +35,41 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
+/** Splits content into {thinking, response} parts based on <think>...</think> tags */
+function parseThinking(content: string): { thinking: string | null; response: string } {
+  const match = content.match(/^<think>([\s\S]*?)<\/think>\s*/);
+  if (match) {
+    return { thinking: match[1].trim(), response: content.slice(match[0].length).trim() };
+  }
+  // Still streaming the think block — no closing tag yet
+  const openOnly = content.match(/^<think>([\s\S]*)$/);
+  if (openOnly) {
+    return { thinking: openOnly[1].trim(), response: "" };
+  }
+  return { thinking: null, response: content };
+}
+
+function ThinkBlock({ content }: { content: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mb-2 rounded-lg border border-yellow-500/30 bg-yellow-500/5 overflow-hidden">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1.5 w-full px-3 py-1.5 text-xs text-yellow-400 hover:bg-yellow-500/10 transition-colors"
+      >
+        <Lightbulb size={13} className="shrink-0" />
+        <span className="font-medium">Razonamiento interno</span>
+        <span className="ml-auto text-yellow-500/60">{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div className="px-3 pb-2 text-xs text-yellow-300/80 whitespace-pre-wrap leading-relaxed border-t border-yellow-500/20 pt-2">
+          {content}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MessageBubble({ msg }: { msg: Message }) {
   const isUser = msg.role === "user";
 
@@ -53,8 +88,12 @@ function MessageBubble({ msg }: { msg: Message }) {
         >
           {isUser ? (
             <span className="whitespace-pre-wrap">{msg.content}</span>
-          ) : msg.content ? (
-            <ReactMarkdown
+          ) : msg.content ? (() => {
+            const { thinking, response } = parseThinking(msg.content);
+            return (
+              <>
+                {thinking !== null && <ThinkBlock content={thinking} />}
+                {response && <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeHighlight]}
               components={{
@@ -88,14 +127,18 @@ function MessageBubble({ msg }: { msg: Message }) {
                 strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
               }}
             >
-              {msg.content}
-            </ReactMarkdown>
-          ) : (
+                  {response}
+                </ReactMarkdown>}
+              </>
+            );
+          })() : (
             <span className="animate-pulse text-muted-foreground">▋</span>
           )}
         </div>
         <div className="self-start pt-1.5">
-          {msg.content && <CopyButton text={msg.content} />}
+          {msg.content && (
+            <CopyButton text={isUser ? msg.content : parseThinking(msg.content).response || msg.content} />
+          )}
         </div>
       </div>
     </div>
