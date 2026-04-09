@@ -47,6 +47,7 @@ import {
   User,
   Video,
 } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -960,6 +961,7 @@ function CoursePurchaseSidebar({
   locale: string;
   courseSlug: string;
 }) {
+  const { user } = useUser();
   const [isBuying, setIsBuying] = useState(false);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const previewVideos = useMemo(
@@ -1071,7 +1073,7 @@ function CoursePurchaseSidebar({
                     const res = await fetch("/api/stripe/checkout", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ courseId: courseData._id, locale, courseSlug }),
+                      body: JSON.stringify({ courseId: courseData._id, locale, courseSlug, userEmail: user?.primaryEmailAddress?.emailAddress }),
                     });
                     const data = await res.json() as { sessionUrl?: string };
                     if (data.sessionUrl) {
@@ -1240,7 +1242,7 @@ function CourseMobilePurchaseBar({
                   const res = await fetch("/api/stripe/checkout", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ courseId: courseData._id, locale, courseSlug }),
+                    body: JSON.stringify({ courseId: courseData._id, locale, courseSlug, userEmail: user?.primaryEmailAddress?.emailAddress }),
                   });
                   const data = await res.json() as { sessionUrl?: string };
                   if (data.sessionUrl) {
