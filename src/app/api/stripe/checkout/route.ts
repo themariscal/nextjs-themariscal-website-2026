@@ -15,10 +15,11 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL);
  */
 export async function POST(req: NextRequest) {
   try {
-    const { courseId, courseSlug, locale } = (await req.json()) as {
+    const { courseId, courseSlug, locale, userEmail } = (await req.json()) as {
       courseId: string;
       courseSlug: string;
       locale: string;
+      userEmail?: string;
     };
 
     const course = await convex.query(api.academyCourses.getCourseById, {
@@ -42,6 +43,7 @@ export async function POST(req: NextRequest) {
       mode: "payment",
       line_items: [{ price: course.stripePriceId, quantity: 1 }],
       allow_promotion_codes: true,
+      ...(userEmail ? { customer_email: userEmail } : {}),
       success_url: `${baseUrl}/${locale}/academy/courses/${courseSlug}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/${locale}/academy/courses/${courseSlug}`,
       metadata: {
