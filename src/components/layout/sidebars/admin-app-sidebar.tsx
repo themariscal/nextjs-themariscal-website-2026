@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ChevronDown, Clapperboard, GraduationCap, Image, User2 } from "lucide-react";
+import { ChevronDown, Clapperboard, Crown, GraduationCap, Image, User2 } from "lucide-react";
 
 import {
   Sidebar,
@@ -36,6 +36,11 @@ const items = [
     title: "Shorts",
     icon: Clapperboard,
     url: "/admin/shorts",
+  },
+  {
+    title: "Suscripciones",
+    icon: Crown,
+    url: "/admin/subscriptions",
   },
 ];
 

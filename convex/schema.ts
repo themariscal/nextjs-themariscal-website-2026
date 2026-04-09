@@ -39,6 +39,7 @@ export default defineSchema({
     // Stripe
     stripeProductId: v.optional(v.string()),
     stripePriceId: v.optional(v.string()),
+    includedInPremium: v.optional(v.boolean()),
   })
     .index("by_language", ["languageId"])
     .index("by_instructor", ["instructorId"]),
@@ -157,4 +158,37 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_user_and_course", ["userId", "courseId"])
     .index("by_email_and_course", ["email", "courseId"]),
+
+  // One record per user (upserted on each RC webhook). revenueCatEventType stores last event for debugging.
+  subscriptions: defineTable({
+    clerkUserId: v.string(),
+    revenueCatCustomerId: v.string(),
+    productIdentifier: v.string(),
+    entitlementId: v.string(),
+    status: v.union(
+      v.literal("active"),
+      v.literal("expired"),
+      v.literal("cancelled"),
+      v.literal("billing_issue")
+    ),
+    planType: v.union(v.literal("monthly"), v.literal("annual")),
+    currentPeriodEnd: v.number(), // Unix epoch seconds (from RevenueCat expiration_at_ms / 1000)
+    // last RC webhook event type (e.g. INITIAL_PURCHASE, RENEWAL)
+    revenueCatEventType: v.string(),
+  })
+    .index("by_clerk_user", ["clerkUserId"])
+    .index("by_clerk_user_and_status", ["clerkUserId", "status"])
+    .index("by_revenuecat_customer", ["revenueCatCustomerId"])
+    .index("by_status", ["status"]),
+
+  subscriptionOfferings: defineTable({
+    name: v.string(),
+    description: v.string(),
+    monthlyPriceUsd: v.number(),
+    annualPriceUsd: v.number(),
+    revenueCatProductIdMonthly: v.string(),
+    revenueCatProductIdAnnual: v.string(),
+    revenueCatOfferingId: v.string(),
+    isActive: v.boolean(),
+  }),
 });

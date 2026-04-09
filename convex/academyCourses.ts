@@ -1219,3 +1219,26 @@ export const appendMarkdownNotesToAllSections = mutation({
     };
   },
 });
+
+export const setIncludedInPremium = mutation({
+  args: {
+    courseId: v.id("academyCourses"),
+    includedInPremium: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized: must be logged in");
+    await ctx.db.patch(args.courseId, {
+      includedInPremium: args.includedInPremium,
+    });
+  },
+});
+
+export const listAllCourses = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+    return await ctx.db.query("academyCourses").take(500);
+  },
+});

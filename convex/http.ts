@@ -118,6 +118,94 @@ http.route({
   }),
 });
 
+const ACTIVATE_EVENTS = new Set(["INITIAL_PURCHASE", "RENEWAL", "UNCANCELLATION"]);
+const DEACTIVATE_EVENTS = new Set(["CANCELLATION", "EXPIRATION", "BILLING_ISSUE"]);
+
+http.route({
+  path: "/api/webhooks/revenuecat",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    // Verify RC webhook secret
+    const authHeader = request.headers.get("Authorization");
+    const webhookSecret = process.env.REVENUECAT_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      return new Response("Server misconfiguration", { status: 500 });
+    }
+    if (authHeader !== `Bearer ${webhookSecret}`) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
+    let event: {
+      type: string;
+      app_user_id: string;
+      product_id: string;
+      expiration_at_ms?: number;
+      entitlement_ids?: string[];
+    };
+    try {
+      const payload = await request.json() as { event: typeof event };
+      event = payload.event;
+    } catch {
+      return new Response("Invalid JSON", { status: 400 });
+    }
+
+    const { type: eventType, app_user_id: clerkUserId, product_id } = event;
+
+    if (!ACTIVATE_EVENTS.has(eventType) && !DEACTIVATE_EVENTS.has(eventType)) {
+      return new Response(JSON.stringify({ received: true }), { status: 200 });
+    }
+
+    const isActive = ACTIVATE_EVENTS.has(eventType);
+    const status = isActive
+      ? "active"
+      : eventType === "CANCELLATION"
+        ? "cancelled"
+        : eventType === "BILLING_ISSUE"
+          ? "billing_issue"
+          : "expired";
+
+    const planType: "monthly" | "annual" = (product_id.toLowerCase().includes("annual") || product_id.toLowerCase().includes("yearly"))
+      ? "annual"
+      : "monthly";
+    // For cancellation/billing_issue events without expiry, use far future (won't be shown as active)
+    const currentPeriodEnd = event.expiration_at_ms
+      ? Math.floor(event.expiration_at_ms / 1000)
+      : Math.floor(Date.now() / 1000);
+    const entitlementId = event.entitlement_ids?.[0] ?? "premium";
+
+    try {
+      await ctx.runMutation(internal.subscriptions.upsertSubscription, {
+        clerkUserId,
+        revenueCatCustomerId: clerkUserId,
+        productIdentifier: product_id,
+        entitlementId,
+        status: status as "active" | "expired" | "cancelled" | "billing_issue",
+        planType,
+        currentPeriodEnd,
+        revenueCatEventType: eventType,
+      });
+
+      // Update Clerk publicMetadata
+      const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+      if (clerkSecretKey) {
+        await fetch(`https://api.clerk.com/v1/users/${clerkUserId}/metadata`, {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${clerkSecretKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ public_metadata: { isPremium: isActive } }),
+        });
+      }
+    } catch (err) {
+      console.error("[rc-webhook]", err);
+      return new Response("Internal error", { status: 500 });
+    }
+
+    return new Response(JSON.stringify({ received: true }), { status: 200 });
+  }),
+});
+
 /**
  * Verifies a Stripe webhook signature using HMAC-SHA256.
  * The Stripe SDK is not available in Convex HTTP actions (V8 runtime),
