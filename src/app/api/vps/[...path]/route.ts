@@ -16,6 +16,13 @@ async function handler(
   }
 
   const { path } = await params;
+  const ALLOWED_PATHS = new Set(['chat', 'services']);
+  if (!ALLOWED_PATHS.has(path[0])) {
+    return new Response(JSON.stringify({ error: 'Not found' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
   const targetUrl = `${VPS_API_URL}/${path.join('/')}`;
 
   const forwardHeaders: Record<string, string> = {};
