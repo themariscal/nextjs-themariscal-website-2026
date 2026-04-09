@@ -140,6 +140,8 @@ export default function AdminAcademyEditCoursePage() {
         languageId: languageIdValue as Id<"courseLanguages">,
         instructorId: instructorIdValue as Id<"courseInstructors">,
         description: values.description,
+        price: values.price,
+        currency: values.currency,
       });
 
       // Stripe price change logic
