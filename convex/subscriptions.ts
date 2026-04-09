@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 /**
@@ -7,7 +7,7 @@ import { v } from "convex/values";
  * the Next.js webhook route via ConvexHttpClient.
  * One record per user — patches existing if found, inserts if new.
  */
-export const upsertSubscription = mutation({
+export const upsertSubscription = internalMutation({
   args: {
     clerkUserId: v.string(),
     revenueCatCustomerId: v.string(),
@@ -71,7 +71,7 @@ export const listActiveSubscribers = query({
   handler: async (ctx) => {
     return await ctx.db
       .query("subscriptions")
-      .filter((q) => q.eq(q.field("status"), "active"))
+      .withIndex("by_status", (q) => q.eq("status", "active"))
       .take(200);
   },
 });

@@ -178,7 +178,8 @@ export default defineSchema({
   })
     .index("by_clerk_user", ["clerkUserId"])
     .index("by_clerk_user_and_status", ["clerkUserId", "status"])
-    .index("by_revenuecat_customer", ["revenueCatCustomerId"]),
+    .index("by_revenuecat_customer", ["revenueCatCustomerId"])
+    .index("by_status", ["status"]),
 
   subscriptionOfferings: defineTable({
     name: v.string(),
