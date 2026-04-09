@@ -22,6 +22,12 @@ export type CourseWithAccess = {
 
 const RATINGS = [4.7, 4.8, 4.9] as const;
 
+function ratingIndex(id: string): number {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0;
+  return Math.abs(hash) % RATINGS.length;
+}
+
 function formatPrice(price?: number): string {
   if (!price || price === 0) return "Gratis";
   return `€${(price / 100).toFixed(2)}`;
@@ -32,7 +38,7 @@ export function CourseCard({ course }: { course: CourseWithAccess }) {
   const locale = (params?.locale as string) ?? "en";
 
   const isStarCourse = course.slug === "claude-code-masterclass";
-  const rating = RATINGS[course._id.length % 3];
+  const rating = RATINGS[ratingIndex(course._id)];
   const priceDisplay = formatPrice(course.price);
 
   const badgeLabel = isStarCourse
