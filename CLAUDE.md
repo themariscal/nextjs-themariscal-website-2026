@@ -50,7 +50,7 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **claude-obsidian** (1617 symbols, 2816 relationships, 9 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **nextjs-themariscal-website-2026** (1879 symbols, 3077 relationships, 9 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 
@@ -66,7 +66,7 @@ This project is indexed by GitNexus as **claude-obsidian** (1617 symbols, 2816 r
 
 1. `gitnexus_query({query: "<error or symptom>"})` — find execution flows related to the issue
 2. `gitnexus_context({name: "<suspect function>"})` — see all callers, callees, and process participation
-3. `READ gitnexus://repo/claude-obsidian/process/{processName}` — trace the full execution flow step by step
+3. `READ gitnexus://repo/nextjs-themariscal-website-2026/process/{processName}` — trace the full execution flow step by step
 4. For regressions: `gitnexus_detect_changes({scope: "compare", base_ref: "main"})` — see what your branch changed
 
 ## When Refactoring
@@ -105,10 +105,10 @@ This project is indexed by GitNexus as **claude-obsidian** (1617 symbols, 2816 r
 
 | Resource | Use for |
 |----------|---------|
-| `gitnexus://repo/claude-obsidian/context` | Codebase overview, check index freshness |
-| `gitnexus://repo/claude-obsidian/clusters` | All functional areas |
-| `gitnexus://repo/claude-obsidian/processes` | All execution flows |
-| `gitnexus://repo/claude-obsidian/process/{name}` | Step-by-step execution trace |
+| `gitnexus://repo/nextjs-themariscal-website-2026/context` | Codebase overview, check index freshness |
+| `gitnexus://repo/nextjs-themariscal-website-2026/clusters` | All functional areas |
+| `gitnexus://repo/nextjs-themariscal-website-2026/processes` | All execution flows |
+| `gitnexus://repo/nextjs-themariscal-website-2026/process/{name}` | Step-by-step execution trace |
 
 ## Self-Check Before Finishing
 
@@ -148,3 +148,65 @@ To check whether embeddings exist, inspect `.gitnexus/meta.json` — the `stats.
 | Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
 
 <!-- gitnexus:end -->
+
+<!-- obsidian:start -->
+## Obsidian Vault — Project Memory
+
+The `obsidian/` folder is the **primary documentation and memory** for this project. It is an Obsidian vault tracked in git.
+
+### Structure
+```
+obsidian/
+  _index.md          ← master entry point, links to everything
+  architecture/      ← stack, modules, Convex backend, frontend
+  flows/             ← execution flows (auth, API, Convex queries)
+  features/          ← one note per feature/page
+  decisions/         ← Architecture Decision Records (ADR format)
+  progress/          ← milestones and feature status
+  notes/             ← ad-hoc notes
+```
+
+### Commands
+
+**"update obsidian map"** / **"actualiza el mapa"**
+Claude runs this pipeline:
+1. `npx gitnexus analyze` — refresh the knowledge graph
+2. Read `gitnexus://repo/nextjs-themariscal-website-2026/context`, `clusters`, `processes`
+3. Query `gitnexus_query` for architecture, flows, and features detail
+4. Regenerate/overwrite notes in `architecture/`, `flows/`, `features/`
+5. Update `updated:` frontmatter in changed notes
+6. Update `_index.md` if new notes were added
+7. Report list of updated files
+
+Never deletes notes. Never touches `decisions/`, `progress/`, `notes/`.
+
+**"save to obsidian: [content]"** / **"guarda en obsidian"** / **"guarda esto en obsidian"**
+Claude determines the correct folder:
+- Architectural decision → `decisions/YYYY-MM-DD-[topic].md`
+- Feature status/progress → `progress/[feature]-status.md`
+- Ad-hoc note → `notes/YYYY-MM-DD-[topic].md`
+
+After writing: adds link to `_index.md`, reports the path.
+
+### Note Format
+
+Every generated note uses YAML frontmatter:
+```yaml
+---
+title: "Note Title"
+type: architecture | flow | feature | decision | progress | note
+updated: YYYY-MM-DD
+tags: [relevant, tags]
+---
+```
+Notes use `[[wiki-links]]` to connect related notes for Obsidian graph view.
+
+### Auto-Documentation
+
+Claude writes to Obsidian automatically (without being asked) after:
+- A significant architectural decision is made during a work session
+- A new feature is completed
+- Something non-obvious about the codebase is discovered
+
+Always reports the saved path.
+<!-- obsidian:end -->
