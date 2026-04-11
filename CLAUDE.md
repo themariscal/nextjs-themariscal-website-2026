@@ -50,7 +50,7 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **nextjs-themariscal-website-2026** (1733 symbols, 2932 relationships, 9 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **nextjs-themariscal-website-2026** (1879 symbols, 3077 relationships, 9 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 
